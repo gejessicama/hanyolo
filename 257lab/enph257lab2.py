@@ -5,15 +5,11 @@ import matplotlib.pyplot as plt
 import pylab as pyl
 import time
 
-plt.ion()
-plt.figure(figsize=(20, 20))
-plt.title("Temperature of a vertical Rod as a function of distance and time", fontsize=20)
-plt.xlabel("Sensor", fontsize=18)
-plt.ylabel("Temperature ($^oC$)", fontsize=18)
-plt.grid('on')
+# plt.ion()
+
 
 # initialize serial
-port_name = "COM5"
+port_name = "COM6"
 baudrate = 9600
 ser = serial.Serial(port_name, baudrate)
 
@@ -22,6 +18,7 @@ timestr = time.strftime("%Y%m%d-%H%M")
 datafile = open(timestr + ".csv", "w+")
 datafile.write("A1,A2,A3,A4,A5,time\n")
 
+X = [1, 2, 3, 4, 5]
 # read data into an array
 
 
@@ -30,18 +27,40 @@ def read_data():
     while data.isspace():  # if faulty reading (whitespace), keep trying
         data = ser.readline().decode()
     datafile.write(data)
-    return list(map(int, data.split(",")))
+    return list(map(float, data.split(",")))
 
-
-msmt = [0] * 5
-temp = msmt[:6]
-X = [1, 2, 3, 4, 5]
-graph = plt.plot(X, temp)[0]
-
+plt.show()
 
 while True:
     msmt = read_data()
-    temp = msmt[:6]
-    graph.set_ydata(temp)
-    plt.draw()
+    plt.title("Temperature of a vertical Rod as a function of distance and time", fontsize=20)
+    plt.xlabel("Sensor", fontsize=18)
+    plt.ylabel("Temperature ($^oC$)", fontsize=18)
+    plt.grid('on')
+    plt.plot(X, msmt[:5])
     plt.pause(0.01)
+    plt.clf()
+
+'''
+def addPoint(xs, ys, axis, colour="r", shape="o"):
+    """
+    animate the plot of the error
+
+    @param xs a list of x points
+    @param ys a list of y points
+    @param axis i.e suplot
+    """
+    axis.plot(xs, ys, colour + shape)
+    return True
+
+        fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
+        fig.set_size_inches(10, 10)
+        ax1.set_title("RMS Error")
+        ax1.set(ylabel="Error")
+        ax2.set_title("Learning Rate")
+        ax2.set(ylabel="Rate")
+        plt.xlabel("Epoch number")
+        plt.tight_layout()
+        # plt.draw()
+        animate.FuncAnimation(fig, addPoint)  # animate the function
+'''
