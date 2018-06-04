@@ -31,12 +31,15 @@ plt.show()
 
 while True:
     msmt = read_data()
-    #print(msmt)
+    print(msmt)
     plt.title("Temperature of a vertical rod as a function of distance and time")
     plt.xlabel("Sensor #")
     plt.ylabel("Temperature ($^oC$)")
     plt.grid('on')
-    plt.scatter(X, msmt[:5])
+    try:
+        plt.scatter(X, msmt[:5])
+    except ValueError:
+        pass
     plt.axis([0,6,0,50])
     plt.pause(0.01)
     plt.clf()
