@@ -1,3 +1,7 @@
+"""
+This is a script to plot the data obtained from the Arduino on a 3d plot.
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mt
@@ -8,6 +12,11 @@ from matplotlib import animation
 
 
 def plot(filename):
+    """
+    This method reads the csv file and turns it into
+    an array to be used for plotting in main
+
+    """
     with open(filename, 'r') as file:
         reader = csv.reader(file)
         data = list(reader)
@@ -28,6 +37,12 @@ def plot(filename):
 
 
 def fix(filename, output='fixed.csv'):
+    """
+    This method tries to fix the csv data by getting rid of
+    the lines that contain more than 6 numbers.
+    This does not look at the values of the data to determine if the
+    data is correct; Need to write a method for that in the future.
+    """
     with open(filename, 'r') as file:
         reader = csv.reader(file)
         data = list(reader)
@@ -46,6 +61,10 @@ def fix(filename, output='fixed.csv'):
 
 
 def main(Animate=False):
+    """
+    This is the main method that does the plotting.
+
+    """
     filename = input("please enter the file name: ")
 
     # fix(filename)
@@ -86,7 +105,6 @@ def main(Animate=False):
             ax.set_zlabel('Temp $^oC$', fontsize=18)
 
             # draw new
-
             for i in range(5):
                 ax.scatter(X[:, i:i + 1], Y[:, :], Z[:, i:i + 1], c=Z[:, i:i + 1].reshape(Z[:, i:i + 1].size,), cmap="plasma")
 
@@ -95,8 +113,8 @@ def main(Animate=False):
             return line.get_children()  # need this to make it work
 
         ani = animation.FuncAnimation(fig, update, range(1, Temp.shape[0], 1000), interval=100, blit=True)
-
         plt.show()
+
     else:
         ax.set_xlim3d(0, 6)
         ax.set_ylim3d(0, time[-1] + 10000)
