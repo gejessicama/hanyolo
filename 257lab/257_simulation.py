@@ -1,6 +1,12 @@
+"""
+    Simulation of heat wave from specified constants.
+    Run from main
+    Will plot graph of T vs X iteratively over time
+    Wait for time threshold to be reached or force stop python to stop simulation
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.integrate import quad
 import math
 
 def HeatEquation_w_convection_radiation():
@@ -79,3 +85,6 @@ def HeatEquation_w_convection_radiation():
             plt.xlabel("Position on rod (m)")
             plt.title('T[0] = %d,T[N] = %d, t = %d'%(T[0],T[N-1],t))
             plt.pause(0.0001)
+
+if __name__ == "__main__":
+    HeatEquation_w_convection_radiation()
