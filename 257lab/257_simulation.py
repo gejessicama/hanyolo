@@ -79,3 +79,6 @@ def HeatEquation_w_convection_radiation():
             plt.xlabel("Position on rod (m)")
             plt.title('T[0] = %d,T[N] = %d, t = %d'%(T[0],T[N-1],t))
             plt.pause(0.0001)
+
+if __name__ == "__main__":
+    HeatEquation_w_convection_radiation()
