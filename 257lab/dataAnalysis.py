@@ -48,10 +48,11 @@ def fix(filename, output='fixed.csv'):
     with open(filename, 'r') as file:
         reader = csv.reader(file)
         data = list(reader)
+        print("size of original:{}".format(len(data)))
         data2 = []
         for line in data:
             l = [x.strip() for x in line if x != '' and ".." not in x and ',' not in x and not bool(re.search(r'\.\d+\.', x))]
-            if len(l) == 6:
+            if len(l) == 7:
                 data2.append(l)
 
         for i in range(1, len(data2)):
@@ -60,6 +61,7 @@ def fix(filename, output='fixed.csv'):
     with open(output, 'w') as file:
         writer = csv.writer(file)
         writer.writerows(data2)
+    print("size of fixed{}".format(len(data2)))
 
 
 def main(Animate=False, smooth=False):
@@ -69,11 +71,12 @@ def main(Animate=False, smooth=False):
     """
     filename = input("please enter the file name: ")
 
-    fix(filename)
+    # fix(filename)
 
     data = plot(filename)
     Temp = data[:, :5].reshape(data[:, :5].size // 5, 5)
-    time = data[:, 5:].reshape(data[:, 5:].size, 1)
+    time = data[:, 6:].reshape(data[:, 6:].size, 1)
+    POWER = data[:, 5:6].reshape(data[:, 5:6].size, 1)
     x = np.ones(Temp.shape) * [1, 2, 3, 4, 5]
     x = x.reshape(x.size // 5, 5)
 
@@ -100,9 +103,9 @@ def main(Animate=False, smooth=False):
     else:
         Temp_smooth = Temp
 
-    fig = plt.figure(figsize=(10, 10))
-    ax = p3.Axes3D(fig)
-    ax.view_init(28, 159)
+    # fig = plt.figure(figsize=(10, 10))
+    # ax = p3.Axes3D(fig)
+    # ax.view_init(28, 159)
 
     if Animate == True:
         X = np.zeros((0, 0))
@@ -142,17 +145,25 @@ def main(Animate=False, smooth=False):
         plt.show()
 
     else:
-        ax.set_xlim3d(0, 6)
-        ax.set_ylim3d(0, time[-1] + 10000)
-        ax.set_zlim3d(0, 70)
-        ax.set_title("Temperature of a Rod as a function of time and distance", fontsize=25)
-        ax.set_xlabel('Sensor location', fontsize=18)
-        ax.set_ylabel('Time (ms)', fontsize=18)
-        ax.set_zlabel('Temp $^oC$', fontsize=18)
+        # ax.set_xlim3d(0, 6)
+        # ax.set_ylim3d(0, time[-1] + 10000)
+        # ax.set_zlim3d(0, 70)
+        # ax.set_title("Temperature of a Rod as a function of time and distance", fontsize=25)
+        # ax.set_xlabel('Sensor location', fontsize=18)
+        # ax.set_ylabel('Time (ms)', fontsize=18)
+        # ax.set_zlabel('Temp $^oC$', fontsize=18)
+
+        size = [20 for i in range(POWER.size)]
+        plt.scatter(time, 30 * POWER, s=size)
 
         for i in range(5):
-            ax.scatter(x[:, i:i + 1], time[:, :], Temp_smooth[:, i:i + 1], c=Temp[:, i:i + 1].reshape(Temp[:, i:i + 1].size,), cmap="plasma")
+            #ax.scatter(x[:, i:i + 1], time[:, :], Temp_smooth[:, i:i + 1], c=Temp[:, i:i + 1].reshape(Temp[:, i:i + 1].size,), cmap="plasma")
+            plt.scatter(time, Temp[:, i:i + 1], label=i)
+
         #ax.plot_surface(x, time, Temp, cmap=cm.plasma)
+        plt.axis([time[5000], time[5000] + 128 * 1000, 0, 40])
+        plt.legend("best")
+        plt.grid()
         plt.show()
 
 if __name__ == '__main__':
