@@ -73,8 +73,13 @@ def main(Animate=True, smooth=False, scatter=False, fixData=False):
 
     """
     filename = input("please enter the file name: ")
+<<<<<<< HEAD
     if fixData:
         fix(filename)  # the output
+=======
+
+    fix(filename)
+>>>>>>> 9a16d881fb3a2bfb8c0313eefafcf01cbab8a6d0
 
     data = plot(filename)
     Temp = data[:, :5].reshape(data[:, :5].size // 5, 5)
