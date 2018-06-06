@@ -67,14 +67,14 @@ def fix(filename, output='fixed.csv'):
     print("size of fixed{}".format(len(data2)))
 
 
-def main(Animate=False, smooth=False):
+def main(Animate=True, smooth=False, scatter=False, fixData=False):
     """
     This is the main method that does the plotting.
 
     """
     filename = input("please enter the file name: ")
-
-    #fix(filename)
+    if fixData:
+        fix(filename)  # the output
 
     data = plot(filename)
     Temp = data[:, :5].reshape(data[:, :5].size // 5, 5)
@@ -136,11 +136,12 @@ def main(Animate=False, smooth=False):
             ax.set_zlabel('Temp $^oC$', fontsize=18)
 
             # draw new
+            if scatter:
+                for i in range(5):
+                    ax.scatter(X[:, i:i + 1], Y[:, :], Z[:, i:i + 1], c=Z[:, i:i + 1].reshape(Z[:, i:i + 1].size,), cmap="plasma")
 
-            for i in range(5):
-                ax.scatter(X[:, i:i + 1], Y[:, :], Z[:, i:i + 1], c=Z[:, i:i + 1].reshape(Z[:, i:i + 1].size,), cmap="plasma")
-
-            # ax.plot_surface(X, Y, Z, cmap=cm.plasma)
+            else:
+                ax.plot_surface(X, Y, Z, cmap=cm.plasma)
 
             return line.get_children()  # need this to make it work
 
@@ -159,11 +160,13 @@ def main(Animate=False, smooth=False):
         #size = [20 for i in range(POWER.size)]
         #plt.scatter(time, 30 * POWER, s=size)
 
-        for i in range(5):
-            ax.scatter(x[:, i:i + 1], time[:, :], Temp_smooth[:, i:i + 1], c=Temp[:, i:i + 1].reshape(Temp[:, i:i + 1].size,), cmap="plasma")
-            # plt.scatter(time, Temp[:, i:i + 1], label=i)
+        if scatter:
+            for i in range(5):
+                ax.scatter(x[:, i:i + 1], time[:, :], Temp_smooth[:, i:i + 1], c=Temp[:, i:i + 1].reshape(Temp[:, i:i + 1].size,), cmap="plasma")
+                # plt.scatter(time, Temp[:, i:i + 1], label=i)
 
-        # ax.plot_surface(x, time, Temp, cmap=cm.plasma)
+        else:
+            ax.plot_surface(x, time, Temp, cmap=cm.plasma)
         # plt.axis([time[5000], time[5000] + 128 * 1000, 0, 40])
         # plt.legend("best")
         # plt.grid()
