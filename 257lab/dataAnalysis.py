@@ -9,6 +9,8 @@ from matplotlib import cm
 import csv
 import mpl_toolkits.mplot3d.axes3d as p3
 from matplotlib import animation
+import re
+from scipy.signal import butter, filtfilt
 
 
 def plot(filename):
@@ -46,11 +48,15 @@ def fix(filename, output='fixed.csv'):
     with open(filename, 'r') as file:
         reader = csv.reader(file)
         data = list(reader)
+        print("size of original:{}".format(len(data)))
         data2 = []
         for line in data:
-            l = [x for x in line if x != '']
-            if len(l) == 6:
+            l = [x.strip() for x in line if x != '' and ".." not in x and ',' not in x and not bool(re.search(r'\.\d+\.', x))]
+            if len(l) == 7:
                 data2.append(l)
+            else:
+                pass
+                # print("{}".format(l))
 
         for i in range(1, len(data2)):
             data2[i] = list(map(float, data2[i]))
@@ -58,22 +64,47 @@ def fix(filename, output='fixed.csv'):
     with open(output, 'w') as file:
         writer = csv.writer(file)
         writer.writerows(data2)
+    print("size of fixed{}".format(len(data2)))
 
 
-def main(Animate=False):
+def main(Animate=False, smooth=False):
     """
     This is the main method that does the plotting.
 
     """
     filename = input("please enter the file name: ")
 
-    # fix(filename)
+    #fix(filename)
 
     data = plot(filename)
     Temp = data[:, :5].reshape(data[:, :5].size // 5, 5)
-    time = data[:, 5:].reshape(data[:, 5:].size, 1)
+    time = data[:, 6:].reshape(data[:, 6:].size, 1)
+    POWER = data[:, 5:6].reshape(data[:, 5:6].size, 1)
     x = np.ones(Temp.shape) * [1, 2, 3, 4, 5]
     x = x.reshape(x.size // 5, 5)
+
+    if smooth:
+        # smooth out the data
+        def butter_lowpass(cutoff, fs, order=5):
+            nyq = 0.5 * fs
+            normal_cutoff = cutoff / nyq
+            b, a = butter(order, normal_cutoff, btype='low', analog=True)
+            return b, a
+
+        def butter_lowpass_filtfilt(data, cutoff, fs, order=5):
+            b, a = butter_lowpass(cutoff, fs, order=order)
+            print(data.shape)
+            y = filtfilt(b, a, np.ravel(data))
+            return y
+
+        cutoff = 1500
+        fs = 50000
+        Temp_smooth = [butter_lowpass_filtfilt(x, cutoff, fs) for x in Temp.transpose()]
+        Temp_smooth = np.array(Temp_smooth)
+        Temp_smooth = Temp_smooth.transpose()
+
+    else:
+        Temp_smooth = Temp
 
     fig = plt.figure(figsize=(10, 10))
     ax = p3.Axes3D(fig)
@@ -92,7 +123,7 @@ def main(Animate=False):
         def update(N):
             X = np.array(x[:N, :])
             Y = np.array(time[:N, :])
-            Z = np.array(Temp[:N, :])
+            Z = np.array(Temp_smooth[:N, :])
 
             ax.clear()  # clear prev
             # settings
@@ -105,10 +136,11 @@ def main(Animate=False):
             ax.set_zlabel('Temp $^oC$', fontsize=18)
 
             # draw new
+
             for i in range(5):
                 ax.scatter(X[:, i:i + 1], Y[:, :], Z[:, i:i + 1], c=Z[:, i:i + 1].reshape(Z[:, i:i + 1].size,), cmap="plasma")
 
-            #ax.plot_surface(X, Y, Z, cmap=cm.plasma)
+            # ax.plot_surface(X, Y, Z, cmap=cm.plasma)
 
             return line.get_children()  # need this to make it work
 
@@ -124,9 +156,17 @@ def main(Animate=False):
         ax.set_ylabel('Time (ms)', fontsize=18)
         ax.set_zlabel('Temp $^oC$', fontsize=18)
 
+        #size = [20 for i in range(POWER.size)]
+        #plt.scatter(time, 30 * POWER, s=size)
+
         for i in range(5):
-            ax.scatter(x[:, i:i + 1], time[:, :], Temp[:, i:i + 1], c=Temp[:, i:i + 1].reshape(Temp[:, i:i + 1].size,), cmap="plasma")
-        #ax.plot_surface(x, time, Temp, cmap=cm.plasma)
+            ax.scatter(x[:, i:i + 1], time[:, :], Temp_smooth[:, i:i + 1], c=Temp[:, i:i + 1].reshape(Temp[:, i:i + 1].size,), cmap="plasma")
+            # plt.scatter(time, Temp[:, i:i + 1], label=i)
+
+        # ax.plot_surface(x, time, Temp, cmap=cm.plasma)
+        # plt.axis([time[5000], time[5000] + 128 * 1000, 0, 40])
+        # plt.legend("best")
+        # plt.grid()
         plt.show()
 
 if __name__ == '__main__':
