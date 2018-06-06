@@ -1,3 +1,10 @@
+"""
+    Simulation of heat wave from specified constants.
+    Run from main
+    Will plot graph of T vs X iteratively over time
+    Wait for time threshold to be reached or force stop python to stop simulation
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import math
