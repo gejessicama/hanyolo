@@ -9,6 +9,8 @@ from matplotlib import cm
 import csv
 import mpl_toolkits.mplot3d.axes3d as p3
 from matplotlib import animation
+import re
+from scipy.signal import butter, filtfilt
 
 
 def plot(filename):
@@ -48,7 +50,7 @@ def fix(filename, output='fixed.csv'):
         data = list(reader)
         data2 = []
         for line in data:
-            l = [x for x in line if x != '']
+            l = [x.strip() for x in line if x != '' and ".." not in x and ',' not in x and not bool(re.search(r'\.\d+\.', x))]
             if len(l) == 6:
                 data2.append(l)
 
@@ -60,20 +62,43 @@ def fix(filename, output='fixed.csv'):
         writer.writerows(data2)
 
 
-def main(Animate=False):
+def main(Animate=False, smooth=False):
     """
     This is the main method that does the plotting.
 
     """
     filename = input("please enter the file name: ")
 
-    # fix(filename)
+    fix(filename)
 
     data = plot(filename)
     Temp = data[:, :5].reshape(data[:, :5].size // 5, 5)
     time = data[:, 5:].reshape(data[:, 5:].size, 1)
     x = np.ones(Temp.shape) * [1, 2, 3, 4, 5]
     x = x.reshape(x.size // 5, 5)
+
+    if smooth:
+        # smooth out the data
+        def butter_lowpass(cutoff, fs, order=5):
+            nyq = 0.5 * fs
+            normal_cutoff = cutoff / nyq
+            b, a = butter(order, normal_cutoff, btype='low', analog=True)
+            return b, a
+
+        def butter_lowpass_filtfilt(data, cutoff, fs, order=5):
+            b, a = butter_lowpass(cutoff, fs, order=order)
+            print(data.shape)
+            y = filtfilt(b, a, np.ravel(data))
+            return y
+
+        cutoff = 1500
+        fs = 50000
+        Temp_smooth = [butter_lowpass_filtfilt(x, cutoff, fs) for x in Temp.transpose()]
+        Temp_smooth = np.array(Temp_smooth)
+        Temp_smooth = Temp_smooth.transpose()
+
+    else:
+        Temp_smooth = Temp
 
     fig = plt.figure(figsize=(10, 10))
     ax = p3.Axes3D(fig)
@@ -92,7 +117,7 @@ def main(Animate=False):
         def update(N):
             X = np.array(x[:N, :])
             Y = np.array(time[:N, :])
-            Z = np.array(Temp[:N, :])
+            Z = np.array(Temp_smooth[:N, :])
 
             ax.clear()  # clear prev
             # settings
@@ -105,6 +130,7 @@ def main(Animate=False):
             ax.set_zlabel('Temp $^oC$', fontsize=18)
 
             # draw new
+
             for i in range(5):
                 ax.scatter(X[:, i:i + 1], Y[:, :], Z[:, i:i + 1], c=Z[:, i:i + 1].reshape(Z[:, i:i + 1].size,), cmap="plasma")
 
@@ -125,7 +151,7 @@ def main(Animate=False):
         ax.set_zlabel('Temp $^oC$', fontsize=18)
 
         for i in range(5):
-            ax.scatter(x[:, i:i + 1], time[:, :], Temp[:, i:i + 1], c=Temp[:, i:i + 1].reshape(Temp[:, i:i + 1].size,), cmap="plasma")
+            ax.scatter(x[:, i:i + 1], time[:, :], Temp_smooth[:, i:i + 1], c=Temp[:, i:i + 1].reshape(Temp[:, i:i + 1].size,), cmap="plasma")
         #ax.plot_surface(x, time, Temp, cmap=cm.plasma)
         plt.show()
 
