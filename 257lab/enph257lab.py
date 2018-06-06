@@ -11,7 +11,7 @@ ser = serial.Serial(port_name, baudrate)
 # creates file with dated name
 timestr = time.strftime("%Y%m%d-%H%M")
 datafile = open("data/"+ timestr + ".csv", "w+")
-datafile.write("A1,A2,A3,A4,A5,time\n")
+datafile.write("A1,A2,A3,A4,A5,heat,time\n")
 
 # x-axis
 X = [1, 2, 3, 4, 5]
