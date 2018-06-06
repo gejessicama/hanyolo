@@ -74,7 +74,7 @@ def main(Animate=False, smooth=False):
     """
     filename = input("please enter the file name: ")
 
-    fix(filename)
+    #fix(filename)
 
     data = plot(filename)
     Temp = data[:, :5].reshape(data[:, :5].size // 5, 5)
