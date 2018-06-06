@@ -17,7 +17,8 @@ def HeatEquation_w_convection_radiation():
     k, c, p = 205.0, 900.0, 2700.0 #Thermal conductivity, specific heat,
     kc,eps,sig = 5,1,5.67*10**-8 #Convection coefficient, Stefan-Boltzman constant, emissivity
 
-    Pin = 15 #Resistor output power
+    Pin_0 = 12
+    Pin = Pin_0 #Resistor output power
     T_amb = 20.0 + 273.15 #Ammbient temperature
     cons = (k / (c * p)) #Thermal difussivity
     P_dT_conv = c * p * math.pi* r ** 2 * dx #coefficient for converting power to temperature
@@ -69,12 +70,12 @@ def HeatEquation_w_convection_radiation():
         # At each half cycle turn power on/off
         t +=dt
         if( t%(Period/2) == 0):
-            print 'pin = ',Pin
-            print 't = ', t
-            if (Pin == 10):
+            #print 'pin = ',Pin
+            #print 't = ', t
+            if (Pin == Pin_0):
                 Pin = 0
             else:
-                Pin = 10
+                Pin = Pin_0
 
         #display plot after every 10 data points sampled to reduce time delay
         if(t%(dt*10) == 0):
