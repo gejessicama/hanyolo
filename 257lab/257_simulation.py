@@ -7,13 +7,12 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.integrate import quad
 import math
 
 def HeatEquation_w_convection_radiation(show_sim,sensor_sim,total_t):
     """
         Function plots graphs of the heat equation simulation
-        
+
     :param show_sim: (bool) show simulation of rod T wrt x over time if true
     :param sensor_sim: (bool) show T at each sensor wrt time
     :param total_t: total time for simulation run
@@ -35,7 +34,7 @@ def HeatEquation_w_convection_radiation(show_sim,sensor_sim,total_t):
     # Set initial temperatures for the rod
     T = [T_amb for x in range(N)]
     x = [i * dx for i in range(N)]
-    s1,s2,s3,s4,s5 = 0.01,0.08,0.15,0.22,0.29#1.0,8.2,15.2,22.5,29.4 #reverse
+    s1,s2,s3,s4,s5 = 0.01,0.08,0.15,0.22,0.29#1.0,8.2,15.2,22.5,29.4 #reverse numbering to physical experiment
     is1,is2,is3,is4,is5 = 0,0,0,0,0
     for i in range(len(x)):
         if x[i] == s1:
@@ -48,7 +47,7 @@ def HeatEquation_w_convection_radiation(show_sim,sensor_sim,total_t):
             is4 = i
         if x[i] == s5:
             is5 = i
-    print 'indices ', is1,is2,is3,is4,is5
+    #print 'indices ', is1,is2,is3,is4,is5
     """
     T_0,T_ = 20,0
     kw,w = 10.5,0.0185
@@ -112,9 +111,6 @@ def HeatEquation_w_convection_radiation(show_sim,sensor_sim,total_t):
     if sensor_sim:
         t_arr = np.linspace(0,thresh,thresh/dt)
         T_t = np.transpose(np.vstack(T_t))
-        print T_t[0][0]
-        print list(T_t[:][2])
-        print list(T_t[:][0])
 
         plt.close()
         plt.plot(t_arr,T_t[:][0],label='s1')
