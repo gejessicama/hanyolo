@@ -12,7 +12,8 @@ import math
 
 def HeatEquation_w_convection_radiation(show_sim,sensor_sim,total_t):
     """
-
+        Function plots graphs of the heat equation simulation
+        
     :param show_sim: (bool) show simulation of rod T wrt x over time if true
     :param sensor_sim: (bool) show T at each sensor wrt time
     :param total_t: total time for simulation run
