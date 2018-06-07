@@ -34,8 +34,8 @@ def HeatEquation_w_convection_radiation(show_sim,sensor_sim,total_t):
     # Set initial temperatures for the rod
     T = [T_amb for x in range(N)]
     x = [i * dx for i in range(N)]
-    s1,s2,s3,s4,s5 = 0.01,0.08,0.15,0.22,0.29#1.0,8.2,15.2,22.5,29.4 #reverse numbering to physical experiment
-    is1,is2,is3,is4,is5 = 0,0,0,0,0
+    s1,s2,s3,s4,s5 = 0.01,0.08,0.15,0.22,0.29#location of temperature sensors: 1.0,8.2,15.2,22.5,29.4 - reverse numbering to physical experiment
+    is1,is2,is3,is4,is5 = 0,0,0,0,0 # indices of sensors in x
     for i in range(len(x)):
         if x[i] == s1:
             is1 = i
