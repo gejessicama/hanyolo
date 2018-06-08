@@ -45,7 +45,7 @@ def get_data(filename):
     POWER = data[:, 5:6].reshape(data[:, 5:6].size, 1)
     x = np.ones(Temp.shape) * [1, 2, 3, 4, 5]
     x = x.reshape(x.size // 5, 5)
-    return data, x, Temp, POWER, x
+    return data, x, Temp, POWER, time
 
 
 def fix(filename, output='fixed.csv'):
@@ -77,7 +77,7 @@ def fix(filename, output='fixed.csv'):
     print("size of fixed{}".format(len(data2)))
 
 
-def main(Animate=True, smooth=False, scatter=False, fixData=False):
+def main(Animate=True, smooth=False, scatter=True, fixData=False):
     """
     This is the main method that does the plotting.
 
@@ -155,7 +155,7 @@ def main(Animate=True, smooth=False, scatter=False, fixData=False):
 
             return line.get_children()  # need this to make it work
 
-        ani = animation.FuncAnimation(fig, update, range(1, Temp.shape[0], 100), interval=100, blit=True)
+        ani = animation.FuncAnimation(fig, update, range(1, Temp.shape[0], 1000), interval=100, blit=True)
         plt.show()
 
     else:

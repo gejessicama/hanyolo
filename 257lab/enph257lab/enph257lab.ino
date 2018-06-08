@@ -15,7 +15,9 @@ void setup() {
   Serial.begin(9600);
   pinMode(8,INPUT);
 }
-void loop() {
+int S1 = 0;
+void loop() { 
+  //this loop takes about 40 ms
 
   pA1 = 0;
   pA2 = 0;
@@ -46,5 +48,5 @@ void loop() {
 
   // Print data to serial in string format, to be split in python
   //Serial.println(data);
-  delay(2);
+  delay(20);
 }
