@@ -40,9 +40,11 @@ void loop() {
   heat = digitalRead(8);
   
   // Converts pin readings to string in csv format
-  String data = String(t1) +  ',' + String(t2) +  ',' + String(t3) + ',' + String(t4) + ',' + String(t5) + ',' + String(heat) + ',' + String(millis());
+  Serial.print(t1); Serial.print(","); Serial.print(t2); Serial.print(","); Serial.print(t3); Serial.print(","); Serial.print(t4); Serial.print(",");
+  Serial.print(t5); Serial.print(","); Serial.print(heat); Serial.print(","); Serial.println(millis());
+  //String data = String(t1) +  ',' + String(t2) +  ',' + String(t3) + ',' + String(t4) + ',' + String(t5) + ',' + String(heat) + ',' + String(millis());
 
   // Print data to serial in string format, to be split in python
-  Serial.println(data);
+  //Serial.println(data);
   delay(2);
 }

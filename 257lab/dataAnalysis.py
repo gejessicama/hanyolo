@@ -38,6 +38,16 @@ def plot(filename):
     return np.array(data2)
 
 
+def get_data(filename):
+    data = plot(filename)
+    Temp = data[:, :5].reshape(data[:, :5].size // 5, 5)
+    time = data[:, 6:].reshape(data[:, 6:].size, 1)
+    POWER = data[:, 5:6].reshape(data[:, 5:6].size, 1)
+    x = np.ones(Temp.shape) * [1, 2, 3, 4, 5]
+    x = x.reshape(x.size // 5, 5)
+    return data, x, Temp, POWER, x
+
+
 def fix(filename, output='fixed.csv'):
     """
     This method tries to fix the csv data by getting rid of
@@ -145,7 +155,7 @@ def main(Animate=True, smooth=False, scatter=False, fixData=False):
 
             return line.get_children()  # need this to make it work
 
-        ani = animation.FuncAnimation(fig, update, range(1, Temp.shape[0], 1000), interval=100, blit=True)
+        ani = animation.FuncAnimation(fig, update, range(1, Temp.shape[0], 100), interval=100, blit=True)
         plt.show()
 
     else:
