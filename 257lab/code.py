@@ -47,7 +47,7 @@ while True:
     try:
         msmt = read_data()
         print(msmt)
-        plt.title("Temperature of a vertical rod as a function of distance and time")
+        plt.title("Temperature of a rod as a function of distance and time")
         plt.xlabel("Sensor #")
         plt.ylabel("Temperature ($^oC$)")
         plt.grid('on')
