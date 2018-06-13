@@ -9,14 +9,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
-def HeatEquation_w_convection_radiation(show_sim,sensor_sim,total_t):
+def HeatEquation_w_convection_radiation(show_sim=False,sensor_sim=False,gen_data=True,total_t=0):
     """
         Function plots graphs of the heat equation simulation
 
     :param show_sim: (bool) show simulation of rod T wrt x over time if true
     :param sensor_sim: (bool) show T at each sensor wrt time
+    :param gen_data: (bool) return data generated for T wrt t and the time array
     :param total_t: total time for simulation run
-    :return:
+    :return: t_arr (np.array), T_t (2d np.array) if gen_data
     """
     # Defining constants
     l, r = .3, 0.01 # length (m), radius (m) of rod
@@ -38,15 +39,15 @@ def HeatEquation_w_convection_radiation(show_sim,sensor_sim,total_t):
     is1,is2,is3,is4,is5 = 0,0,0,0,0 # indices of sensors in x
     for i in range(len(x)):
         if x[i] == s1:
-            is1 = i
+            is5 = i
         if x[i] == s2:
-            is2 = i
+            is4 = i
         if x[i] == s3:
             is3 = i
         if x[i] == s4:
-            is4 = i
+            is2 = i
         if x[i] == s5:
-            is5 = i
+            is1 = i
     #print 'indices ', is1,is2,is3,is4,is5
     """
     T_0,T_ = 20,0
@@ -56,10 +57,11 @@ def HeatEquation_w_convection_radiation(show_sim,sensor_sim,total_t):
     """
 
     T_t = []
+    t_arr = []
     # Run model of heat flow for time steps until threshold time limit is reached
     t = 0.0
-    thresh = total_t #time (s)
-    Period = 340 #period (s) of turning Pin on/off
+    thresh = (total_t) #time (s)
+    Period = 294 #period (s) of turning Pin on/off
     plt.show()
 
     while (t<thresh):
@@ -90,27 +92,30 @@ def HeatEquation_w_convection_radiation(show_sim,sensor_sim,total_t):
         # At each half cycle turn power on/off
         t +=dt
         if( t%(Period/2) == 0):
-            print 'pin = ',Pin
-            print 't = ', t
+            #print 'pin = ',Pin
+            #print 't = ', t
             if (Pin == Pin_0):
                 Pin = 0
             else:
                 Pin = Pin_0
         T_sens = [T[is1],T[is2],T[is3],T[is4],T[is5]]
         T_t.append(T_sens)
+        t_arr.append(t)
         #display plot after every 10 data points sampled to reduce time delay
         if(t%(dt*10) == 0 and show_sim):
             plt.clf()
             plt.scatter(x, T)
-            plt.title("Temperature versus position on the rod")
+            #plt.title("Temperature versus position on the rod")
             plt.ylabel("Temperature [K]")
             plt.xlabel("Position on rod [m]")
             plt.title('T[0] = %d,T[N] = %d, t = %d'%(T[0],T[N-1],t))
             plt.pause(0.00001)
 
     if sensor_sim:
-        t_arr = np.linspace(0,thresh,thresh/dt)
         T_t = np.transpose(np.vstack(T_t))
+
+        if gen_data:
+            return  t_arr,T_t
 
         plt.close()
         plt.plot(t_arr,T_t[:][0],label='s1')
@@ -119,10 +124,10 @@ def HeatEquation_w_convection_radiation(show_sim,sensor_sim,total_t):
         plt.plot(t_arr,T_t[:][3],label='s4')
         plt.plot(t_arr,T_t[:][4],label='s5')
         plt.legend(loc='lower right')
-        plt.title('Temp vs time')
+        #plt.title('Temp vs time')
         plt.xlabel('time[s]')
         plt.ylabel('Temp [C]')
         plt.show()
 
 if __name__ == "__main__":
-    HeatEquation_w_convection_radiation(False,True,10000)
+    HeatEquation_w_convection_radiation(True,False,False,10000)
