@@ -16,9 +16,18 @@ in an if statement
 def show(filename="goodData/Horizontal_heating_steady_state.csv"):
 
     filename = input("please enter the file name: ")
+    params = [0] * 5
+    vals = input("Enter k_c, power, epi, c, k and density each followed by a comma: ")
+
+    params = vals.split(",")
+    print(str(params))
+    offset = float(input("Enter the offset in ms for the data to start: "))
+    params = [float(x) for x in params]
+    assert len(params) == 6
+
     data = get_data(filename)
     Temp = data[2]
-    time1 = (data[4] - 292590) / 1000
+    time1 = (data[4] - offset) / 1000
     time = np.array([x for x in time1[:, :] if x >= 0])
 
     time = time.reshape(len(time), 1)
@@ -26,35 +35,36 @@ def show(filename="goodData/Horizontal_heating_steady_state.csv"):
 
     plt.figure(figsize=(10, 10))
 
-    #plt.scatter(time, 30 * POWER)
+    # plt.scatter(time, 30 * POWER)
     plt.title("Thermal Waves versus Time on an Aluminum rod", fontsize=15)
     plt.xlabel("time (s)", fontsize=18)
     plt.ylabel("Temperature $^oC$", fontsize=18)
     plt.grid('on')
 
-    fit = heating_rod_sim()
+    fit = heating_rod_sim(k_c=params[0], power=params[1], epi=params[2], c=params[3], k=params[4], p=params[5])
     size = np.ones(time.shape) * 5
 
-    #plt.scatter([0.3 - 0.013, 0.3 - 0.083, 0.3 - 0.153, 0.3 - 0.222, 0.3 - 0.2925] * np.ones(Temp.shape), Temp[-1], label="Data @ steady state")
+    # plt.scatter([0.3 - 0.013, 0.3 - 0.083, 0.3 - 0.153, 0.3 - 0.222, 0.3 - 0.2925] * np.ones(Temp.shape), Temp[-1], label="Data @ steady state")
 
-    #plt.scatter(time, 40 * data[3], c="k", label="power")
+    # plt.scatter(time, 40 * data[3], c="k", label="power")
+    width = list(np.ones(len(fit[-1])) * 10)
     plt.scatter(time, Temp[:, 4:5], c="r", marker="o", label="5", s=size)
-    plt.plot(fit[-1], fit[-2][:, 1:2], "r--", label="Fit for the data")
+    plt.plot(fit[-1], fit[-2][:, 1:2], "r--", linewidth=3)
 
     plt.scatter(time, Temp[:, 3:4], c="b", marker="o", label="4", s=size)
-    plt.plot(fit[-1], fit[-2][:, 8:9], "b--", label="Fit for the data")
+    plt.plot(fit[-1], fit[-2][:, 8:9], "b--", linewidth=3)
 
     plt.scatter(time, Temp[:, 2:3], c="k", marker="o", label="3", s=size)
-    plt.plot(fit[-1], fit[-2][:, 15:16], "k--", label="Fit for the data")
+    plt.plot(fit[-1], fit[-2][:, 15:16], "k--", linewidth=3)
 
     plt.scatter(time, Temp[:, 1:2], c="g", marker="o", label="2", s=size)
-    plt.plot(fit[-1], fit[-2][:, 23:24], "g--", label="Fit for the data")
+    plt.plot(fit[-1], fit[-2][:, 23:24], "g--", linewidth=3)
 
     plt.scatter(time, Temp[:, 0:1], c="c", marker="o", label="1", s=size)
-    plt.plot(fit[-1], fit[-2][:, 29:30], "c--", label="Fit for the data")
+    plt.plot(fit[-1], fit[-2][:, 29:30], "c--", linewidth=3)
 
-    plt.axis([0, time[-1] + 10, 0, 45])
-    plt.yticks(np.linspace(10, 50, 20))
+    plt.axis([0, 147 * 2 * 3.5, 20, 45])
+    plt.yticks(np.linspace(20, 50, 15))
     # for i in range(5):
     #    plt.scatter(time, Temp[:, i:i + 1], label="Sensor: {}".format(i + 1))
 
@@ -63,9 +73,9 @@ def show(filename="goodData/Horizontal_heating_steady_state.csv"):
     plt.show()
 
 
-def heating_rod_sim(show=False):
+def heating_rod_sim(k_c=0, power=0, epi=0, c=0, k=0, p=0, show=False):
     L = 0.3  # length of rod
-    inital = 31 + 273.15
+    inital = 24.5 + 273.15
     Dx = 0.01  # steps of x
     N = int(L / Dx)  # the number of steps
     Dt = 0.04  # steps in time
@@ -73,24 +83,24 @@ def heating_rod_sim(show=False):
     time_s = []
     Temps = []
 
-    k = 200.0  # W / m / K
-    c = 900.0  # J / kg / K
-    p = 2600.0  # kg / m^3
+    # k = 200.0  # W / m / K
+    # c = 900.0  # J / kg / K
+    # p = 2600.0  # kg / m^3
 
     period = 147.0 * 2
     r = 0.02535  # m radius
-    power = 15.0
+    # power = 15.0
     Pin = power  # W  power in
-    nu = 0.6  # 80% the efficiency of the power resistor to transfer into the rod
+    nu = 0.8  # 80% the efficiency of the power resistor to transfer into the rod
     T_amb = 22.0 + 273.15  # ambient temp
-    k_c = 5   # W/m^2/K convection constant
-    epi = 0.1  # emissivity
+    # k_c = 5   # W/m^2/K convection constant
+    # epi = 0.1  # emissivity
     sigma = 5.67 * 10 ** (-8)  # W/m^2/K (stefan-Boltzmann constant)
 
     C = k / (c * p)  # constant
     x = np.linspace(0.0, L, N)
 
-    T = [inital] + [28.0 + 273.15] * (N - 1)
+    T = [inital] + [24.5 + 273.15] + [23.0 + 273.15] * (N - 2)
     T = np.array(T)
 
     t = 0
@@ -118,12 +128,12 @@ def heating_rod_sim(show=False):
             T[0] = T[0] - C * Dt * (T[0] - T[1]) / (Dx ** 2)  # heat transfer (conduction)loss
 
             T[0] = T[0] + nu * Pin * Dt / (c * p * math.pi * r ** (2) * Dx)  # % power gain
-            #k_c = 1.32 * ((T[0] - T_amb) / (2 * r)) ** (1 / 4)
+            # k_c = 1.32 * ((T[0] - T_amb) / (2 * r)) ** (1 / 4)
 
             T[0] = T[0] - Dt * (2 / (c * r * p) + 1 / (c * p * Dx)) * k_c * (T[0] - T_amb)  # convection loss
 
             T[0] = T[0] - Dt * (2 / (c * r * p) + 1 / (c * p * Dx)) * epi * sigma * (T[0]**(4) - T_amb ** 4)  # radiation loss
-            #k_c = 1.32 * ((T[-1] - T_amb) / (2 * r)) ** (1 / 4)
+            # k_c = 1.32 * ((T[-1] - T_amb) / (2 * r)) ** (1 / 4)
 
             T[-1] = T[-1] + C * Dt * (T[-2] - T[-1]) / (Dx**2)  # heat gain (conduction)
             T[-1] = T[-1] - Dt * (2 / (c * r * p) + 1 / (c * p * Dx)) * k_c * (T[-1] - T_amb)  # convection loss
@@ -156,7 +166,7 @@ def heating_rod_sim(show=False):
             plt.legend(loc=0, prop={'size': 15})
             plt.pause(0.01)
             plt.clf()
-        if t >= delay and not show:
+        if t >= period * 3 and not show:
             return x, np.array(Temps).reshape(len(time_s), N), time_s
 
 
