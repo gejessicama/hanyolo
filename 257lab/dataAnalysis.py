@@ -11,6 +11,7 @@ import mpl_toolkits.mplot3d.axes3d as p3
 from matplotlib import animation
 import re
 from scipy.signal import butter, filtfilt
+import simulation_data
 
 
 def plot(filename):
@@ -46,71 +47,71 @@ def get_data(filename):
     x = np.ones(Temp.shape) * [1, 2, 3, 4, 5]
     x = x.reshape(x.size // 5, 5)
     return data, x, Temp, POWER, time
-def conpare_svd(sens_n,filename):
+
+
+def conpare_svd(sens_n, filename):
     """
         Funtion plots graphs of simulation and experimental data from sensors
         :param sens_n: (int) sensor number or (str) all - for all sensors
         :param filename: (str)
         :return:
         """
-    gd_,_,gd_T_t,gd_P,gd_t = get_data(filename)
+    gd_, _, gd_T_t, gd_P, gd_t = get_data(filename)
     gd_T_t = np.transpose(np.vstack(gd_T_t))
-    
-    t_arr,T_t = simulation_data.HeatEquation_w_convection_radiation(False,True,True,np.max(gd_t)/1000.0)
-    
+
+    t_arr, T_t = simulation_data.HeatEquation_w_convection_radiation(False, True, True, np.max(gd_t) / 1000.0)
+
     gd_T_t_k = [i + 273 for i in gd_T_t]
     gd_t = [j / 1000.0 for j in gd_t]
-    
+
     if (sens_n == 'all'):
         fig = plt.figure()
         ax = fig.add_subplot(111, label="Sim data")
         ax2 = fig.add_subplot(111, label="Exp data", frame_on=False)
         for i in range(5):
-            if (i is not 2):
-                ax.plot(t_arr,T_t[:][i],label='sim sensor'+str(i),color='k')
-                ax2.plot(gd_t,gd_T_t_k[:][i],label='data sensor'+str(i))
-    
-        ax.set_xlabel("time [s]", color="C0")
-        ax.set_ylabel("sample data", color="C0")
-        ax.tick_params(axis='x', colors="C0")
-        ax.tick_params(axis='y', colors="C0")
-        ax2.xaxis.tick_top()
-        ax2.yaxis.tick_right()
-        ax2.set_xlabel('time [s]', color="C1")
-        ax2.set_ylabel('exp data', color="C1")
-        ax2.set_ybound(295,330)
-        ax2.xaxis.set_label_position('top')
-        ax2.yaxis.set_label_position('right')
-        ax2.tick_params(axis='x', colors="C1")
-        ax2.tick_params(axis='y', colors="C1")
-    plt.show()
+            ax.plot(t_arr, T_t[:][i], label='sim sensor' + str(i), color='k')
+            ax2.scatter(gd_t, gd_T_t_k[:][i], label='data sensor' + str(i))
 
-else:
-    gd_T_t_k = [i + 273 for i in gd_T_t]
-    gd_t = [j / 1000.0 for j in gd_t]
-    print 'sensor = ',int(sens_n)
-    fig = plt.figure()
-    ax = fig.add_subplot(111, label="Sim data")
-    ax2 = fig.add_subplot(111, label="Exp data", frame_on=False)
-    
-    ax.plot(t_arr, T_t[:][int(sens_n)-1],color="C0")
         ax.set_xlabel("time [s]", color="C0")
         ax.set_ylabel("sample data", color="C0")
         ax.tick_params(axis='x', colors="C0")
         ax.tick_params(axis='y', colors="C0")
-        
-        ax2.plot(gd_t,gd_T_t_k[:][int(sens_n)-1],color="C1")
         ax2.xaxis.tick_top()
         ax2.yaxis.tick_right()
         ax2.set_xlabel('time [s]', color="C1")
         ax2.set_ylabel('exp data', color="C1")
+        ax2.set_ybound(295, 330)
         ax2.xaxis.set_label_position('top')
         ax2.yaxis.set_label_position('right')
         ax2.tick_params(axis='x', colors="C1")
         ax2.tick_params(axis='y', colors="C1")
-        
         plt.show()
 
+    else:
+        gd_T_t_k = [i + 273 for i in gd_T_t]
+        gd_t = [j / 1000.0 for j in gd_t]
+        print('sensor = ', int(sens_n))
+        fig = plt.figure()
+        ax = fig.add_subplot(111, label="Sim data")
+        ax2 = fig.add_subplot(111, label="Exp data", frame_on=False)
+
+        ax.plot(t_arr, T_t[:][int(sens_n) - 1], color="C0")
+        ax.set_xlabel("time [s]", color="C0")
+        ax.set_ylabel("sample data", color="C0")
+        ax.tick_params(axis='x', colors="C0")
+        ax.tick_params(axis='y', colors="C0")
+
+        ax2.plot(gd_t, gd_T_t_k[:][int(sens_n) - 1], color="C1")
+        ax2.xaxis.tick_top()
+        ax2.yaxis.tick_right()
+        ax2.set_xlabel('time [s]', color="C1")
+        ax2.set_ylabel('exp data', color="C1")
+        ax2.xaxis.set_label_position('top')
+        ax2.yaxis.set_label_position('right')
+        ax2.tick_params(axis='x', colors="C1")
+        ax2.tick_params(axis='y', colors="C1")
+
+        plt.show()
 
 
 def fix(filename, output='fixed.csv'):
@@ -248,4 +249,7 @@ def main(Animate=False, smooth=False, scatter=False, fixData=False):
         plt.show()
 
 if __name__ == '__main__':
-    main()
+    filename = input("File: ")
+    num = input("Sensor num: ")
+    conpare_svd(num, filename)
+    # main()

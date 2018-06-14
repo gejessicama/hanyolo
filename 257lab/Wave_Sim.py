@@ -18,7 +18,11 @@ def show(filename="goodData/Horizontal_heating_steady_state.csv"):
     filename = input("please enter the file name: ")
     data = get_data(filename)
     Temp = data[2]
-    time = data[4] / 1000
+    time1 = (data[4] - 292590) / 1000
+    time = np.array([x for x in time1[:, :] if x >= 0])
+
+    time = time.reshape(len(time), 1)
+    Temp = Temp[len(time1) - len(time):, :]
 
     plt.figure(figsize=(10, 10))
 
@@ -29,25 +33,28 @@ def show(filename="goodData/Horizontal_heating_steady_state.csv"):
     plt.grid('on')
 
     fit = heating_rod_sim()
+    size = np.ones(time.shape) * 5
 
     #plt.scatter([0.3 - 0.013, 0.3 - 0.083, 0.3 - 0.153, 0.3 - 0.222, 0.3 - 0.2925] * np.ones(Temp.shape), Temp[-1], label="Data @ steady state")
-    plt.scatter(time, Temp[:, 4:5], c="r", marker="o", label="5")
-    plt.plot(fit[-1], fit[-2][:, 0:1], "r--", label="Fit for the data")
 
-    plt.scatter(time, Temp[:, 3:4], c="b", marker="o", label="4")
-    plt.plot(fit[-1], fit[-2][:, 7:8], "b--", label="Fit for the data")
+    #plt.scatter(time, 40 * data[3], c="k", label="power")
+    plt.scatter(time, Temp[:, 4:5], c="r", marker="o", label="5", s=size)
+    plt.plot(fit[-1], fit[-2][:, 1:2], "r--", label="Fit for the data")
 
-    plt.scatter(time, Temp[:, 2:3], c="k", marker="o", label="3")
-    plt.plot(fit[-1], fit[-2][:, 14:15], "k--", label="Fit for the data")
+    plt.scatter(time, Temp[:, 3:4], c="b", marker="o", label="4", s=size)
+    plt.plot(fit[-1], fit[-2][:, 8:9], "b--", label="Fit for the data")
 
-    plt.scatter(time, Temp[:, 1:2], c="g", marker="o", label="2")
-    plt.plot(fit[-1], fit[-2][:, 21:22], "g--", label="Fit for the data")
+    plt.scatter(time, Temp[:, 2:3], c="k", marker="o", label="3", s=size)
+    plt.plot(fit[-1], fit[-2][:, 15:16], "k--", label="Fit for the data")
 
-    plt.scatter(time, Temp[:, 0:1], c="c", marker="o", label="1")
-    plt.plot(fit[-1], fit[-2][:, 28:29], "c--", label="Fit for the data")
+    plt.scatter(time, Temp[:, 1:2], c="g", marker="o", label="2", s=size)
+    plt.plot(fit[-1], fit[-2][:, 23:24], "g--", label="Fit for the data")
 
-    plt.axis([0, time[-1] + 10, 0, 60])
-    plt.yticks(np.linspace(0, 60, 100))
+    plt.scatter(time, Temp[:, 0:1], c="c", marker="o", label="1", s=size)
+    plt.plot(fit[-1], fit[-2][:, 29:30], "c--", label="Fit for the data")
+
+    plt.axis([0, time[-1] + 10, 0, 45])
+    plt.yticks(np.linspace(10, 50, 20))
     # for i in range(5):
     #    plt.scatter(time, Temp[:, i:i + 1], label="Sensor: {}".format(i + 1))
 
@@ -58,7 +65,7 @@ def show(filename="goodData/Horizontal_heating_steady_state.csv"):
 
 def heating_rod_sim(show=False):
     L = 0.3  # length of rod
-    inital = 25.3 + 273.15
+    inital = 31 + 273.15
     Dx = 0.01  # steps of x
     N = int(L / Dx)  # the number of steps
     Dt = 0.04  # steps in time
@@ -66,28 +73,29 @@ def heating_rod_sim(show=False):
     time_s = []
     Temps = []
 
-    k = 205.0  # W / m / K
-    c = 910.0  # J / kg / K
-    p = 2710.0  # kg / m^3
+    k = 200.0  # W / m / K
+    c = 900.0  # J / kg / K
+    p = 2600.0  # kg / m^3
 
     period = 147.0 * 2
     r = 0.02535  # m radius
     power = 15.0
     Pin = power  # W  power in
     nu = 0.6  # 80% the efficiency of the power resistor to transfer into the rod
-    T_amb = 21.5 + 273.15  # ambient temp
-    k_c = 30   # W/m^2/K convection constant
+    T_amb = 22.0 + 273.15  # ambient temp
+    k_c = 5   # W/m^2/K convection constant
     epi = 0.1  # emissivity
     sigma = 5.67 * 10 ** (-8)  # W/m^2/K (stefan-Boltzmann constant)
 
     C = k / (c * p)  # constant
     x = np.linspace(0.0, L, N)
 
-    T = [inital] + [25.3 + 273.15] * (N - 1)
+    T = [inital] + [28.0 + 273.15] * (N - 1)
     T = np.array(T)
 
     t = 0
-    delay = 4999
+    delay = 1000
+    last_change = 0
     if show:
         plt.figure(figsize=(20, 20))
     while True:
@@ -122,9 +130,11 @@ def heating_rod_sim(show=False):
 
             T[-1] = T[-1] - Dt * (2 / (c * r * p) + 1 / (c * p * Dx)) * epi * sigma * (T[-1]**(4) - T_amb ** 4)  # radiation loss
 
-            if(int(t + 1) % (period // 2) == 0 and Pin == 0 and int(t + 1) != 0):
+            if(int(t + 1) % (period // 2) == 0 and Pin == 0 and int(t + 1) != 0 and t > last_change):
+                last_change = t + 1
                 Pin = power
-            elif(int(t + 1) % (period // 2) == 0 and Pin == power and int(t + 1) != 0):
+            elif(int(t + 1) % (period // 2) == 0 and Pin == power and int(t + 1) != 0 and t > last_change):
+                last_change = t + 1
                 Pin = 0
 
             t += Dt
