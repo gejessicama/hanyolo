@@ -47,24 +47,34 @@ def show(filename="goodData/Horizontal_heating_steady_state.csv"):
     # plt.scatter([0.3 - 0.013, 0.3 - 0.083, 0.3 - 0.153, 0.3 - 0.222, 0.3 - 0.2925] * np.ones(Temp.shape), Temp[-1], label="Data @ steady state")
 
     # plt.scatter(time, 40 * data[3], c="k", label="power")
+    error = 1
+    e1 = 10 ** 3
+    # plt.style.use('presentation')
+    plt.style.use('ggplot')
     width = list(np.ones(len(fit[-1])) * 10)
-    plt.scatter(time, Temp[:, 4:5], c="r", marker="o", label="1", s=size)
-    plt.plot(fit[-1], fit[-2][:, 1:2], "r--", linewidth=3)
 
-    plt.scatter(time, Temp[:, 3:4], c="b", marker="o", label="8", s=size)
-    plt.plot(fit[-1], fit[-2][:, 8:9], "b--", linewidth=3)
+    plt.scatter(time, Temp[:, 4:5], c="m", marker="o", label="1", s=size)
+    plt.errorbar(time, Temp[:, 4:5], yerr=error, c="m", errorevery=e1, fmt='none', capsize=5, capthick=3)
+    plt.plot(fit[-1], fit[-2][:, 1:2], "m--", linewidth=3)
 
-    plt.scatter(time, Temp[:, 2:3], c="k", marker="o", label="15", s=size)
-    plt.plot(fit[-1], fit[-2][:, 15:16], "k--", linewidth=3)
+    plt.scatter(time, Temp[:, 3:4], c="r", marker="o", label="8", s=size)
+    plt.errorbar(time, Temp[:, 3:4], yerr=error, c="r", errorevery=1.2 * e1, fmt='none', capsize=5, capthick=3)
+    plt.plot(fit[-1], fit[-2][:, 8:9], "r--", linewidth=3)
 
-    plt.scatter(time, Temp[:, 1:2], c="g", marker="o", label="21", s=size)
+    plt.scatter(time, Temp[:, 2:3], c="c", marker="o", label="15", s=size)
+    plt.errorbar(time, Temp[:, 2:3], yerr=error, c="c", errorevery=1.3 * e1, fmt='none', capsize=5, capthick=3)
+    plt.plot(fit[-1], fit[-2][:, 15:16], "c--", linewidth=3)
+
+    plt.scatter(time, Temp[:, 1:2], c="g", marker="o", label="22", s=size)
+    plt.errorbar(time, Temp[:, 1:2], yerr=error, c="g", errorevery=1.4 * e1, fmt='none', capsize=5, capthick=3)
     plt.plot(fit[-1], fit[-2][:, 23:24], "g--", linewidth=3)
 
-    plt.scatter(time, Temp[:, 0:1], c="c", marker="o", label="29", s=size)
-    plt.plot(fit[-1], fit[-2][:, 29:30], "c--", linewidth=3)
+    plt.scatter(time, Temp[:, 0:1], c="b", marker="o", label="29", s=size)
+    plt.errorbar(time, Temp[:, 0:1], yerr=error, c="b", errorevery=1.5 * e1, fmt='none', capsize=5, capthick=3)
+    plt.plot(fit[-1], fit[-2][:, 29:30], "b--", linewidth=3)
 
-    plt.axis([0, 147 * 2 * 3.5, 20, 45])
-    plt.yticks(np.linspace(20, 50, 15))
+    plt.axis([0, 147 * 2 * 3, 20, 45])
+    plt.yticks(np.linspace(20, 45, 25))
     # for i in range(5):
     #    plt.scatter(time, Temp[:, i:i + 1], label="Sensor: {}".format(i + 1))
 
