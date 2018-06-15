@@ -17,13 +17,13 @@ def show(filename="goodData/Horizontal_heating_steady_state.csv"):
 
     filename = input("please enter the file name: ")
     params = [0] * 5
-    vals = input("Enter k_c, power, epi, c, k and density each followed by a comma: ")
+    vals = input("Enter k_c, power, epi, c, k and density as well as T_0, T_1 and rest of T each followed by a comma: ")
 
     params = vals.split(",")
     print(str(params))
     offset = float(input("Enter the offset in ms for the data to start: "))
     params = [float(x) for x in params]
-    assert len(params) == 6
+    assert len(params) == 9
 
     data = get_data(filename)
     Temp = data[2]
@@ -41,7 +41,7 @@ def show(filename="goodData/Horizontal_heating_steady_state.csv"):
     plt.ylabel("Temperature $^oC$", fontsize=18)
     plt.grid('on')
 
-    fit = heating_rod_sim(k_c=params[0], power=params[1], epi=params[2], c=params[3], k=params[4], p=params[5])
+    fit = heating_rod_sim(k_c=params[0], power=params[1], epi=params[2], c=params[3], k=params[4], p=params[5], T_0=params[6], T_1=params[7], T=params[8])
     size = np.ones(time.shape) * 5
 
     # plt.scatter([0.3 - 0.013, 0.3 - 0.083, 0.3 - 0.153, 0.3 - 0.222, 0.3 - 0.2925] * np.ones(Temp.shape), Temp[-1], label="Data @ steady state")
@@ -73,9 +73,9 @@ def show(filename="goodData/Horizontal_heating_steady_state.csv"):
     plt.show()
 
 
-def heating_rod_sim(k_c=0, power=0, epi=0, c=0, k=0, p=0, show=False):
+def heating_rod_sim(k_c=0, power=0, epi=0, c=0, k=0, p=0, T_0=0, T_1=1, T=0, show=False):
     L = 0.3  # length of rod
-    inital = 24.5 + 273.15
+    inital = T_0 + 273.15
     Dx = 0.01  # steps of x
     N = int(L / Dx)  # the number of steps
     Dt = 0.04  # steps in time
@@ -100,7 +100,7 @@ def heating_rod_sim(k_c=0, power=0, epi=0, c=0, k=0, p=0, show=False):
     C = k / (c * p)  # constant
     x = np.linspace(0.0, L, N)
 
-    T = [inital] + [24.5 + 273.15] + [23.0 + 273.15] * (N - 2)
+    T = [inital] + [T_1 + 273.15] + [T + 273.15] * (N - 2)
     T = np.array(T)
 
     t = 0
