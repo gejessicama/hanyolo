@@ -36,9 +36,9 @@ def show(filename="goodData/Horizontal_heating_steady_state.csv"):
     plt.figure(figsize=(10, 10))
 
     # plt.scatter(time, 30 * POWER)
-    plt.title("Thermal Waves versus Time on an Aluminum rod", fontsize=15)
-    plt.xlabel("time (s)", fontsize=18)
-    plt.ylabel("Temperature $^oC$", fontsize=18)
+    plt.title("Thermal Waves on an Aluminum rod", fontsize=15)
+    plt.xlabel("Time [s]", fontsize=18)
+    plt.ylabel("Temperature [$^oC$]", fontsize=18)
     plt.grid('on')
 
     fit = heating_rod_sim(k_c=params[0], power=params[1], epi=params[2], c=params[3], k=params[4], p=params[5], T_0=params[6], T_1=params[7], T=params[8])
@@ -48,19 +48,19 @@ def show(filename="goodData/Horizontal_heating_steady_state.csv"):
 
     # plt.scatter(time, 40 * data[3], c="k", label="power")
     width = list(np.ones(len(fit[-1])) * 10)
-    plt.scatter(time, Temp[:, 4:5], c="r", marker="o", label="5", s=size)
+    plt.scatter(time, Temp[:, 4:5], c="r", marker="o", label="1", s=size)
     plt.plot(fit[-1], fit[-2][:, 1:2], "r--", linewidth=3)
 
-    plt.scatter(time, Temp[:, 3:4], c="b", marker="o", label="4", s=size)
+    plt.scatter(time, Temp[:, 3:4], c="b", marker="o", label="8", s=size)
     plt.plot(fit[-1], fit[-2][:, 8:9], "b--", linewidth=3)
 
-    plt.scatter(time, Temp[:, 2:3], c="k", marker="o", label="3", s=size)
+    plt.scatter(time, Temp[:, 2:3], c="k", marker="o", label="15", s=size)
     plt.plot(fit[-1], fit[-2][:, 15:16], "k--", linewidth=3)
 
-    plt.scatter(time, Temp[:, 1:2], c="g", marker="o", label="2", s=size)
+    plt.scatter(time, Temp[:, 1:2], c="g", marker="o", label="21", s=size)
     plt.plot(fit[-1], fit[-2][:, 23:24], "g--", linewidth=3)
 
-    plt.scatter(time, Temp[:, 0:1], c="c", marker="o", label="1", s=size)
+    plt.scatter(time, Temp[:, 0:1], c="c", marker="o", label="29", s=size)
     plt.plot(fit[-1], fit[-2][:, 29:30], "c--", linewidth=3)
 
     plt.axis([0, 147 * 2 * 3.5, 20, 45])
