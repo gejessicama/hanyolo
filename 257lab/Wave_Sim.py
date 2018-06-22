@@ -74,7 +74,7 @@ def show(filename="goodData/Horizontal_heating_steady_state.csv"):
     plt.plot(fit[-1], fit[-2][:, 29:30], "b--", linewidth=3)
 
     plt.axis([0, 147 * 2 * 3, 20, 45])
-    plt.yticks(np.linspace(20, 45, 25))
+    plt.yticks(np.linspace(20, 45, 26))
     # for i in range(5):
     #    plt.scatter(time, Temp[:, i:i + 1], label="Sensor: {}".format(i + 1))
 
