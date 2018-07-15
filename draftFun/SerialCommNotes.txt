@@ -1,0 +1,21 @@
+For TINAH serial communication to the arduino:
+
+Serial1.print(msg)
+	Sends info
+Serial1.write(msg)
+	Sends a single byte of info
+Serial1.available()
+	Boolean if there is info to read
+Serial1.read()
+	Reads in info (one byte at a time??)
+
+More info on arduino website https://www.arduino.cc/reference/en/language/functions/communication/serial/
+only need to use Serial1 instead of Serial
+
+
+
+For the signals currently sent:
+'s' if there is an object on the right
+'S' if there is an object on the left
+'c' if there is a cliff on the right
+'C' if there is a cliff on the left
