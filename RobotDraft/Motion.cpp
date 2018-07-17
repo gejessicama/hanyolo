@@ -16,7 +16,7 @@ int proportionalTerm, derivativeTerm, gain;
 uint16_t count;
 
 // HELPER FUNCTION DEFINITION
-boolean isOnWhite (uint8_t);
+//boolean isOnWhite (uint8_t);
 
 /*
    Constructor for Motion class object

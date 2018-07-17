@@ -15,14 +15,20 @@
 #define leftMotor 1
 #define rightQRD 8
 #define leftQRD 9
-#define onTape 100
 
+#define onTheSurface 400
+#define baseSpeed 255
 
-uint8_t state = 1;
+#define pGainConst 54
+#define dGainConst 0
 
 void setup() {
   Serial1.begin(9600);
 }
+
+uint8_t state = 1;
+
+Motion hanYolo(rightMotor, leftMotor, onTheSurface, baseSpeed);
 
 void loop() {
   /*
@@ -34,7 +40,8 @@ void loop() {
      organization and debugging easier
   */
   switch (state) {
-    case 1 : //we are on the ramp just starting
+    case 1 : // STARTING STATE UNTIL FIRST GAP
+      hanYolo.followTape(rightQRD, leftQRD, pGainConst, dGainConst);
       //read in QRDs determine speed
       //read in QRDs for cliff detection
       //check if sonar sees a cliff
