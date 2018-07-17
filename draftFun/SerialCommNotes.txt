@@ -5,7 +5,7 @@ Serial1.print(msg)
 Serial1.write(msg)
 	Sends a single byte of info
 Serial1.available()
-	Boolean if there is info to read
+	Number of bytes available to read
 Serial1.read()
 	Reads in info (one byte at a time??)
 
