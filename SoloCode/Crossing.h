@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #ifndef CROSSING_H
 #define CROSSING_H
 
