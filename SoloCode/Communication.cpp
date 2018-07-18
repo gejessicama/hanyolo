@@ -1,19 +1,18 @@
 /*
- * The idea is that this would have the communication functions
- * Perhaps one function is called to read in and store whatever info was just passed
- * through serial
- * and then subsequent functions can acess the stored data about what info was sent and what we may
- * be sensing
+ * Functions to communicate with the arduino. Must check that there is info to read before calling
+ * Uses a digital output pin to send the activation signal to the arduino
+ * 
+ * THE CLIFF FUNCTIONALITY IS PROBABLY NOT NECESSARY!!!
  */
 
 #include "Communication.h"
 #include <phys253.h>
 
-Communication::Communication(char rObject, char lObject){
-  objectToRight = false;
-  objectToLeft = false;
+Communication::Communication(char rObject, char lObject, char rCliff, char lCliff){
   rightObject = rObject;
   leftObject = lObject;
+  rightCliff = rCliff;
+  leftCliff = lCliff;
 }
 
 /*
@@ -22,10 +21,18 @@ Communication::Communication(char rObject, char lObject){
  */
 void Communication::readIn(){
   incomingByte = Serial1.read();
+  objectToRight = false;
+  objectToLeft = false;
+  cliffToRight = false;
+  cliffToLeft = false;
   if (incomingByte == rightObject){
     objectToRight = true;
   }else if (incomingByte == leftObject){
     objectToLeft = true;
+  }else if (incomingByte == rightCliff){
+    cliffToRight = true;
+  }else if (incomingByte == leftCliff){
+    cliffToLeft = true;
   }
 }
 
