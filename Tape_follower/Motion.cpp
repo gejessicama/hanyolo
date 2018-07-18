@@ -8,7 +8,7 @@
 #define rQRD2 1
 #define ON 400
 #define POW 0.6
-#define qrdcliff 400
+#define qrdcliff 700
 
 int currentErr, lastErr, lastState;
 int lastOn = -1;
