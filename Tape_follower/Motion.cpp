@@ -11,8 +11,12 @@
 #define encoder1PinA 11
 #define encoder1PinB 12
 #define POW 0.6
+<<<<<<< HEAD
 #define qrdcliff 800
 #define ON 400
+=======
+#define qrdcliff 700
+>>>>>>> bd8e0d20c5fd993d482338f4329e878f2c55bdb6
 
 int currentErr, lastErr, lastState;
 int lastOn = -1;
