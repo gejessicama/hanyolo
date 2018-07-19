@@ -2,7 +2,6 @@
  * This will contain the necessary functions for crossing both of the gaps we face
  */
 
-#include <phys253.h>
 #include "Crossing.h"
 
 Crossing::Crossing(uint8_t rMotor, uint8_t lMotor, uint8_t rQRD, uint8_t lQRD, uint8_t overCliff){
