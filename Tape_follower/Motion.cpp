@@ -6,16 +6,31 @@
 #define leftQRD 3
 #define lQRD2 4
 #define rQRD2 1
-#define ON 400
+#define encoder0PinA 9
+#define encoder0PinB 10
+#define encoder1PinA 11
+#define encoder1PinB 12
 #define POW 0.6
-#define qrdcliff 400
+#define qrdcliff 800
+#define ON 400
 
 int currentErr, lastErr, lastState;
 int lastOn = -1;
-const int v0 = 255;
+const int v0 = 200;
 
 float count = 1;
 int displayCount = 0;
+
+int encoder0Pos = 0,encoder1Pos = 0;
+int encoder0PinALast = LOW,encoder1PinALast = LOW;
+int n = LOW;
+
+unsigned long it = millis();
+unsigned long time_[8];
+long pos[8];
+unsigned long time_1[8];
+long pos1[8];
+int i = 0, i1 = 0;
 
 Motion::Motion(int pr,int dv) : kp(pr),kd(dv){}	
 
@@ -39,7 +54,7 @@ void Motion::followTape(){
   
     kp = knob(6) / 1024.0 * 200;
     kd = knob(7) / 1024.0 * 200;
-
+    /*
     LCD.clear();
     LCD.print("p");
     LCD.print(kp);
@@ -49,7 +64,7 @@ void Motion::followTape(){
     LCD.print(rVal);
     LCD.print(" l=");
     LCD.print(lVal);
-    
+    */
   
     int p = kp * currentErr;
     int d = kd * (currentErr - lastState) / count; // this is never zero
@@ -72,26 +87,95 @@ bool Motion::cliff(){
     int lVal2 = analogRead(lQRD2);
     int rVal2 = analogRead(rQRD2);
     if(lVal2 >qrdcliff && rVal2 > qrdcliff){
-       dropBridge1();
+       //dropBridge1();
+       return true;
     }
 }
 
 void Motion::dropBridge1(){
   LCD.clear();
   LCD.print("B1 down");
-  motor.speed(rightMotor, POW*(0));
-  motor.speed(leftMotor, POW*(0));
-  delay(1000);
+  //motor.speed(rightMotor, POW*(0));
+  //motor.speed(leftMotor, POW*(0));
+  //delay(1000);
   LCD.clear();
 }
 
 void Motion::dropBridge2(){
   LCD.clear();
   LCD.print("B2 down");
+  //motor.speed(rightMotor, POW*(0));
+  //motor.speed(leftMotor, POW*(0));
+  //delay(1000);
+  LCD.clear();
+}
+
+void Motion::stopMoving(){
   motor.speed(rightMotor, POW*(0));
   motor.speed(leftMotor, POW*(0));
-  delay(1000);
-  LCD.clear();
+}
+
+long Motion::getEncoder0(bool velocity,bool displacement){ 
+  long cp = encoder0Pos;
+  long velo;
+  long posi = cp;
+  delay(1);
+  n = digitalRead(encoder0PinA);
+  if ((encoder0PinALast == LOW) && (n == HIGH)) {
+    if (digitalRead(encoder0PinB) == LOW) {
+      encoder0Pos--;
+    } else {
+      encoder0Pos++;
+    }
+    unsigned long ft = millis();
+    //float vel = 1000.0*((float) encoder0Pos-cp)/(ft-it+.5);
+    time_[i%8] = ft;
+    pos[i%8] = cp;
+    float vel = 1000.0*((float)cp - pos[(i+1)%8])/(ft - time_[(i+1)%8]);
+    velo = vel;
+    posi = cp;
+    it = ft;
+    i++;
+  }
+   //nsigned long vel = (encoder0Pos - cp)/(50
+  encoder0PinALast = n;
+  if (velocity){
+      return velo;
+    }
+    if(displacement){
+      return posi;
+    }
+}
+long Motion::getEncoder1(bool velocity,bool displacement){ 
+  long cp = encoder1Pos;
+  long velo;
+  long posi = cp;
+  delay(1);
+  n = digitalRead(encoder1PinA);
+  if ((encoder1PinALast == LOW) && (n == HIGH)) {
+    if (digitalRead(encoder1PinB) == LOW) {
+      encoder1Pos--;
+    } else {
+      encoder1Pos++;
+    }
+    unsigned long ft = millis();
+    //float vel = 1000.0*((float) encoder0Pos-cp)/(ft-it+.5);
+    time_1[i1%8] = ft;
+    pos1[i1%8] = cp;
+    float vel = 1000.0*((float)cp - pos[(i1+1)%8])/(ft - time_[(i1+1)%8]);
+    velo = vel;
+    posi = cp;
+    it = ft;
+    i1++;
+  }
+   //nsigned long vel = (encoder0Pos - cp)/(50
+  encoder1PinALast = n;
+  if (velocity){
+      return velo;
+    }
+    if(displacement){
+      return posi;
+    }
 }
 
 
