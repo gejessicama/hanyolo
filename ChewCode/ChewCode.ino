@@ -1,16 +1,13 @@
 /*
    Code for the Arduino
-   The Arduino (Chew) controls our Sonar sensing and sends this information to the TINAH
-   It also listens for the TINAH to tell it to activate the claw
-   The arduino then activates the claw before telling the TINAH it is done and then continues
 
-   For now, Chew will constantly be reading in the sonars and sending that information to Solo
-   Late may want to change how it sends info
+   Chew keeps track of what state of the course we are in, this state is updated
+   everytime we recieve a signal from Solo
 
-   Need more communication from TINAH to tell us when to ignore an object
+   Depending on the state we look for an Ewok and then tell Solo that we found
+   an Ewok and go pick it up, and tell Solo we finished picking it up
 
-   or: read in an object and check for a claw signal for a certain amount of time. If no signal is
-   recieved in that time, then give up and resume as normal
+   Chew also controls the claw (AND HOPEFULLY ALSO THE SCISSOR LIFT)
 */
 
 #include "Claw.h"
@@ -21,7 +18,9 @@
 #define echoPinLeft  11
 #define triggerPinFront 12
 #define echoPinFront 13
+
 #define interruptPin 0
+#define toSoloPin 1
 #define objectLimit 400
 
 volatile uint8_t state = 0;
@@ -33,6 +32,7 @@ void setup() {
   pinMode(triggerPinRight, OUTPUT);
   pinMode(triggerPinLeft, OUTPUT);
   pinMode(triggerPinFront, OUTPUT);
+  pinMode(toSoloPin, OUTPUT);
   attachInterrupt(interruptPin, updateState, RISING);
 }
 
@@ -44,17 +44,17 @@ void loop() {
       
     case 1 : // STARTING STATE UNTIL FIRST GAP
       if (readInSonar(triggerPinRight, echoPinRight, objectLimit)) {
-        //tell solo to wait
+        digitalWrite(toSoloPin, HIGH);
         //activate right claw pick up
-        //tell solo to go
+        digitalWrite(toSoloPin, LOW);
       }
       break;
       
     case 2 : // CROSSING THE FIRST GAP
       if (readInSonar(triggerPinRight, echoPinRight, objectLimit)) {
-        //tell solo to wait
+        digitalWrite(toSoloPin, HIGH);
         //activate right claw pick up
-        //tell solo to go
+        digitalWrite(toSoloPin, LOW);
       }
       break;
       
@@ -62,9 +62,9 @@ void loop() {
       //ignore for a certain amount of hard coded time
       // (we need to pass the arch and the stormtroopers)
       if (readInSonar(triggerPinLeft, echoPinLeft, objectLimit)) {
-        //tell solo to wait
+        digitalWrite(toSoloPin, HIGH);
         //activate left claw pick up
-        //tell solo to go
+        digitalWrite(toSoloPin, LOW);
       }
       break;
 
@@ -78,17 +78,17 @@ void loop() {
       
     case 6 : // WE JUST CROSSED OUR SECOND BRIDGE
       if (readInSonar(triggerPinFront, echoPinFront, objectLimit)) {
-        //tell solo to wait
+        digitalWrite(toSoloPin, HIGH);
         //activate front claw pick up
-        //tell solo to go
+        digitalWrite(toSoloPin, LOW);
       }
       break;
       
     case 7 : // WE JUST TURNED TOWARDS THE SECOND TOWER
       if (readInSonar(triggerPinLeft, echoPinLeft, objectLimit)) {
-        //tell solo to wait
+        digitalWrite(toSoloPin, HIGH);
         //activate left claw pick up
-        //tell solo to go
+        digitalWrite(toSoloPin, LOW);
       }
       break;
     case 8 : // COMPLETED THE COURSE MAYBE?

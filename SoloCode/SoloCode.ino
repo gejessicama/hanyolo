@@ -1,19 +1,8 @@
 /*
- * Draft of potential Robot Code
+ * Code for the TINAH
  * 
- * "Main" function that calls and runs all others
- * 
- * can edit functionality s.t. this keeps track of all the pins
- * or can edit functionallity such taht a menu keeps track of all the pins
+ * Solo
  */
-
- /*
-  *  DONT NEED SERIAL COMMUNICATION: 
-  *   CHEW MAKES PIN GO HIGH WHILE PICKING UP AN OBJECT
-  *   CHEW MAKES PIN GO LOW WHEN FINISHED PICKING UP AN OBJECT
-  *   
-  *   SOLO MAKES PIN GO HIGH (THEN RESETS) TO INDICATE STATE INCREMENT
-  */
 
 #include <phys253.h>
 #include "Motion.h"
@@ -63,7 +52,16 @@ void loop() {
       }
       break;
       
-    case 2 : //CROSSING THE FIRST GAP
+    case 2 : //CROSSING THE FIRST GAP 
+
+// THIS NEEDS TO BE MORE THOUGH OUT
+/*
+ * Second bridge should block IR signal until we have turned a bit (and hopefully picked up the stuffy
+ * as soon as we detect the IR signal we need to stop and wait for it to change frequencies
+ * likely we should have a helper function we call that just loops and waits for signal to change
+ * and when the signal changes then we exit and increment
+ */
+
       //read in QRDs to follow bridge
       // need an updated follow tape function that tells us to wiggle if we lose the tape
       //or one that uses all 4, or just being cautious
