@@ -7,85 +7,132 @@
  * or can edit functionallity such taht a menu keeps track of all the pins
  */
 
+ /*
+  *  DONT NEED SERIAL COMMUNICATION: 
+  *   CHEW MAKES PIN GO HIGH WHILE PICKING UP AN OBJECT
+  *   CHEW MAKES PIN GO LOW WHEN FINISHED PICKING UP AN OBJECT
+  *   
+  *   SOLO MAKES PIN GO HIGH (THEN RESETS) TO INDICATE STATE INCREMENT
+  */
+
 #include <phys253.h>
 #include "Motion.h"
 #include "Crossing.h"
 
 #define rightMotor 0
 #define leftMotor 1
-#define rightQRD 8
-#define leftQRD 9
+#define rightMostQRD 1
+#define rightMiddleQRD 2
+#define leftMiddleQRD 3
+#define leftMostQRD 4
 
-#define onTheSurface 400
 #define baseSpeed 255
+#define onTheTape 400
+#define overTheCliff 700
 
 #define pGainConst 54
 #define dGainConst 0
 
+#define interruptPin 0
+
+void pauseState();
+void resumeState();
+
+volatile uint8_t state = 0;
+volatile uint8_t rememberState;
+
+Motion hanMovo(rightMotor, leftMotor, onTheTape, baseSpeed);
+Crossing hanFlyo(rightMotor, leftMotor, rightMostQRD, leftMostQRD, overTheCliff);
+
 void setup() {
-  Serial1.begin(9600);
+  attachInterrupt(interruptPin, pauseState, RISING);
+  attachInterrupt(interruptPin, resumeState, FALLING);
 }
 
-uint8_t state = 1;
-
-Motion hanYolo(rightMotor, leftMotor, onTheSurface, baseSpeed);
-
 void loop() {
-  /*
-     Based on the state, call different functions that will tell the robot how to move
-     each case for each state will likely have another non repeated function to call
-     when the sate needs to end and switch to the next state
 
-     Most if not all functions called here can be placed in additional classes to make
-     organization and debugging easier
-  */
   switch (state) {
     case 1 : // STARTING STATE UNTIL FIRST GAP
-      hanYolo.followTape(rightQRD, leftQRD, pGainConst, dGainConst);
-      //read in QRDs determine speed
-      //read in QRDs for cliff detection
-      //check if sonar sees a cliff
-      //check if sonar sees a stuffy
-      // pick up stuffy when seen
-      // figure out conditions that lead to state 2
+      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
+      //read in QRDs for side cliff detection
+      
+      if (hanFlyo.cliff()){
+        state ++;
+        //tell chew to increment State
+        //drop the first bridge
+      }
       break;
-    case 2 : //we need to cross the gap
+      
+    case 2 : //CROSSING THE FIRST GAP
       //read in QRDs to follow bridge
-      //read in sonar to not run off bridge
+      // need an updated follow tape function that tells us to wiggle if we lose the tape
+      //or one that uses all 4, or just being cautious
+      //side cliff detection?
+      //look for IR beacon
+      //when the IR beacon changes from 1k to 10k
+        // increment state
+        // tell Chew to increment state
       break;
-    case 3 : //we are now in front of the IR beacon
+      
+    case 3 : //IR BEACON JUST CHANGED FREQUENCY
       //read in QRDs to follow tape
-      //check if sonar sees a cliff
-      //check if IR sensor sees the right frequency
-      // go go go when right frequency found!!! and next state
+      //Side cliff detection??
+      
+      if (hanFlyo.cliff()){
+        state ++;
+        //tell chew to increment State
+        //backpedal a certain distance
+        // 90 degree turn
+      }
       break;
-    case 4 : // we are now in the stormtrooper room
-      //read in QRDs to tape follow
-      //read in QRDs for cliff detection
-      //check if sonar sees a stuffy
-      // pick up stuffy when found
-      // 90 turn when cliff reached
+
+    // COULD ADD ANOTHER CASE HERE AFTER WE HAVE GONE A CERTAIN DISTANCE AND ARE PAST THE STORMTROOPERS
+      
+    case 4 : //WE JUST LEFT THE TAPE AND TURNED TOWARDS THE SECOND GAP
+      //move both wheels forward to cover the same distance
+      //Side cliff detection???? maybe not
+      
+      if (hanFlyo.cliff()){
+        state ++;
+        //tell chew to increment State
+        //drop the second bridge
+      }
       break;
-    case 5 : // we are about to cross the second gap
-      // run motors but no tape following
-      // check QRDs for cliff
-      // check sonar for cliff
-      // when front cliff found drop bridge and continue
-      // figure out when done crossing 90 turn and to enter next state
+      
+    case 5 : //WE JUST DROPPED THE SECOND BRIDGE  
+      //back to our cautious tape following
+      //check for end of tape
+      // when our tape ends
+      // increment our state, Chew's state
       break;
-    case 6 : // we just reached first tower
-      //check sonar to pick up stuffy
-      //use edge following to move forward
-      //check sonar to know we have reached 2nd tower
+      
+    case 6 : //WE JUST CROSSED OUR SECOND BRIDGE
+      //move both wheels forward to cover the same distance
+      //when we have moved forward a set distance
+      // increment our state, chew's state, 90 deg turn
       break;
-    case 7 : //we are on the second tower
-      // move slowly
-      // check sonar (in front??) to find chewy
-      // when chewy picked up exectute basket return
+      
+    case 7 : //WE JUST TURNED TOWARDS THE SECOND TOWER
+      //use edge following on the right side
+      //(will need chew to look for sonar on left side)
+      //either check if interrupt has been called then lift the basket, or have Chew lift the basket
+      //if check interrupt method then increment states
+      //otherwise wait for basket touch sensor to go to 0 then increment states
       break;
-    case 8: //completed course
+      
+    case 8: //COMPLETED THE COURSE MAYBE
       // something about shutting off/ just chilling
       break;
   }
-
 }
+
+// INTERRUPT FUNCTIONS
+void pauseState(){
+  rememberState = state;
+  state = 0;
+}
+
+void resumeState(){
+  state = rememberState;
+}
+

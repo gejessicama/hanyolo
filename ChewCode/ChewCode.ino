@@ -13,70 +13,100 @@
    recieved in that time, then give up and resume as normal
 */
 
-#include "Sonar.h"
+#include "Claw.h"
 
 #define triggerPinRight 8
 #define echoPinRight 9
 #define triggerPinLeft 10
 #define echoPinLeft  11
-#define listenPin 2
-#define objectLim 400
-
-//make sure these are the same as defined for Solo
-#define rightObjectChar 'r'
-#define leftObjectChar 'l'
-#define frontObjectChar 'f'
+#define triggerPinFront 12
+#define echoPinFront 13
+#define interruptPin 0
+#define objectLimit 400
 
 volatile uint8_t state = 0;
 
-Sonar chewy(objectLim);
-
+boolean readInSonar(uint8_t, uint8_t, uint16_t);
 void updateState();
 
 void setup() {
-  Serial.begin(9600);
   pinMode(triggerPinRight, OUTPUT);
   pinMode(triggerPinLeft, OUTPUT);
-  attachInterrupt(listenPin, updateState, RISING);
+  pinMode(triggerPinFront, OUTPUT);
+  attachInterrupt(interruptPin, updateState, RISING);
 }
 
 void loop() {
 
-  //ignores state = 0, 3, 5, 8
-
   switch (state) {
+    case 0 : // START BUTTON NOT YET PRESSED
+      break;
+      
     case 1 : // STARTING STATE UNTIL FIRST GAP
-      if (chewy.readIn(triggerPinRight, echoPinRight)) {
-        Serial.print(rightObjectChar);
-        //activate claw sequence
+      if (readInSonar(triggerPinRight, echoPinRight, objectLimit)) {
+        //tell solo to wait
+        //activate right claw pick up
+        //tell solo to go
       }
       break;
-    case 2 : //we need to cross the gap
-      if (chewy.readIn(triggerPinRight, echoPinRight)) {
-        Serial.print(rightObjectChar);
-        //activate claw sequence
+      
+    case 2 : // CROSSING THE FIRST GAP
+      if (readInSonar(triggerPinRight, echoPinRight, objectLimit)) {
+        //tell solo to wait
+        //activate right claw pick up
+        //tell solo to go
       }
       break;
-    case 4 : // we are now in the stormtrooper room
+      
+    case 3 : // IR BEACON JUST CHANGED FREQUENCY
       //ignore for a certain amount of hard coded time
       // (we need to pass the arch and the stormtroopers)
-      if (chewy.readIn(triggerPinLeft, echoPinLeft)) {
-        Serial.print(leftObjectChar);
-        //activate claw sequence
+      if (readInSonar(triggerPinLeft, echoPinLeft, objectLimit)) {
+        //tell solo to wait
+        //activate left claw pick up
+        //tell solo to go
       }
       break;
-    case 6 : // we just reached first tower
-      //read in sonar in front
+
+    // COULD ADD ANOTHER CASE HERE FOR WHEN WE ARE PAST THE STORMTROOPERS
+      
+    case 4 : // WE JUST LEFT THE TAPE AND TURNED TOWARDS THE SECOND GAP
       break;
-    case 7 : //we are on the second tower
-      if (chewy.readIn(triggerPinRight, echoPinRight)) {
-        Serial.print(rightObjectChar);
-        //activate claw sequence
+      
+    case 5 : // WE JUST DROPPED THE SECOND BRIDGE
+      break;
+      
+    case 6 : // WE JUST CROSSED OUR SECOND BRIDGE
+      if (readInSonar(triggerPinFront, echoPinFront, objectLimit)) {
+        //tell solo to wait
+        //activate front claw pick up
+        //tell solo to go
       }
       break;
+      
+    case 7 : // WE JUST TURNED TOWARDS THE SECOND TOWER
+      if (readInSonar(triggerPinLeft, echoPinLeft, objectLimit)) {
+        //tell solo to wait
+        //activate left claw pick up
+        //tell solo to go
+      }
+      break;
+    case 8 : // COMPLETED THE COURSE MAYBE?
+      break;
+      
   }
 }
 
+boolean readInSonar(uint8_t trig, uint8_t echo, uint16_t objLim){
+  digitalWrite(trig, HIGH); 
+  delayMicroseconds(10);  
+  digitalWrite(trig, LOW);
+  return (pulseIn(echo, HIGH) < objLim);
+}
+
+//  INTERRUPT FUNCTION
 void updateState() {
   state++;
 }
+
+

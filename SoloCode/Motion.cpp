@@ -6,17 +6,6 @@
 #include <phys253.h>
 #include "Motion.h"
 
-//  VARIALBLES FOR ALL FUNCTIONS
-uint8_t ON, rightMotor, leftMotor, baseSpeed;
-
-//  VARIABLES FOR TAPE FOLLOWING
-uint8_t currentError, lastError, lastState, lastOn;
-int rVal, lVal;
-int proportionalTerm, derivativeTerm, gain;
-uint16_t count;
-
-// HELPER FUNCTION DEFINITION
-//boolean isOnWhite (uint8_t);
 
 /*
    Constructor for Motion class object
@@ -58,7 +47,7 @@ void Motion::followTape(uint8_t rightQRD, uint8_t leftQRD, uint8_t proportionalG
   gain = proportionalTerm + derivativeTerm;
   
   motor.speed(rightMotor, baseSpeed + gain);
-  motor.speed(leftMotor, -baseSpeed + gain);
+  motor.speed(leftMotor, baseSpeed - gain);
 
   if (currentError != lastError) {
     lastState = lastError;
