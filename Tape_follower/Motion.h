@@ -14,6 +14,7 @@ class Motion{
     void stopMoving();
     long getEncoder0(bool,bool);
     long getEncoder1(bool,bool);
+    bool reverse(long finalL,long finalR, long currentLeftEncoder, long currentRightEncoder);
 };
 
 #endif
