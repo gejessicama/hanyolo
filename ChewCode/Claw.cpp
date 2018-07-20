@@ -10,19 +10,19 @@
 #include "Claw.h"
 
 
-Claw::Claw(){
-  
+Claw::Claw(uint16_t objectLim){
+  objectLimit = objectLim;
 }
 
 boolean Claw::pickUpRight(){
-  
+  delay(5000);
 }
 
 boolean Claw::pickUpLeft(){
-  
+  delay(5000);
 }
 
 boolean Claw::pickUpFront(){
-  
+  delay(5000);
 }
 

@@ -4,9 +4,10 @@
 
 class Claw{
   private:
+    int objectLimit;
     
   public:
-    Claw();
+    Claw(uint16_t);
     boolean pickUpRight();
     boolean pickUpLeft();
     boolean pickUpFront();

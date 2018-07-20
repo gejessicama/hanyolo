@@ -1,18 +1,42 @@
 /*
    The Motion Class contains functions that let us follow tape, follow an edge
 
-   Cannot follow both tape and edge at the same time. 
+   Cannot follow both tape and edge at the same time.
    Requires that motors are wired so that positive inputs make them go forwards
 */
 #include "Motion.h"
 
-Motion::Motion(uint8_t rMotor, uint8_t lMotor, uint8_t onTape, uint8_t overCliff, int v0){
-  
+Motion::Motion(uint8_t rMotor, uint8_t lMotor, uint8_t onTape, uint8_t overCliff, int v0) {
+
   rightMotor = rMotor;
   leftMotor = lMotor;
   ON = onTape;
   CLIFF = overCliff;
   baseSpeed = v0;
+}
+
+void Motion::reset() {
+  lastError = 0;
+  lastState = 0;
+  lastOn = -1;
+  count = 0;
+
+}
+
+void Motion::pidControl(uint8_t proportionalGain, uint8_t derivativeGain) {
+  proportionalTerm = proportionalGain * currentError;
+  derivativeTerm = derivativeGain * (currentError - lastState) * 1.0 / count;
+  gain = proportionalTerm + derivativeTerm;
+
+  motor.speed(rightMotor, baseSpeed + gain);
+  motor.speed(leftMotor, baseSpeed - gain);
+
+  if (currentError != lastError) {
+    lastState = lastError;
+    count = 0;
+  }
+  lastError = currentError;
+  count ++;
 }
 
 void Motion::followTape(uint8_t rightQRD, uint8_t leftQRD, uint8_t proportionalGain,
@@ -34,24 +58,12 @@ void Motion::followTape(uint8_t rightQRD, uint8_t leftQRD, uint8_t proportionalG
     currentError = lastOn * 5;
   }
 
-  proportionalTerm = proportionalGain * currentError;
-  derivativeTerm = derivativeGain * (currentError - lastState) * 1.0 / count; 
-  gain = proportionalTerm + derivativeTerm;
-  
-  motor.speed(rightMotor, baseSpeed + gain);
-  motor.speed(leftMotor, baseSpeed - gain);
-
-  if (currentError != lastError) {
-    lastState = lastError;
-    count = 0;
-  }
-  lastError = currentError;
-  count ++;
+  pidControl(proportionalGain, derivativeGain);
 }
 
-void Motion::followRightEdge(uint8_t outQRD, uint8_t inQRD,uint8_t proportionalGain,
-                        uint8_t derivativeGain){
- 
+void Motion::followRightEdge(uint8_t outQRD, uint8_t inQRD, uint8_t proportionalGain,
+                             uint8_t derivativeGain) {
+
   rVal = isOverCliff(outQRD);
   lVal = isOnWhite(inQRD);
 
@@ -66,23 +78,24 @@ void Motion::followRightEdge(uint8_t outQRD, uint8_t inQRD,uint8_t proportionalG
     lastOn = 1;
   }
 
-  proportionalTerm = proportionalGain * currentError;
-  derivativeTerm = derivativeGain * (currentError - lastState) * 1.0 / count; 
-  gain = proportionalTerm + derivativeTerm;
-  
-  motor.speed(rightMotor, baseSpeed + gain);
-  motor.speed(leftMotor, baseSpeed - gain);
+  pidControl(proportionalGain, derivativeGain);
+}
 
-  if (currentError != lastError) {
-    lastState = lastError;
-    count = 0;
+void Motion::bothWheelsForward(uint8_t rightDistance, uint8_t leftDistance,
+                       uint8_t proportionalGain, uint8_t derivativeGain) {
+  if (rightDistance == leftDistance) { // no problem
+    currentError = 0;
+    lastState = 0;
+  } else {
+    currentError = leftDistance - rightDistance;
+    lastOn = currentError;
   }
-  lastError = currentError;
-  count ++;
+
+  pidControl(proportionalGain, derivativeGain);
 }
 
 
-//long Motion::getEncoder0(bool velocity,bool displacement){ 
+//long Motion::getEncoder0(bool velocity,bool displacement){
 //  long cp = encoder0Pos;
 //  long velo;
 //  long posi = cp;
@@ -113,7 +126,7 @@ void Motion::followRightEdge(uint8_t outQRD, uint8_t inQRD,uint8_t proportionalG
 //      return posi;
 //    }
 //}
-//long Motion::getEncoder1(bool velocity,bool displacement){ 
+//long Motion::getEncoder1(bool velocity,bool displacement){
 //  long cp = encoder1Pos;
 //  long velo;
 //  long posi = cp;
@@ -151,8 +164,8 @@ boolean Motion::isOnWhite (uint8_t qrdPin) {
   return false;
 }
 
-boolean Motion::isOverCliff (uint8_t qrdPin){
-  if(analogRead(qrdPin) > CLIFF)
+boolean Motion::isOverCliff (uint8_t qrdPin) {
+  if (analogRead(qrdPin) > CLIFF)
     return true;
   return false;
 }
