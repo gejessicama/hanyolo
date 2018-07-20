@@ -6,17 +6,13 @@
 #define leftQRD 3
 #define lQRD2 4
 #define rQRD2 1
-#define encoder0PinA 9
-#define encoder0PinB 10
-#define encoder1PinA 11
-#define encoder1PinB 12
+#define encoder0PinA 8
+#define encoder0PinB 9
+#define encoder1PinA 10
+#define encoder1PinB 11
 #define POW 0.6
-<<<<<<< HEAD
-#define qrdcliff 800
-#define ON 400
-=======
 #define qrdcliff 700
->>>>>>> bd8e0d20c5fd993d482338f4329e878f2c55bdb6
+#define ON 400
 
 int currentErr, lastErr, lastState;
 int lastOn = -1;

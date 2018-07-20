@@ -12,8 +12,14 @@ void loop() {
     while(true) {
       robotMotion.followTape();
       long pos0 = robotMotion.getEncoder0(false,true);
+      long pos1 = robotMotion.getEncoder1(false,true);
       LCD.clear();
-      LCD.print(pos0);/*
+      LCD.print("P0 ");
+      LCD.print(pos0);
+      LCD.print("\t");
+      LCD.print("P1 ");
+      LCD.print(pos1);
+      /*
       if(robotMotion.cliff()) {
         robotMotion.stopMoving();
         robotMotion.dropBridge1();
