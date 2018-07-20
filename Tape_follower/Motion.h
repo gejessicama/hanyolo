@@ -12,7 +12,9 @@ class Motion{
     void ResetServo();
     void dropBridge1();
     void dropBridge2();
-    
+    void stopMoving();
+    long getEncoder0(bool,bool);
+    long getEncoder1(bool,bool);
 };
 
 #endif

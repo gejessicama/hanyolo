@@ -6,8 +6,11 @@ class Claw{
   private:
     
   public:
-    
-    
+    Claw();
+    boolean pickUpRight();
+    boolean pickUpLeft();
+    boolean pickUpFront();
+  
 };
 
 #endif

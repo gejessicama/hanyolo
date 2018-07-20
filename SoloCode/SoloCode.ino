@@ -1,11 +1,8 @@
 /*
- * Draft of potential Robot Code
- * 
- * "Main" function that calls and runs all others
- * 
- * can edit functionality s.t. this keeps track of all the pins
- * or can edit functionallity such taht a menu keeps track of all the pins
- */
+   Code for the TINAH
+
+   Solo
+*/
 
 #include <phys253.h>
 #include "Motion.h"
@@ -13,79 +10,159 @@
 
 #define rightMotor 0
 #define leftMotor 1
-#define rightQRD 8
-#define leftQRD 9
+#define rightMostQRD 1
+#define rightMiddleQRD 2
+#define leftMiddleQRD 3
+#define leftMostQRD 4
+#define rightOutQRD 5
+#define rightInQRD 6
 
-#define onTheSurface 400
 #define baseSpeed 255
+#define onTheTape 400
+#define overTheCliff 700
 
 #define pGainConst 54
 #define dGainConst 0
 
+#define fromChewPin 0
+#define toChewPin 8
+#define rightEncoderPin 1
+#define leftEncoderPin 3
+
+volatile uint8_t state = 0;
+volatile uint8_t rememberState;
+volatile uint16_t rightWheelDist, leftWheelDist;
+
+Motion hanMovo(rightMotor, leftMotor, onTheTape, overTheCliff, baseSpeed);
+Crossing hanFlyo(rightMotor, leftMotor, rightMostQRD, leftMostQRD, overTheCliff);
+
+void updateChewState();
+
+//  INTERRUPT FUNCTIONS
+void pauseState();
+void resumeState();
+void incrementRightPos(); //just need to know how much distance corresponds to
+void incrementLeftPos();
+
 void setup() {
-  Serial1.begin(9600);
+  attachInterrupt(digitalPinToInterrupt(fromChewPin), pauseState, RISING);
+  attachInterrupt(digitalPinToInterrupt(fromChewPin), resumeState, FALLING);
 }
 
-uint8_t state = 1;
-
-Motion hanYolo(rightMotor, leftMotor, onTheSurface, baseSpeed);
-
 void loop() {
-  /*
-     Based on the state, call different functions that will tell the robot how to move
-     each case for each state will likely have another non repeated function to call
-     when the sate needs to end and switch to the next state
 
-     Most if not all functions called here can be placed in additional classes to make
-     organization and debugging easier
-  */
   switch (state) {
-    case 1 : // STARTING STATE UNTIL FIRST GAP
-      hanYolo.followTape(rightQRD, leftQRD, pGainConst, dGainConst);
-      //read in QRDs determine speed
-      //read in QRDs for cliff detection
-      //check if sonar sees a cliff
-      //check if sonar sees a stuffy
-      // pick up stuffy when seen
-      // figure out conditions that lead to state 2
+    case 1 : // STARTING STATE UNTIL FIRST GAP :: could also read in QRDs to detect cliffs on the side of the robot
+      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
+      if (hanFlyo.cliff()) {
+        state ++;
+        updateChewState();
+        hanFlyo.dropBridge1(); // dropping the first bridge will include backing up to the right distance
+      }
       break;
-    case 2 : //we need to cross the gap
-      //read in QRDs to follow bridge
-      //read in sonar to not run off bridge
+
+    case 2 : //CROSSING THE FIRST GAP :: could have updated tape function to wiggle if we lose the tape, side cliff detection
+
+      // THIS NEEDS TO BE MORE THOUGH OUT
+      /*
+         Second bridge should block IR signal until we have turned a bit (and hopefully picked up the stuffy
+         as soon as we detect the IR signal we need to stop and wait for it to change frequencies
+         likely we should have a helper function we call that just loops and waits for signal to change
+         and when the signal changes then we exit and increment
+      */
+      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
+
+      //look for IR beacon
+      //when the IR beacon changes from 1k to 10k
+      state++;
+      updateChewState();
+      attachInterrupt(digitalPinToInterrupt(rightEncoderPin), incrementRightPos, RISING);
       break;
-    case 3 : //we are now in front of the IR beacon
-      //read in QRDs to follow tape
-      //check if sonar sees a cliff
-      //check if IR sensor sees the right frequency
-      // go go go when right frequency found!!! and next state
+
+    case 3 : //IR BEACON JUST CHANGED FREQUENCY
+      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
+      //Side cliff detection??
+
+      // WHEN WE HAVE GONE A CERTAIN DISTANCE CHANGE STATE
+      state++;
+      updateChewState();
+      detachInterrupt(digitalPinToInterrupt(rightEncoderPin));
       break;
-    case 4 : // we are now in the stormtrooper room
-      //read in QRDs to tape follow
-      //read in QRDs for cliff detection
-      //check if sonar sees a stuffy
-      // pick up stuffy when found
-      // 90 turn when cliff reached
+
+    case 4 : // WE ARE NOW PAST THE STORMTROOPERS
+      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
+      if (hanFlyo.cliff()) {
+        state ++;
+        updateChewState();
+        //hanFlyo.backUp();
+        //hanFlyo.turnRight();
+        attachInterrupt(digitalPinToInterrupt(rightEncoderPin), incrementRightPos, RISING);
+      }
       break;
-    case 5 : // we are about to cross the second gap
-      // run motors but no tape following
-      // check QRDs for cliff
-      // check sonar for cliff
-      // when front cliff found drop bridge and continue
-      // figure out when done crossing 90 turn and to enter next state
+
+    case 5 : //WE JUST LEFT THE TAPE AND TURNED TOWARDS THE SECOND GAP
+      //move both wheels forward to cover the same distance
+      //Side cliff detection???? maybe not
+
+      if (hanFlyo.cliff()) {
+        state ++;
+        updateChewState();
+        detachInterrupt(digitalPinToInterrupt(rightEncoderPin));
+        hanFlyo.dropBridge2();
+      }
       break;
-    case 6 : // we just reached first tower
-      //check sonar to pick up stuffy
-      //use edge following to move forward
-      //check sonar to know we have reached 2nd tower
+
+    case 6 : //WE JUST DROPPED THE SECOND BRIDGE
+      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
+      if (hanFlyo.cliff()){
+        state++;
+        updateChewState();
+        attachInterrupt(digitalPinToInterrupt(rightEncoderPin), incrementRightPos, RISING);
+      }
       break;
-    case 7 : //we are on the second tower
-      // move slowly
-      // check sonar (in front??) to find chewy
-      // when chewy picked up exectute basket return
+
+    case 7 : //WE JUST CROSSED OUR SECOND BRIDGE
+      //move both wheels forward to cover the same distance
+      //when we have moved forward a set distance
+        state++;
+        updateChewState();
+        detachInterrupt(digitalPinToInterrupt(rightEncoderPin));
+        
       break;
-    case 8: //completed course
+
+    case 8 : //WE JUST TURNED TOWARDS THE SECOND TOWER
+      hanMovo.followRightEdge(rightOutQRD, rightInQRD, pGainConst, dGainConst);
+      //either check if interrupt has been called then lift the basket, or have Chew lift the basket
+      //if check interrupt method then increment states
+      //otherwise wait for basket touch sensor to go to 0 then increment states
+      break;
+
+    case 9 : //COMPLETED THE COURSE MAYBE
       // something about shutting off/ just chilling
       break;
   }
-
 }
+
+void updateChewState() {
+  digitalWrite(toChewPin, HIGH);
+  digitalWrite(toChewPin, LOW);
+}
+
+// INTERRUPT FUNCTIONS
+void pauseState() {
+  rememberState = state;
+  state = 0;
+}
+
+void resumeState() {
+  state = rememberState;
+}
+
+void incrementRightPos(){
+  
+}
+
+void incrementLeftPos(){
+  
+}
+
