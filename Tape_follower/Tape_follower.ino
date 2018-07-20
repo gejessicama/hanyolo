@@ -7,11 +7,8 @@ void setup(){
   robot.ResetServo();
 }
 
-<<<<<<< HEAD
-=======
 Motion robotMotion(54,0);
 
->>>>>>> 243827279eb41b3cf559fbad039fa27535020f14
 void loop() {
 
     while(true) {

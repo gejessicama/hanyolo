@@ -11,13 +11,9 @@
 #define encoder1PinA 11
 #define encoder1PinB 12
 #define POW 0.6
-<<<<<<< HEAD
 #define qrdcliff 830
 #define rightServo 0
-=======
-#define qrdcliff 800
 #define ON 400
->>>>>>> 243827279eb41b3cf559fbad039fa27535020f14
 
 int currentErr, lastErr, lastState;
 int lastOn = -1;
@@ -116,13 +112,11 @@ void Motion::dropBridge2(){
 void Motion::stopMoving(){
   motor.speed(rightMotor, POW*(0));
   motor.speed(leftMotor, POW*(0));
-<<<<<<< HEAD
   delay(1000);
   LCD.clear();
 
   RCServo0.write(180); //right servo  90 -> 90 + 40 -> 180
   delay(15);
-=======
 }
 
 long Motion::getEncoder0(bool velocity,bool displacement){ 
@@ -186,7 +180,6 @@ long Motion::getEncoder1(bool velocity,bool displacement){
     if(displacement){
       return posi;
     }
->>>>>>> 243827279eb41b3cf559fbad039fa27535020f14
 }
 
 
