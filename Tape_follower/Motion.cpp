@@ -8,7 +8,8 @@
 #define rQRD2 1
 #define ON 400
 #define POW 0.6
-#define qrdcliff 700
+#define qrdcliff 830
+#define rightServo 0
 
 int currentErr, lastErr, lastState;
 int lastOn = -1;
@@ -65,7 +66,7 @@ void Motion::followTape(){
       count = 0;
     }
     lastErr = currentErr;
-    count ++; 
+    count++; 
 }
 
 bool Motion::cliff(){
@@ -76,6 +77,12 @@ bool Motion::cliff(){
     }
 }
 
+void Motion::ResetServo(){
+  //reset the servos to inital positions
+  RCServo0.write(90); //right servo  90 -> 100 -> 180
+  delay(15);
+}
+
 void Motion::dropBridge1(){
   LCD.clear();
   LCD.print("B1 down");
@@ -83,6 +90,9 @@ void Motion::dropBridge1(){
   motor.speed(leftMotor, POW*(0));
   delay(1000);
   LCD.clear();
+
+  RCServo0.write(100); //right servo  90 -> 100 -> 180
+  delay(15);
 }
 
 void Motion::dropBridge2(){
@@ -92,6 +102,9 @@ void Motion::dropBridge2(){
   motor.speed(leftMotor, POW*(0));
   delay(1000);
   LCD.clear();
+
+  RCServo0.write(180); //right servo  90 -> 90 + 40 -> 180
+  delay(15);
 }
 
 

@@ -9,6 +9,7 @@ class Motion{
   	Motion(int pr,int dv);
   	void followTape();
     bool cliff();
+    void ResetServo();
     void dropBridge1();
     void dropBridge2();
     
