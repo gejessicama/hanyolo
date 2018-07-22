@@ -27,10 +27,10 @@
 //#define oneIRPin
 //#define tenIRPin
 
-#define rightEncoderPin 1
-#define leftEncoderPin 3
+#define rightEncoderPin 1 //THIS PIN MAY NOT BE WORKING
+#define leftEncoderPin 2
 
-#define fromChewPin 0
+#define fromChewPin 3
 #define toChewPin 8
 #define dropTheBridgePin 9
 
@@ -53,32 +53,30 @@ volatile uint8_t rightWheelDist, leftWheelDist;
 Motion hanMovo(rightMotor, leftMotor, onTheTape, overTheCliff, baseSpeed);
 Crossing hanFlyo(rightMotor, leftMotor, rightMostQRD, leftMostQRD, overTheCliff, backUpBridgeDistance);
 
-//  HELPER FUNCTIONS 
+//  HELPER FUNCTIONS
 void updateChewState();
 void raiseBasket();
 void lowerBasket();
 
 //  INTERRUPT FUNCTIONS
-void pauseState();
-void resumeState();
+void changeState();
 void incrementRightPos(); //just need to know how much distance corresponds to
 void incrementLeftPos();
 
 void setup() {
-  attachInterrupt(digitalPinToInterrupt(fromChewPin), pauseState, RISING);
-  attachInterrupt(digitalPinToInterrupt(fromChewPin), resumeState, FALLING);
+  attachInterrupt(fromChewPin, changeState, CHANGE);
 }
 
 void loop() {
 
   switch (state) {
-    
+
     case 0 : // START BUTTON NOT YET PRESSED
-      if (startbutton()){
+      if (startbutton()) {
         updateState();
       }
       break;
-      
+
     case 1 : // STARTING STATE UNTIL FIRST GAP :: could also read in QRDs to detect cliffs on the side of the robot
       hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
       if (hanFlyo.cliff()) {
@@ -104,12 +102,12 @@ void loop() {
       rightWheelDist = 0;
       leftWheelDist = 0;
       attachInterrupt(digitalPinToInterrupt(rightEncoderPin), incrementRightPos, RISING);
-      
+
       break;
 
     case 3 : //IR BEACON JUST CHANGED FREQUENCY :: side cliff?
       hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
-      if(rightWheelDist > distanceToStormtroopers){
+      if (rightWheelDist > distanceToStormtroopers) {
         updateState();
         detachInterrupt(digitalPinToInterrupt(rightEncoderPin));
       }
@@ -140,7 +138,7 @@ void loop() {
 
     case 6 : //WE JUST DROPPED THE SECOND BRIDGE
       hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
-      if (hanFlyo.cliff()){
+      if (hanFlyo.cliff()) {
         updateState();
         rightWheelDist = 0;
         leftWheelDist = 0;
@@ -151,9 +149,9 @@ void loop() {
     case 7 : //WE JUST CROSSED OUR SECOND BRIDGE
       //move both wheels forward to cover the same distance
       //when we have moved forward a set distance
-        updateState();
-        detachInterrupt(digitalPinToInterrupt(rightEncoderPin));
-        
+      updateState();
+      detachInterrupt(digitalPinToInterrupt(rightEncoderPin));
+
       break;
 
     case 8 : //WE JUST TURNED TOWARDS THE SECOND TOWER
@@ -175,32 +173,32 @@ void updateState() {
   digitalWrite(toChewPin, LOW);
 }
 
-void raiseBasket(){
-  
+void raiseBasket() {
+
 }
 
-void lowerBasket(){
-  
+void lowerBasket() {
+
 }
 
 // INTERRUPT FUNCTIONS
-void pauseState() {
-  rememberState = state;
-  state = 0;
-}
-
-void resumeState() {
-  state = rememberState;
-  if (state == 8){
-    raiseBasket();
+void changeState() {
+  if (state == 0) {
+    state = rememberState;
+    if (state == 8) {
+      raiseBasket();
+    }
+  } else {
+    rememberState = state;
+    state = 0;
   }
 }
 
-void incrementRightPos(){
-  
+void incrementRightPos() {
+
 }
 
-void incrementLeftPos(){
-  
+void incrementLeftPos() {
+
 }
 
