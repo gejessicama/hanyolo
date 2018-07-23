@@ -1,0 +1,104 @@
+/*
+   Solo code just for the first stage of the course with full functionality
+*/
+
+#include <phys253.h>
+#include "Motion.h"
+#include "Crossing.h"
+
+#define rightMotor 0
+#define leftMotor 1
+#define scissorLiftMotor 2
+
+#define rightMostQRD 1
+#define rightMiddleQRD 2
+#define leftMiddleQRD 3
+#define leftMostQRD 4
+#define rightOutQRD 5
+#define rightInQRD 6
+
+//#define basketSensorPin
+//#define scissorUpLimitPin
+//#define scissorDownLimitPin
+//#define oneIRPin
+//#define tenIRPin
+
+#define rightEncoderPin 1 //THIS PIN MAY NOT BE WORKING
+#define leftEncoderPin 2
+
+#define fromChewPin 3
+#define toChewPin 8
+#define dropTheBridgePin 9
+
+
+#define baseSpeed 255
+//#define powerMultiplier 1
+#define onTheTape 400
+#define overTheCliff 700
+
+#define pGainConst 54
+#define dGainConst 0
+
+#define distanceToStormtroopers 36
+#define backUpBridgeDistance 2
+
+volatile uint8_t state = 0;
+volatile uint8_t rememberState;
+volatile uint16_t rightWheelDist, leftWheelDist;
+
+Motion hanMovo(rightMotor, leftMotor, onTheTape, overTheCliff, baseSpeed);
+Crossing hanFlyo(rightMotor, leftMotor, rightMostQRD, leftMostQRD, overTheCliff, backUpBridgeDistance);
+
+//  HELPER FUNCTIONS
+void updateChewState();
+void raiseBasket();
+void lowerBasket();
+
+//  INTERRUPT FUNCTIONS
+void changeState();
+void incrementRightPos(); //just need to know how much distance corresponds to
+void incrementLeftPos(); //need to make sure wheels only turn forwards
+
+void setup() {
+  pinMode(rightEncoderPin, INPUT);
+  pinMode(leftEncoderPin, INPUT);
+  pinMode(fromChewPin, INPUT);
+  attachInterrupt(fromChewPin, changeState, CHANGE);
+}
+
+void loop() {
+
+  switch (state) {
+
+    case 0 : // START BUTTON NOT YET PRESSED
+      if (startbutton()) {
+        state = 1;
+        updateState();
+      }
+      break;
+
+    case 1 : // STARTING STATE UNTIL FIRST GAP :: could also read in QRDs to detect cliffs on the side of the robot
+      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
+      if (hanFlyo.cliff()) {
+        hanFlyo.dropBridge1(dropTheBridgePin); // dropping the first bridge will include backing up to the right distance
+        state = 0;
+        updateState();
+      }
+      break;
+  }
+}
+
+void updateState() {
+  digitalWrite(toChewPin, HIGH);
+  digitalWrite(toChewPin, LOW);
+}
+
+// INTERRUPT FUNCTIONS
+void changeState() {
+  if (state == 0) {
+    state = rememberState;
+  } else {
+    rememberState = state;
+    state = 0;
+  }
+}

@@ -48,7 +48,7 @@
 
 volatile uint8_t state = 0;
 volatile uint8_t rememberState;
-volatile uint8_t rightWheelDist, leftWheelDist;
+volatile uint16_t rightWheelDist, leftWheelDist;
 
 Motion hanMovo(rightMotor, leftMotor, onTheTape, overTheCliff, baseSpeed);
 Crossing hanFlyo(rightMotor, leftMotor, rightMostQRD, leftMostQRD, overTheCliff, backUpBridgeDistance);
@@ -61,9 +61,12 @@ void lowerBasket();
 //  INTERRUPT FUNCTIONS
 void changeState();
 void incrementRightPos(); //just need to know how much distance corresponds to
-void incrementLeftPos();
+void incrementLeftPos(); //need to make sure wheels only turn forwards
 
 void setup() {
+  pinMode(rightEncoderPin, INPUT);
+  pinMode(leftEncoderPin, INPUT);
+  pinMode(fromChewPin, INPUT);
   attachInterrupt(fromChewPin, changeState, CHANGE);
 }
 
