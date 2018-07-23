@@ -18,7 +18,7 @@ Crossing::Crossing(uint8_t rMotor, uint8_t lMotor, uint8_t rQRD, uint8_t lQRD, u
 }
 
 boolean Crossing::cliff() {
-  if (analogRead(rightQRD) > overTheCliff || analogRead(leftQRD) > overTheCliff) {
+  if (analogRead(rightQRD) > overTheCliff && analogRead(leftQRD) > overTheCliff) {
     motor.speed(rightMotor, -255);
     motor.speed(leftMotor, -255);
     return true;

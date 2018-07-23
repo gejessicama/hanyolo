@@ -32,15 +32,15 @@ volatile uint8_t state;
 
 boolean readInSonar(uint8_t, uint8_t, uint16_t);
 void updateState();
-void dropBridge1();
-void dropBridge2();
+void dropBridge();
 
 void setup() {
+//  Serial.begin(9600);
   pinMode(rightTriggerPin, OUTPUT);
   pinMode(leftTriggerPin, OUTPUT);
   pinMode(toSoloPin, OUTPUT);
   attachInterrupt(digitalPinToInterrupt(fromSoloPin), updateState, RISING);
-  attachInterrupt(digitalPinToInterrupt(dropTheBridgePin), dropBridge, RISING);
+//  attachInterrupt(digitalPinToInterrupt(dropTheBridgePin), dropBridge, RISING);
 }
 
 void loop() {
@@ -55,11 +55,11 @@ void loop() {
         grabbyBoi.pickUpRight();
         digitalWrite(toSoloPin, LOW);
       }
-      if (readInSonar(leftTriggerPin, leftEchoPin)){
-        digitalWrite(toSoloPin, HIGH);
-        grabbyBoi.pickUpLeft();
-        digitalWrite(toSoloPin, LOW);
-      }
+//      if (readInSonar(leftTriggerPin, leftEchoPin)){
+//        digitalWrite(toSoloPin, HIGH);
+//        grabbyBoi.pickUpLeft();
+//        digitalWrite(toSoloPin, LOW);
+//      }
       break;
   }
 }
@@ -74,6 +74,7 @@ boolean readInSonar(uint8_t trig, uint8_t echo){
 //  INTERRUPT FUNCTIONS
 void updateState() {
   state++;
+  Serial.println("updated");
 }
 
 void dropBridge(){

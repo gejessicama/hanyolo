@@ -23,7 +23,7 @@
 //#define oneIRPin
 //#define tenIRPin
 
-#define rightEncoderPin 1 //THIS PIN MAY NOT BE WORKING
+#define rightEncoderPin 1
 #define leftEncoderPin 2
 
 #define fromChewPin 3
@@ -60,9 +60,13 @@ void incrementRightPos(); //just need to know how much distance corresponds to
 void incrementLeftPos(); //need to make sure wheels only turn forwards
 
 void setup() {
-  pinMode(rightEncoderPin, INPUT);
-  pinMode(leftEncoderPin, INPUT);
+  //#include <phys253setup.txt>
+  //  pinMode(rightEncoderPin, INPUT);
+  //  pinMode(leftEncoderPin, INPUT);
+  LCD.begin();
+  LCD.print("Hello");
   pinMode(fromChewPin, INPUT);
+  pinMode(toChewPin, OUTPUT);
   attachInterrupt(fromChewPin, changeState, CHANGE);
 }
 
@@ -71,6 +75,8 @@ void loop() {
   switch (state) {
 
     case 0 : // START BUTTON NOT YET PRESSED
+      LCD.clear();
+      LCD.print("Waiting");
       if (startbutton()) {
         state = 1;
         updateState();
@@ -78,12 +84,17 @@ void loop() {
       break;
 
     case 1 : // STARTING STATE UNTIL FIRST GAP :: could also read in QRDs to detect cliffs on the side of the robot
+      LCD.clear();
+      LCD.print("Moving");
       hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
-      if (hanFlyo.cliff()) {
-        hanFlyo.dropBridge1(dropTheBridgePin); // dropping the first bridge will include backing up to the right distance
-        state = 0;
-        updateState();
-      }
+//      if (hanFlyo.cliff()) {
+//        //hanFlyo.dropBridge1(dropTheBridgePin); // dropping the first bridge will include backing up to the right distance
+//        state = 0;
+//        updateState();
+//      }
+      break;
+    case 2 :
+      //LCD.clear();
       break;
   }
 }
@@ -95,10 +106,13 @@ void updateState() {
 
 // INTERRUPT FUNCTIONS
 void changeState() {
-  if (state == 0) {
-    state = rememberState;
+//  LCD.clear();
+//  LCD.print("Stuffy Seen");
+    if (state == 2) {
+    state = 1;
+    //    state = rememberState;
   } else {
-    rememberState = state;
-    state = 0;
+    //    rememberState = state;
+    state = 2;
   }
 }
