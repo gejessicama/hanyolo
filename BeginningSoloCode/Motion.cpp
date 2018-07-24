@@ -29,7 +29,7 @@ void Motion::pidControl(uint8_t proportionalGain, uint8_t derivativeGain) {
   gain = proportionalTerm + derivativeTerm;
 
   motor.speed(rightMotor, baseSpeed + gain);
-  motor.speed(leftMotor, baseSpeed - gain);
+  motor.speed(leftMotor, -baseSpeed + gain);
 
   if (currentError != lastError) {
     lastState = lastError;
