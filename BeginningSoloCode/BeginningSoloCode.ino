@@ -83,7 +83,7 @@ void loop() {
       }
       break;
     case 23 :
-      LCD.clear();
+      LCD.clear(); 
       LCD.println(analogRead(leftMostQRD));
       LCD.print(analogRead(rightMostQRD));
       state = 23;
