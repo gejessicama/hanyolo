@@ -6,37 +6,15 @@
 */
 #include "Motion.h"
 
-Motion::Motion(uint8_t rMotor, uint8_t lMotor, uint8_t onTape, uint8_t overCliff, int v0) {
+Motion::Motion(uint8_t rMotor, uint8_t lMotor, uint8_t onTape, uint8_t overCliff,
+               int v0, double powerMult) {
 
   rightMotor = rMotor;
   leftMotor = lMotor;
   ON = onTape;
   CLIFF = overCliff;
   baseSpeed = v0;
-}
-
-void Motion::reset() {
-  lastError = 0;
-  lastState = 0;
-  lastOn = -1;
-  count = 0;
-
-}
-
-void Motion::pidControl(uint8_t proportionalGain, uint8_t derivativeGain) {
-  proportionalTerm = proportionalGain * currentError;
-  derivativeTerm = derivativeGain * (currentError - lastState) * 1.0 / count;
-  gain = proportionalTerm + derivativeTerm;
-
-  motor.speed(rightMotor, baseSpeed + gain);
-  motor.speed(leftMotor, baseSpeed - gain);
-
-  if (currentError != lastError) {
-    lastState = lastError;
-    count = 0;
-  }
-  lastError = currentError;
-  count ++;
+  powerMultiplier = powerMult;
 }
 
 void Motion::followTape(uint8_t rightQRD, uint8_t leftQRD, uint8_t proportionalGain,
@@ -61,114 +39,28 @@ void Motion::followTape(uint8_t rightQRD, uint8_t leftQRD, uint8_t proportionalG
   pidControl(proportionalGain, derivativeGain);
 }
 
-void Motion::followRightEdge(uint8_t outQRD, uint8_t inQRD, uint8_t proportionalGain,
-                             uint8_t derivativeGain) {
+void Motion::pidControl(uint8_t proportionalGain, uint8_t derivativeGain) {
+  proportionalTerm = proportionalGain * currentError;
+  derivativeTerm = derivativeGain * (currentError - lastState) * 1.0 / count;
+  gain = proportionalTerm + derivativeTerm;
 
-  rVal = isOverCliff(outQRD);
-  lVal = isOnWhite(inQRD);
+  motor.speed(rightMotor, powerMultiplier * (baseSpeed + gain));
+  motor.speed(leftMotor, powerMultiplier * (-baseSpeed + gain));
 
-  if (rVal && !lVal) { // We are over the cliff all is good
-    currentError = 0;
-    lastState = 0;
-  } else if (!rVal && !lVal) { // We are too far left
-    currentError = -1;
-    lastOn = -1;
-  } else if (rVal && lVal) { // We are too far right
-    currentError = 1;
-    lastOn = 1;
+  if (currentError != lastError) {
+    lastState = lastError;
+    count = 0;
   }
-
-  pidControl(proportionalGain, derivativeGain);
+  lastError = currentError;
+  count ++;
 }
-
-void Motion::bothWheelsForward(uint8_t rightDistance, uint8_t leftDistance,
-                       uint8_t proportionalGain, uint8_t derivativeGain) {
-  if (rightDistance == leftDistance) { // no problem
-    currentError = 0;
-    lastState = 0;
-  } else {
-    currentError = leftDistance - rightDistance;
-    lastOn = currentError;
-  }
-
-  pidControl(proportionalGain, derivativeGain);
-}
-
-
-//long Motion::getEncoder0(bool velocity,bool displacement){
-//  long cp = encoder0Pos;
-//  long velo;
-//  long posi = cp;
-//  delay(1);
-//  n = digitalRead(encoder0PinA);
-//  if ((encoder0PinALast == LOW) && (n == HIGH)) {
-//    if (digitalRead(encoder0PinB) == LOW) {
-//      encoder0Pos--;
-//    } else {
-//      encoder0Pos++;
-//    }
-//    unsigned long ft = millis();
-//    //float vel = 1000.0*((float) encoder0Pos-cp)/(ft-it+.5);
-//    time_[i%8] = ft;
-//    pos[i%8] = cp;
-//    float vel = 1000.0*((float)cp - pos[(i+1)%8])/(ft - time_[(i+1)%8]);
-//    velo = vel;
-//    posi = cp;
-//    it = ft;
-//    i++;
-//  }
-//   //nsigned long vel = (encoder0Pos - cp)/(50
-//  encoder0PinALast = n;
-//  if (velocity){
-//      return velo;
-//    }
-//    if(displacement){
-//      return posi;
-//    }
-//}
-//long Motion::getEncoder1(bool velocity,bool displacement){
-//  long cp = encoder1Pos;
-//  long velo;
-//  long posi = cp;
-//  delay(1);
-//  n = digitalRead(encoder1PinA);
-//  if ((encoder1PinALast == LOW) && (n == HIGH)) {
-//    if (digitalRead(encoder1PinB) == LOW) {
-//      encoder1Pos--;
-//    } else {
-//      encoder1Pos++;
-//    }
-//    unsigned long ft = millis();
-//    //float vel = 1000.0*((float) encoder0Pos-cp)/(ft-it+.5);
-//    time_1[i1%8] = ft;
-//    pos1[i1%8] = cp;
-//    float vel = 1000.0*((float)cp - pos[(i1+1)%8])/(ft - time_[(i1+1)%8]);
-//    velo = vel;
-//    posi = cp;
-//    it = ft;
-//    i1++;
-//  }
-//   //nsigned long vel = (encoder0Pos - cp)/(50
-//  encoder1PinALast = n;
-//  if (velocity){
-//      return velo;
-//    }
-//    if(displacement){
-//      return posi;
-//    }
-//}
 
 boolean Motion::isOnWhite (uint8_t qrdPin) {
-  if (analogRead(qrdPin) < ON)
+  if (analogRead(qrdPin) < ON) {
     return true;
-  return false;
+  } else {
+    return false;
+  }
 }
-
-boolean Motion::isOverCliff (uint8_t qrdPin) {
-  if (analogRead(qrdPin) > CLIFF)
-    return true;
-  return false;
-}
-
 
 

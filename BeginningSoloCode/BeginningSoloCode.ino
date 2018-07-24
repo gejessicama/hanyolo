@@ -32,7 +32,7 @@
 
 
 #define baseSpeed 255
-//#define powerMultiplier 1
+#define powerMultiplier 0.5
 #define onTheTape 400
 #define overTheCliff 700
 
@@ -46,7 +46,7 @@ volatile uint8_t state = 0;
 volatile uint8_t rememberState;
 volatile uint16_t rightWheelDist, leftWheelDist;
 
-Motion hanMovo(rightMotor, leftMotor, onTheTape, overTheCliff, baseSpeed);
+Motion hanMovo(rightMotor, leftMotor, onTheTape, overTheCliff, baseSpeed, powerMultiplier);
 Crossing hanFlyo(rightMotor, leftMotor, rightMostQRD, leftMostQRD, overTheCliff, backUpBridgeDistance);
 
 //  HELPER FUNCTIONS
