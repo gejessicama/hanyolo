@@ -70,5 +70,13 @@ boolean Motion::isOnWhite (uint8_t qrdPin) {
     return false;
   }
 }
-
+/*
+bool Motion::cliff() {
+  int lVal2 = analogRead(lQRD2);
+  int rVal2 = analogRead(rQRD2);
+  if (lVal2 > qrdcliff && rVal2 > qrdcliff) {
+    //dropBridge1();
+    return true;
+  }
+}*/
 

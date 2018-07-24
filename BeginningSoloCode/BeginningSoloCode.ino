@@ -32,9 +32,9 @@
 
 
 #define baseSpeed 255
-#define powerMultiplier 0.5
+#define powerMultiplier 0.6
 #define onTheTape 400
-#define overTheCliff 700
+#define overTheCliff 750
 
 #define pGainConst 54
 #define dGainConst 0
@@ -82,16 +82,24 @@ void loop() {
         updateState();
       }
       break;
-
+    case 23:
+      LCD.println(analogRead(leftMostQRD));
+      LCD.print(analogRead(rightMostQRD));
+      state = 23;
+    
     case 1 : // STARTING STATE UNTIL FIRST GAP :: could also read in QRDs to detect cliffs on the side of the robot
       LCD.clear();
       LCD.print("Moving");
       hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
-//      if (hanFlyo.cliff()) {
-//        //hanFlyo.dropBridge1(dropTheBridgePin); // dropping the first bridge will include backing up to the right distance
-//        state = 0;
-//        updateState();
-//      }
+      if (hanFlyo.cliff()) {
+        //LCD.clear();
+        //LCD.print("CLiff");
+        state = 23;//exp
+        
+       //hanFlyo.dropBridge1(dropTheBridgePin); // dropping the first bridge will include backing up to the right distance
+        //state = 0;//experiment
+        //updateState();
+      }
       break;
     case 2 :
       //LCD.clear();

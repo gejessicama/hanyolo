@@ -21,6 +21,8 @@ boolean Crossing::cliff() {
   if (analogRead(rightQRD) > overTheCliff && analogRead(leftQRD) > overTheCliff) {
     motor.speed(rightMotor, -255);
     motor.speed(leftMotor, -255);
+    motor.stop(rightMotor);
+    motor.stop(leftMotor);
     return true;
   }
   return false;
