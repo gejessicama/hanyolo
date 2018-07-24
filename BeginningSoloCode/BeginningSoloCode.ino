@@ -34,7 +34,7 @@
 #define baseSpeed 255
 #define powerMultiplier 0.6
 #define onTheTape 400
-#define overTheCliff 750
+#define overTheCliff 700
 
 #define pGainConst 54
 #define dGainConst 0
