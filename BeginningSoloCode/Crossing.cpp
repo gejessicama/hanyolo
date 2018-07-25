@@ -16,23 +16,62 @@ Crossing::Crossing(uint8_t rMotor, uint8_t lMotor, uint8_t rQRD, uint8_t lQRD, u
   overTheCliff = overCliff;
   backUpDistance = backDist;
 }
-
+int count = 0;
+int seq = 0;
+long l = 0.0;
+long r = 0.0;
+long avl = l;
+long avr = r;
 boolean Crossing::cliff() {
-  if (analogRead(rightQRD) > overTheCliff || analogRead(leftQRD) > overTheCliff) {
+  /*
+  long lt = analogRead(leftQRD);
+  long rt = analogRead(rightQRD);
+  seq++;
+  if ( lt> overTheCliff &&  rt> overTheCliff){
+
+    
+    l+=lt;
+    r+=rt;
+    
+    if(seq != count){
+      count = 0;
+      l = 0.0;
+      r = 0.0;
+      seq = 0;
+    }
+      
+  }
+  if (count > 0){
+    avl = l/(count);
+    avr = r/(count);
+  }
+
+  
+  if (count == 5 && avl> overTheCliff &&  avr> overTheCliff){
     motor.speed(rightMotor, -255);
     motor.speed(leftMotor, -255);
+    motor.stop(rightMotor);
+    motor.stop(leftMotor);
+    count = 0;
+    return true;
+  }
+  */
+  if (analogRead(rightQRD) > overTheCliff && analogRead(leftQRD) > overTheCliff) {
+    
+    motor.speed(rightMotor, -255);
+    motor.speed(leftMotor, -255);
+    motor.stop(rightMotor);
+    motor.stop(leftMotor);
     return true;
   }
   return false;
 }
 
-void Crossing::backUp(uint8_t distance) {
-  // monitor both? or one? encoder to back up to that distance
-}
-
 void Crossing::dropBridge1(uint8_t communicationPin) {
-  backUp(backUpDistance);
+  //backup here
   digitalWrite(communicationPin, HIGH);
+  digitalWrite(communicationPin, LOW);
+  //wait for bridge to fall
 }
 
 void Crossing::dropBridge2(uint8_t communicationPin) {
