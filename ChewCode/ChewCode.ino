@@ -79,7 +79,7 @@ void loop() {
     case 6 : // WE JUST CROSSED OUR SECOND BRIDGE
       if (readInSonar(triggerPinFront, echoPinFront, objectLimit)) {
         digitalWrite(toSoloPin, HIGH);
-        //activate front claw pick up
+        //activate front claw pick up 
         digitalWrite(toSoloPin, LOW);
       }
       break;

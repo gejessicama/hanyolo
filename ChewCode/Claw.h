@@ -5,6 +5,10 @@
 class Claw{
   private:
     
+    boolean dropoff();
+    void open();
+    void close();
+
   public:
     Claw();
     boolean pickUpRight();
