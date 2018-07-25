@@ -26,15 +26,21 @@
 #define rightEncoderPin 1
 #define leftEncoderPin 2
 
+#define rightEncoderPinA 0
+#define rightEncoderPinB 1
+#define leftEncoderPinA 2
+#define leftEncoderPinB 3
+
+
 #define fromChewPin 3
 #define toChewPin 8
 #define dropTheBridgePin 9
 
 
-#define baseSpeed 255
-#define powerMultiplier 0.6
+#define baseSpeed 100
+#define powerMultiplier 0.30 
 #define onTheTape 400
-#define overTheCliff 700
+#define overTheCliff 650
 
 #define pGainConst 54
 #define dGainConst 0
@@ -46,7 +52,7 @@ volatile uint8_t state = 0;
 volatile uint8_t rememberState;
 volatile uint16_t rightWheelDist, leftWheelDist;
 
-Motion hanMovo(rightMotor, leftMotor, onTheTape, overTheCliff, baseSpeed, powerMultiplier);
+Motion hanMovo(rightMotor, leftMotor, onTheTape, overTheCliff, baseSpeed, powerMultiplier,leftEncoderPinA,leftEncoderPinB,rightEncoderPinA,rightEncoderPinB);
 Crossing hanFlyo(rightMotor, leftMotor, rightMostQRD, leftMostQRD, overTheCliff, backUpBridgeDistance);
 
 //  HELPER FUNCTIONS
@@ -65,15 +71,50 @@ void setup() {
   //  pinMode(leftEncoderPin, INPUT);
   LCD.begin();
   LCD.print("Hello");
+  pinMode(rightEncoderPinA, INPUT);
+  pinMode(rightEncoderPinB, INPUT);
+  pinMode(leftEncoderPinA, INPUT);
+  pinMode(leftEncoderPinB, INPUT);
+  
   pinMode(fromChewPin, INPUT);
   pinMode(toChewPin, OUTPUT);
-  attachInterrupt(fromChewPin, changeState, CHANGE);
+  attachInterrupt(fromChewPin, changeState, CHANGE);//change does not work
+  attachInterrupt(leftEncoderPinA,getEncoderLeftPosHere,RISING);
+  attachInterrupt(rightEncoderPinA,getEncoderRightPosHere,RISING);
+  Serial.begin(9600);
 }
+long startTime = millis();
 
 void loop() {
+  /*
+  Serial.print("lout ");
+  Serial.print(analogRead(leftMostQRD));
+  Serial.print(" Rout ");
+  Serial.print(analogRead(rightMostQRD));
+  Serial.print(" lmid ");
+  Serial.print(analogRead(leftMiddleQRD));
+  Serial.print(" Rmid ");
+  Serial.println(analogRead(rightMiddleQRD));
+  *//*
+  int lPos = hanMovo.encoderRightPos;
+  int rPos = hanMovo.encoderLeftPos;
+  hanMovo.nL = digitalRead(leftEncoderPinA);
+  hanMovo.nR = digitalRead(rightEncoderPinA);
+  
+  //int lPos = hanMovo.getEncoderLeftPos();
+  //int rPos = hanMovo.getEncoderRightPos();
 
+  long timeNow = millis();
+
+  if (timeNow - startTime >= 1000.0){
+    startTime = timeNow;
+    LCD.clear();
+    LCD.print(" L "); 
+    LCD.print(hanMovo.encoderLeftPos);
+  }
+  */
   switch (state) {
-
+    
     case 0 : // START BUTTON NOT YET PRESSED
       LCD.clear();
       LCD.print("Waiting");
@@ -87,11 +128,19 @@ void loop() {
       LCD.println(analogRead(leftMostQRD));
       LCD.print(analogRead(rightMostQRD));
       state = 23;
-    
+      break;
+
     case 1 : // STARTING STATE UNTIL FIRST GAP :: could also read in QRDs to detect cliffs on the side of the robot
-      LCD.clear();
-      LCD.print("Moving");
+      //LCD.clear();
+      //LCD.println("Moving");
+      
+      //LCD.print(" L ");
+      //LCD.print(lPos);
+      //LCD.print("R ");
+      //LCD.print(rPos);
+      
       hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
+      
       if (hanFlyo.cliff()) {
         //LCD.clear();
         //LCD.print("CLiff");
@@ -124,4 +173,46 @@ void changeState() {
     //    rememberState = state;
     state = 2;
   }
+}
+
+void getEncoderLeftPosHere() {
+  //if (millis() - lastTimeLeftEnc <10) return encoderLeftPos;
+  for(int i = 0; i < 2000; i++){
+      if(digitalRead(leftEncoderPinA) == LOW){
+        return;
+      }
+  }
+  int B = digitalRead(leftEncoderPinB);
+/*  for(int i = 0; i < 2000; i++){
+      if(digitalRead(leftEncoderPinB) != B){
+        return;
+      }
+  }
+  
+  if (B == LOW) {
+      hanMovo.encoderLeftPos--;
+    } else {
+      hanMovo.encoderLeftPos++;
+    }
+*/  hanMovo.encoderLeftPos++;
+  //  LCD.clear();
+  //  LCD.print(" L "); 
+ //   LCD.print(hanMovo.encoderLeftPos);
+}
+
+void getEncoderRightPosHere() {
+  //if (millis() - lastTimeRightEnc < 10) return encoderRightPos;
+  for(int i; i < 5000; i++){
+      if(digitalRead(rightEncoderPinA) == LOW){
+        return;
+      }
+  }
+  if (digitalRead(rightEncoderPinB) == LOW) {
+      hanMovo.encoderRightPos--;
+    } else {
+      hanMovo.encoderRightPos++;
+    }
+  LCD.clear();
+  LCD.print(" R ");
+  LCD.print(hanMovo.encoderRightPos);
 }

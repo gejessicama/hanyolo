@@ -19,7 +19,7 @@ void loop() {
       LCD.print("  ");
       LCD.print("PL ");
       LCD.print(posL);
-      
+      /*
       if(robotMotion.cliff()) {
         //robotMotion.stopMoving();
         long fPosL = posL - 50.0;
@@ -41,7 +41,7 @@ void loop() {
         
         //robotMotion.dropBridge1();
         
-      }
+      }*/
     }
     /*
     while(true) {

@@ -6,11 +6,17 @@
 #define leftQRD 3
 #define lQRD2 4
 #define rQRD2 1
+/*
 #define encoder0PinA 8
 #define encoder0PinB 9
 #define encoder1PinA 10
 #define encoder1PinB 11
-#define POW 0.6
+*/
+#define encoder0PinA 10
+#define encoder0PinB 11
+#define encoder1PinA 8
+#define encoder1PinB 9
+#define POW 0.3
 #define qrdcliff 400
 #define ON 400
 

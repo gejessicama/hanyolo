@@ -14,13 +14,19 @@ class Motion {
     int rVal, lVal;
     int proportionalTerm, derivativeTerm, gain;
     uint16_t count;
+
+    //encoders
+    int lEncA, lEncB, rEncA, rEncB;
     
+    int lEncALast = LOW, rEncALast = LOW;
+    
+
     boolean isOnWhite(uint8_t);
     boolean isOverCliff(uint8_t);
     void pidControl(uint8_t, uint8_t);
 
   public:
-    Motion(uint8_t, uint8_t, uint8_t, uint8_t, int, double);
+    Motion(uint8_t, uint8_t, uint8_t, uint8_t, int, double, int,int,int,int);
     void followTape(uint8_t, uint8_t, uint8_t, uint8_t);
     void followRightEdge(uint8_t, uint8_t, uint8_t, uint8_t);
     void bothWheelsForward(uint8_t, uint8_t, uint8_t, uint8_t); // pass both distances and PID to match
@@ -28,9 +34,11 @@ class Motion {
     boolean cliff();
     void reset();
     
-    long getEncoder0(bool,bool);
-    long getEncoder1(bool,bool);
+    long getEncoderLeftPos();
+    long getEncoderRightPos();
     void turn90Degrees();
+    int nL = LOW,nR = LOW;
+    int encoderLeftPos = 0, encoderRightPos = 0;
 };
 
 #endif
