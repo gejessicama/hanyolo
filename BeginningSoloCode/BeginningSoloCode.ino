@@ -37,8 +37,8 @@
 #define dropTheBridgePin 9
 
 
-#define baseSpeed 100
-#define powerMultiplier 0.30 
+#define baseSpeed 255
+#define powerMultiplier 0.40 
 #define onTheTape 400
 #define overTheCliff 650
 
@@ -56,7 +56,7 @@ Motion hanMovo(rightMotor, leftMotor, onTheTape, overTheCliff, baseSpeed, powerM
 Crossing hanFlyo(rightMotor, leftMotor, rightMostQRD, leftMostQRD, overTheCliff, backUpBridgeDistance);
 
 //  HELPER FUNCTIONS
-void updateChewState();
+void updateState();
 void raiseBasket();
 void lowerBasket();
 
@@ -70,18 +70,17 @@ void setup() {
   //  pinMode(rightEncoderPin, INPUT);
   //  pinMode(leftEncoderPin, INPUT);
   LCD.begin();
-  LCD.print("Hello");
-  pinMode(rightEncoderPinA, INPUT);
-  pinMode(rightEncoderPinB, INPUT);
-  pinMode(leftEncoderPinA, INPUT);
-  pinMode(leftEncoderPinB, INPUT);
+  LCD.print("Setup");
+//  pinMode(rightEncoderPinA, INPUT);
+//  pinMode(rightEncoderPinB, INPUT);
+//  pinMode(leftEncoderPinA, INPUT);
+//  pinMode(leftEncoderPinB, INPUT);
   
   pinMode(fromChewPin, INPUT);
   pinMode(toChewPin, OUTPUT);
   attachInterrupt(fromChewPin, changeState, CHANGE);//change does not work
-  attachInterrupt(leftEncoderPinA,getEncoderLeftPosHere,RISING);
-  attachInterrupt(rightEncoderPinA,getEncoderRightPosHere,RISING);
-  Serial.begin(9600);
+//  attachInterrupt(leftEncoderPinA,getEncoderLeftPosHere,RISING);
+//  attachInterrupt(rightEncoderPinA,getEncoderRightPosHere,RISING);
 }
 long startTime = millis();
 
@@ -117,22 +116,21 @@ void loop() {
     
     case 0 : // START BUTTON NOT YET PRESSED
       LCD.clear();
-      LCD.print("Waiting");
+      LCD.print("Press Start");
       if (startbutton()) {
-        state = 1;
         updateState();
       }
       break;
-    case 23 :
-      LCD.clear(); 
-      LCD.println(analogRead(leftMostQRD));
-      LCD.print(analogRead(rightMostQRD));
-      state = 23;
-      break;
+//    case 23 :
+//      LCD.clear(); 
+//      LCD.println(analogRead(leftMostQRD));
+//      LCD.print(analogRead(rightMostQRD));
+//      state = 23;
+//      break;
 
-    case 1 : // STARTING STATE UNTIL FIRST GAP :: could also read in QRDs to detect cliffs on the side of the robot
-      //LCD.clear();
-      //LCD.println("Moving");
+    case 1 : // STARTING STATE UNTIL FIRST GAP
+      LCD.clear();
+      LCD.println("Moving");
       
       //LCD.print(" L ");
       //LCD.print(lPos);
@@ -141,31 +139,38 @@ void loop() {
       
       hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
       
-      if (hanFlyo.cliff()) {
-        //LCD.clear();
-        //LCD.print("CLiff");
-        state = 23;//exp
+      if (stopbutton()) {
+        updateState();
         
        //hanFlyo.dropBridge1(dropTheBridgePin); // dropping the first bridge will include backing up to the right distance
         //state = 0;//experiment
-        //updateState();
       }
       break;
     case 2 :
-      //LCD.clear();
+      motor.speed(rightMotor, -255);
+      motor.speed(leftMotor, 255);
+      motor.stop(rightMotor);
+      motor.stop(leftMotor);
+      motor.stop_all();
+      LCD.clear();
+      LCD.print("Pick Up Stuffy");
       break;
   }
 }
 
 void updateState() {
   digitalWrite(toChewPin, HIGH);
+  delayMicroseconds(2);
   digitalWrite(toChewPin, LOW);
+  if (state == 0){
+    state = 1;
+  }else{
+    state = 0;
+  }
 }
 
 // INTERRUPT FUNCTIONS
 void changeState() {
-//  LCD.clear();
-//  LCD.print("Stuffy Seen");
     if (state == 2) {
     state = 1;
     //    state = rememberState;
