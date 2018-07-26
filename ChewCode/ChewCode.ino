@@ -97,6 +97,7 @@ void loop() {
     case 7 : // WE JUST CROSSED OUR SECOND BRIDGE
       if (readInSonar(frontTriggerPin, frontEchoPin)) {
         digitalWrite(toSoloPin, HIGH);
+        //activate front claw pick up
         grabbyBoi.pickUpFront();
         digitalWrite(toSoloPin, LOW);
       }

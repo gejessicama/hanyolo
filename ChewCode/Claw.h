@@ -6,6 +6,10 @@ class Claw{
   private:
     int objectLimit;
     
+    boolean dropoff();
+    void open();
+    void close();
+
   public:
     Claw(uint16_t);
     boolean pickUpRight();
