@@ -1,45 +1,47 @@
 /*
-   Code for Chew, but just for the first stage of the course
+   Code for Chew
+   Chew will constantly be checking both the left and right sonars. When it finds a stuffy,
+   it will store the value of where that stuffy is and send a signal to the TINAH, then go 
+   back to normal. If the TINAH sends a signal to pick something up, chew will pick up
+   in the position of whatever was last seen. The resting state for last seen will be in
+   front?? maybe.... but test this thouroughly without the bridges
 */
 
 #include "Claw.h"
 
-#define rightTriggerPin 8
-#define rightEchoPin 9
-#define leftTriggerPin 10
-#define leftEchoPin  11
+#define rightTriggerPin 4
+#define rightEchoPin 5
+#define leftTriggerPin 6
+#define leftEchoPin  7
 
-#define clawBaseTurnPin 0
-#define clawBaseLiftPin 1
-#define clawElbowPin 2
-#define clawGripPin 3
-#define bridgeDropPin 4
-
-
-#define frontTriggerPin 12
-#define frontEchoPin 13
+#define clawSusanPin 8
+#define clawBasePin 9
+#define clawElbowPin 10
+#define clawGripPin 12
+#define bridgeDropPin 13
 
 #define fromSoloPin 2
-#define toSoloPin 4
+#define toSoloPin 0
 #define dropTheBridgePin 3
 
-
 const uint16_t objectLimit = 400;
+const uint16_t stuffyLimit = 60000;
 
-Claw grabbyBoi(objectLimit);
+Claw grabbyBoi(clawSusanPin, clawBasePin, clawElbowPin, clawGripPin);
 
-volatile uint8_t state;
+volatile uint8_t state = 1;
+volatile uint8_t sideLastSeen;
 
 boolean readInSonar(uint8_t, uint8_t, uint16_t);
+//void pickUpStuffy
 void updateState();
 void dropBridge();
 
 void setup() {
-//  Serial.begin(9600);
   pinMode(rightTriggerPin, OUTPUT);
   pinMode(leftTriggerPin, OUTPUT);
   pinMode(toSoloPin, OUTPUT);
-  attachInterrupt(digitalPinToInterrupt(fromSoloPin), updateState, RISING);
+  //attachInterrupt(digitalPinToInterrupt(fromSoloPin), pickUpStuffy, RISING);
 //  attachInterrupt(digitalPinToInterrupt(dropTheBridgePin), dropBridge, RISING);
 }
 
@@ -55,11 +57,11 @@ void loop() {
         grabbyBoi.pickUpRight();
         digitalWrite(toSoloPin, LOW);
       }
-//      if (readInSonar(leftTriggerPin, leftEchoPin)){
-//        digitalWrite(toSoloPin, HIGH);
-//        grabbyBoi.pickUpLeft();
-//        digitalWrite(toSoloPin, LOW);
-//      }
+      if (readInSonar(leftTriggerPin, leftEchoPin)){
+        digitalWrite(toSoloPin, HIGH);
+        grabbyBoi.pickUpLeft();
+        digitalWrite(toSoloPin, LOW);
+      }
       break;
   }
 }
