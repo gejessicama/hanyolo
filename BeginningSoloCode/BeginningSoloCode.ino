@@ -37,8 +37,8 @@
 #define dropTheBridgePin 9
 
 
-#define baseSpeed 100
-#define powerMultiplier 0.30 
+#define baseSpeed 200
+#define powerMultiplier 0.4 
 #define onTheTape 400
 #define overTheCliff 650
 
@@ -95,7 +95,7 @@ void loop() {
   Serial.print(analogRead(leftMiddleQRD));
   Serial.print(" Rmid ");
   Serial.println(analogRead(rightMiddleQRD));
-  *//*
+  */
   int lPos = hanMovo.encoderRightPos;
   int rPos = hanMovo.encoderLeftPos;
   hanMovo.nL = digitalRead(leftEncoderPinA);
@@ -111,8 +111,10 @@ void loop() {
     LCD.clear();
     LCD.print(" L "); 
     LCD.print(hanMovo.encoderLeftPos);
+    //LCD.print(" R ");
+    //LCD.print(hanMovo.encoderRightPos);
   }
-  */
+  
   switch (state) {
     
     case 0 : // START BUTTON NOT YET PRESSED
@@ -139,8 +141,8 @@ void loop() {
       //LCD.print("R ");
       //LCD.print(rPos);
       
-      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
-      
+      //hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
+      /*
       if (hanFlyo.cliff()) {
         //LCD.clear();
         //LCD.print("CLiff");
@@ -149,7 +151,7 @@ void loop() {
        //hanFlyo.dropBridge1(dropTheBridgePin); // dropping the first bridge will include backing up to the right distance
         //state = 0;//experiment
         //updateState();
-      }
+      }*/
       break;
     case 2 :
       //LCD.clear();
@@ -177,12 +179,12 @@ void changeState() {
 
 void getEncoderLeftPosHere() {
   //if (millis() - lastTimeLeftEnc <10) return encoderLeftPos;
-  for(int i = 0; i < 2000; i++){
+  for(int i = 0; i < 0; i++){
       if(digitalRead(leftEncoderPinA) == LOW){
         return;
       }
   }
-  int B = digitalRead(leftEncoderPinB);
+  //int B = digitalRead(leftEncoderPinB);
 /*  for(int i = 0; i < 2000; i++){
       if(digitalRead(leftEncoderPinB) != B){
         return;
@@ -202,7 +204,7 @@ void getEncoderLeftPosHere() {
 
 void getEncoderRightPosHere() {
   //if (millis() - lastTimeRightEnc < 10) return encoderRightPos;
-  for(int i; i < 5000; i++){
+  for(int i; i < 2000; i++){
       if(digitalRead(rightEncoderPinA) == LOW){
         return;
       }
@@ -212,7 +214,9 @@ void getEncoderRightPosHere() {
     } else {
       hanMovo.encoderRightPos++;
     }
-  LCD.clear();
-  LCD.print(" R ");
-  LCD.print(hanMovo.encoderRightPos);
+   
+    //hanMovo.encoderRightPos++;
+  //LCD.clear();
+  //LCD.print(" R ");
+  //LCD.print(hanMovo.encoderRightPos);
 }
