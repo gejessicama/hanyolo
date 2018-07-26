@@ -37,13 +37,15 @@
 #define dropTheBridgePin 9
 
 
-#define baseSpeed 255
-#define powerMultiplier 0.40 
+
+#define bSpeed 255
+#define powerMult 0.4 
+
 #define onTheTape 400
 #define overTheCliff 650
 
-#define pGainConst 54
-#define dGainConst 0
+uint8_t pGainConst =  54;
+uint8_t dGainConst  = 0;
 
 #define distanceToStormtroopers 36
 #define backUpBridgeDistance 2
@@ -52,7 +54,7 @@ volatile uint8_t state = 0;
 volatile uint8_t rememberState;
 volatile uint16_t rightWheelDist, leftWheelDist;
 
-Motion hanMovo(rightMotor, leftMotor, onTheTape, overTheCliff, baseSpeed, powerMultiplier,leftEncoderPinA,leftEncoderPinB,rightEncoderPinA,rightEncoderPinB);
+Motion hanMovo(rightMotor, leftMotor, onTheTape, overTheCliff, bSpeed, powerMult,leftEncoderPinA,leftEncoderPinB,rightEncoderPinA,rightEncoderPinB);
 Crossing hanFlyo(rightMotor, leftMotor, rightMostQRD, leftMostQRD, overTheCliff, backUpBridgeDistance);
 
 //  HELPER FUNCTIONS
@@ -84,6 +86,8 @@ void setup() {
 }
 long startTime = millis();
 
+
+int setupStage = 0;
 void loop() {
   /*
   Serial.print("lout ");
@@ -94,7 +98,7 @@ void loop() {
   Serial.print(analogRead(leftMiddleQRD));
   Serial.print(" Rmid ");
   Serial.println(analogRead(rightMiddleQRD));
-  *//*
+  
   int lPos = hanMovo.encoderRightPos;
   int rPos = hanMovo.encoderLeftPos;
   hanMovo.nL = digitalRead(leftEncoderPinA);
@@ -110,13 +114,45 @@ void loop() {
     LCD.clear();
     LCD.print(" L "); 
     LCD.print(hanMovo.encoderLeftPos);
+    //LCD.print(" R ");
+    //LCD.print(hanMovo.encoderRightPos);
   }
   */
   switch (state) {
     
     case 0 : // START BUTTON NOT YET PRESSED
       LCD.clear();
-      LCD.print("Press Start");
+      LCD.print("Start| Stop>nx");
+      LCD.println(setupStage);
+      if(stopbutton()){
+        delay(200);
+        setupStage++;
+        //updateSetup();
+      }
+      if (setupStage == 0){
+        hanMovo.powerMultiplier =  knob(6) / 1024.0;
+        hanMovo.baseSpeed = knob(7) / 1024.0 * 255;
+        LCD.print("Pow ");
+        LCD.print(hanMovo.powerMultiplier);
+        LCD.print(" Vel ");
+        LCD.print(hanMovo.baseSpeed);
+      }
+      if (setupStage == 1){
+        pGainConst = knob(6) / 1024.0 * 200;
+        dGainConst = knob(7) / 1024.0 * 200;
+        LCD.print("kp");
+        LCD.print(pGainConst);
+        LCD.print("kd");
+        LCD.print(dGainConst);
+      }
+      if (setupStage == 2){
+        hanMovo.ON =  (int)(knob(6) / 1024.0 * 1000);
+        hanMovo.CLIFF = (int)(knob(7) / 1024.0 * 1000);
+        LCD.print("Pow ");
+        LCD.print(hanMovo.powerMultiplier);
+        LCD.print(" Vel ");
+        LCD.print(hanMovo.baseSpeed);
+      }
       if (startbutton()) {
         updateState();
       }
@@ -129,22 +165,35 @@ void loop() {
 //      break;
 
     case 1 : // STARTING STATE UNTIL FIRST GAP
-      LCD.clear();
-      LCD.println("Moving");
+      //LCD.clear();
+      //LCD.println("Moving");
+      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);/*
+      if (stopbutton()) {
+        updateState(); 
+       //hanFlyo.dropBridge1(dropTheBridgePin); // dropping the first bridge will include backing up to the right distance
+        //state = 0;//experiment
+      }
+      */
+
       
       //LCD.print(" L ");
       //LCD.print(lPos);
       //LCD.print("R ");
       //LCD.print(rPos);
       
-      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
       
-      if (stopbutton()) {
-        updateState();
+      /*
+      if (hanFlyo.cliff()) {
+        //LCD.clear();
+        //LCD.print("CLiff");
+        state = 23;//exp
         
        //hanFlyo.dropBridge1(dropTheBridgePin); // dropping the first bridge will include backing up to the right distance
         //state = 0;//experiment
-      }
+        //updateState();
+      }*/
+      
+      
       break;
     case 2 :
       motor.speed(rightMotor, -255);
@@ -159,6 +208,7 @@ void loop() {
 }
 
 void updateState() {
+  // Changed to Low then HIGH
   digitalWrite(toChewPin, HIGH);
   delayMicroseconds(2);
   digitalWrite(toChewPin, LOW);
@@ -180,14 +230,22 @@ void changeState() {
   }
 }
 
+void updateSetup(){
+  if(setupStage == 0){
+    setupStage = 1;
+  }
+  if (setupStage == 1){
+    setupStage = 2;
+  }
+}
 void getEncoderLeftPosHere() {
   //if (millis() - lastTimeLeftEnc <10) return encoderLeftPos;
-  for(int i = 0; i < 2000; i++){
+  for(int i = 0; i < 0; i++){
       if(digitalRead(leftEncoderPinA) == LOW){
         return;
       }
   }
-  int B = digitalRead(leftEncoderPinB);
+  //int B = digitalRead(leftEncoderPinB);
 /*  for(int i = 0; i < 2000; i++){
       if(digitalRead(leftEncoderPinB) != B){
         return;
@@ -207,7 +265,7 @@ void getEncoderLeftPosHere() {
 
 void getEncoderRightPosHere() {
   //if (millis() - lastTimeRightEnc < 10) return encoderRightPos;
-  for(int i; i < 5000; i++){
+  for(int i; i < 2000; i++){
       if(digitalRead(rightEncoderPinA) == LOW){
         return;
       }
@@ -217,7 +275,9 @@ void getEncoderRightPosHere() {
     } else {
       hanMovo.encoderRightPos++;
     }
-  LCD.clear();
-  LCD.print(" R ");
-  LCD.print(hanMovo.encoderRightPos);
+   
+    //hanMovo.encoderRightPos++;
+  //LCD.clear();
+  //LCD.print(" R ");
+  //LCD.print(hanMovo.encoderRightPos);
 }

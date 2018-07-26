@@ -68,6 +68,17 @@ boolean Crossing::cliff() {
 }
 
 void Crossing::dropBridge1(uint8_t communicationPin) {
+  //move back for some time
+  int vback = -200;
+  unsigned long reverseTime = 500.0;
+  unsigned long startTime = millis();
+  unsigned long endTime = millis();
+  while (endTime - startTime < reverseTime){
+    motor.speed(rightMotor, vback);
+    motor.speed(leftMotor, vback);
+    endTime = millis();
+  }
+  
   //backup here
   digitalWrite(communicationPin, HIGH);
   digitalWrite(communicationPin, LOW);

@@ -6,8 +6,8 @@
 class Motion {
   private:
     // VARIABLES FOR ALL
-    uint8_t ON, CLIFF, rightMotor, leftMotor, baseSpeed;
-    double powerMultiplier;
+    uint8_t rightMotor, leftMotor;
+    
 
     // VARIABLES FOR TAPE FOLLOWING, EDGE FOLLOWING
     int currentError, lastError, lastState, lastOn;
@@ -39,6 +39,8 @@ class Motion {
     void turn90Degrees();
     int nL = LOW,nR = LOW;
     int encoderLeftPos = 0, encoderRightPos = 0;
+    double powerMultiplier;
+    uint8_t ON, CLIFF, baseSpeed;
 };
 
 #endif
