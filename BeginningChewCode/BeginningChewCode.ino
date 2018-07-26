@@ -70,7 +70,7 @@ boolean readInSonar(uint8_t trig, uint8_t echo){
   digitalWrite(trig, HIGH); 
   delayMicroseconds(10);  
   digitalWrite(trig, LOW);
-  return (pulseIn(echo, HIGH) < objectLimit);
+  return (pulseIn(echo, HIGH) > stuffyLimit);
 }
 
 //  INTERRUPT FUNCTIONS
