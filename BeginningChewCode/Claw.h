@@ -1,17 +1,26 @@
 #include <Arduino.h>
+#include <Servo.h>
 #ifndef CLAW_H
 #define CLAW_H
 
-class Claw{
+class Claw {
   private:
-    int objectLimit;
-    
+    Servo susan, base, elbow, grip;
+    //uint8_t susanPin, basePin, elbowPin, gripPin;
+
   public:
-    Claw(uint16_t);
-    boolean pickUpRight();
-    boolean pickUpLeft();
-    boolean pickUpFront();
-  
+    Claw(Servo,Servo,Servo,Servo);
+    void pickUpRight();
+    void pickUpLeft();
+    void pickUpFront();
+    void dropoff();
+    void travel();
+    void openGrip();
+    void closeGrip();
+    void swivel();
+    void moveClaw(Servo, uint8_t);
+
+
 };
 
 #endif
