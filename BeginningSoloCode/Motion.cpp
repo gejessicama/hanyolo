@@ -125,6 +125,10 @@ long Motion::getEncoderRightPos() {
 }
 
 
+void Motion::driveMotors(int vel){
+   motor.speed(rightMotor,vel);
+   motor.speed(leftMotor,-vel);
+}
 /*
 bool Motion::cliff() {
   int lVal2 = analogRead(lQRD2);

@@ -33,6 +33,7 @@ class Motion {
     void bothWheelsBackward(int, int); // pass both distances and PID to match
     boolean cliff();
     void reset();
+    void driveMotors(int);
     
     long getEncoderLeftPos();
     long getEncoderRightPos();
@@ -40,7 +41,7 @@ class Motion {
     int nL = LOW,nR = LOW;
     int encoderLeftPos = 0, encoderRightPos = 0;
     double powerMultiplier;
-    uint8_t ON, CLIFF, baseSpeed;
+    int ON, CLIFF, baseSpeed;
 };
 
 #endif

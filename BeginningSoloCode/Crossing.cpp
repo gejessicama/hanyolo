@@ -75,7 +75,7 @@ void Crossing::dropBridge1(uint8_t communicationPin) {
   unsigned long endTime = millis();
   while (endTime - startTime < reverseTime){
     motor.speed(rightMotor, vback);
-    motor.speed(leftMotor, vback);
+    motor.speed(leftMotor, -vback);
     endTime = millis();
   }
   
