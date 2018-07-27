@@ -10,28 +10,33 @@
 
 Servo susan, base, elbow, grip;
 
-#define deLae 500
+#define rightTriggerPin 4
+#define rightEchoPin 5
+#define leftTriggerPin 6
+#define leftEchoPin  7
+
+#define deLae 700
 #define bigDelae 500
 
-#define susanLeft 165
-#define baseLeftDown 80
-#define elbowLeftDown 180
-
-#define susanFront 20
-#define baseFrontDown 70
-#define elbowFrontDown 150
-
-#define susanRight 60
+#define susanRight 160
 #define baseRightDown 100
 #define elbowRightDown 180
 
-#define susanBasket 117
+#define susanFront 108
+#define baseFrontDown 70
+#define elbowFrontDown 150
+
+#define susanLeft 60
+#define baseLeftDown 90
+#define elbowLeftDown 180
+
+#define susanBasket 20
 #define baseDropoff 0
 #define elbowDropoff 0
 
-#define susanTravel 117
+#define susanTravel 20
 #define baseTravel 0
-#define elbowTravel 95
+#define elbowTravel 0
 
 #define baseSwivel 0
 #define elbowSwivel 0 
@@ -39,38 +44,57 @@ Servo susan, base, elbow, grip;
 #define gripOpen 120
 #define gripClose 0
 
-int pos = 0;
+const uint16_t objectLimit = 400;
+const uint16_t stuffyLimit = 60000;
 
 void setup() {
+  pinMode(rightTriggerPin, OUTPUT);
+  pinMode(leftTriggerPin, OUTPUT);
+  
   susan.attach(12);
   base.attach(8);
   elbow.attach(9);
   grip.attach(10);
 
-  pickUpLeft();
-}
+  //Serial.begin(9600);
 
+  pickUpLeft();
+  pickUpRight();
+}
 void loop() {
 
-//    for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
-//    // in steps of 1 degree
-//    elbow.write(0);
-//    base.write(0);
-//    susan.write(pos);              // tell servo to go to position in variable 'pos'
-//    delay(15);                       // waits 15ms for the servo to reach the position
-//  }
-//
-//  for (pos = 180; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
-//    elbow.write(0);
-//    base.write(0);
-//    susan.write(pos);              // tell servo to go to position in variable 'pos'
-//    delay(15);                       // waits 15ms for the servo to reach the position
-//  }
-//    delay(500);
+  //Serial.println(readSonar(rightTriggerPin, rightEchoPin));
+  //Serial.println(readSonar(leftTriggerPin, leftEchoPin));
+
+  if (readInSonar(rightTriggerPin, rightEchoPin)){
+    pickUpLeft();
+    }
+  if (readInSonar(leftTriggerPin, leftEchoPin)){
+    pickUpRight();
   }
+  else {
+    travel();
+  }
+}
+
+boolean readInSonar(uint8_t trig, uint8_t echo){
+  digitalWrite(trig, HIGH); 
+  delayMicroseconds(10);  
+  digitalWrite(trig, LOW);
+  return (pulseIn(echo, HIGH)>stuffyLimit);
+}
+
+// returns values from the sonar, for testing 
+long readSonar(uint8_t trig, uint8_t echo){
+  digitalWrite(trig, HIGH); 
+  delayMicroseconds(10);  
+  digitalWrite(trig, LOW);
+  return (pulseIn(echo, HIGH));
+}
 
 // Pick up something from the right
 void pickUpRight(){
+  swivel();
   moveClaw(susan, susanRight);
   openGrip();
   moveClaw(base, baseRightDown);
@@ -78,7 +102,6 @@ void pickUpRight(){
   closeGrip();
   swivel();
   dropoff();
-  return true;
 }
 
 // Pickup something from the left
@@ -91,11 +114,11 @@ void pickUpLeft(){
   closeGrip();
   swivel();
   dropoff();
-  return true;
 }
 
 // Pickup something from the front
 void pickUpFront(){
+  swivel();
   moveClaw(susan, susanFront);
   openGrip();
   moveClaw(base, baseFrontDown);
@@ -103,7 +126,6 @@ void pickUpFront(){
   closeGrip();
   swivel();
   dropoff();
-  return true;
 }
 
 // Drops stuff off in the basket
@@ -113,7 +135,6 @@ void dropoff(){
   moveClaw(elbow, elbowDropoff);
   openGrip();
   travel();
-  return true;
 }
 
 // The position for the claw to be in while we're just running the course
@@ -151,6 +172,6 @@ void moveClaw(Servo servo, uint8_t pos){
   delay(deLae);
 }
 
-//boolean Claw::imagineIDidAllThatAndIMissedIt(){
+//boolean imagineIDidAllThatAndIMissedIt(){
   //return !digitalRead(touchSensorPin);
 //}

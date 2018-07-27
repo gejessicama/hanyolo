@@ -76,6 +76,7 @@ void loop() {
 
     case 0 : // START BUTTON NOT YET PRESSED
       if (startbutton()) {
+        delay(200);
         updateState();
       }
       break;

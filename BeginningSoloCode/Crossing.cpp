@@ -8,13 +8,14 @@
 #include "Crossing.h"
 
 Crossing::Crossing(uint8_t rMotor, uint8_t lMotor, uint8_t rQRD, uint8_t lQRD, uint8_t overCliff,
-                   uint8_t backDist) {
+                   uint8_t backDist,uint8_t sigIR) {
   rightMotor = rMotor;
   leftMotor = lMotor;
   rightQRD = rQRD;
   leftQRD = lQRD;
   overTheCliff = overCliff;
   backUpDistance = backDist;
+  IRsig = sigIR;
 }
 int count = 0;
 int seq = 0;
@@ -69,9 +70,12 @@ boolean Crossing::cliff() {
 
 void Crossing::dropBridge1(uint8_t communicationPin) {
   //move back for some time
-  backUp(400);
+  backUp(400);delay(1000);  
+  RCServo0.write(40);
+  delay(1000);
+  /*
   digitalWrite(communicationPin, HIGH);
-  digitalWrite(communicationPin, LOW);
+  digitalWrite(communicationPin, LOW);*/
   //wait for bridge to fall
 }
 
@@ -88,8 +92,26 @@ void Crossing::backUp(long reverseTime = 400.0){
   motor.stop_all();
 }
 void Crossing::dropBridge2(uint8_t communicationPin) {
-  backUp(backUpDistance);
-  digitalWrite(communicationPin, LOW);
+  
+  backUp(400);
+  RCServo0.write(180);
+  /*backUp(backUpDistance);
+  digitalWrite(communicationPin, LOW);*/
 }
 
+uint8_t lval;
+bool Crossing::detectIR(){
+  uint8_t val = digitalRead(IRsig);
+    if (val !=lval){
+      //LCD.clear();
+      if (val == HIGH){
+        //LCD.print("Not 10K");
+        return true;
+      }else if(val == LOW){
+        //LCD.println("10K");
+        return false;
+      }
+    }
+  lval = val;
+}
 
