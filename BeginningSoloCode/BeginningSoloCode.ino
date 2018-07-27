@@ -93,35 +93,7 @@ int setupStage = 0;
 int vel = 100;
 int bt = 0; // 390-410 - optimal
 void loop() {
-  /*
-    Serial.print("lout ");
-    Serial.print(analogRead(leftMostQRD));
-    Serial.print(" Rout ");
-    Serial.print(analogRead(rightMostQRD));
-    Serial.print(" lmid ");
-    Serial.print(analogRead(leftMiddleQRD));
-    Serial.print(" Rmid ");
-    Serial.println(analogRead(rightMiddleQRD));
-
-    int lPos = hanMovo.encoderRightPos;
-    int rPos = hanMovo.encoderLeftPos;
-    hanMovo.nL = digitalRead(leftEncoderPinA);
-    hanMovo.nR = digitalRead(rightEncoderPinA);
-
-    //int lPos = hanMovo.getEncoderLeftPos();
-    //int rPos = hanMovo.getEncoderRightPos();
-
-    long timeNow = millis();
-
-    if (timeNow - startTime >= 1000.0){
-    startTime = timeNow;
-    LCD.clear();
-    LCD.print(" L ");
-    LCD.print(hanMovo.encoderLeftPos);
-    //LCD.print(" R ");
-    //LCD.print(hanMovo.encoderRightPos);
-    }
-  */
+ 
   switch (state) {
 
     case 0 : // START BUTTON NOT YET PRESSED
@@ -160,9 +132,9 @@ void loop() {
       if (setupStage == 3) {
         vel = 255.0 * knob(7) / 1024.0;
         bt = 10 * knob(6);
-        LCD.print("vel");
-        LCD.print(vel);
-        LCD.print(" bt ");
+        /*LCD.print("vel");
+        LCD.print(vel);*/
+        LCD.print(" ft ");
         LCD.print(bt);
       }
       if (startbutton()) {
@@ -180,30 +152,9 @@ void loop() {
       hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
       //hanMovo.driveMotors(vel);
       //hanMovo.followRightEdge(rightOutQRD,rightInQRD,pGainConst, dGainConst);
-      /*
-        if (stopbutton()) {
-        updateState();
-        //hanFlyo.dropBridge1(dropTheBridgePin); // dropping the first bridge will include backing up to the right distance
-        //state = 0;//experiment
-        }
-      */
       if (hanFlyo.cliff()) { // detect cliff then reverse for bt time
         hanFlyo.dropBridge1(toChewPin);
         state = 3;
-        /*
-        long st = millis();
-        long ct = millis();
-        while (ct - st < bt) {
-          hanMovo.driveMotors(-255);
-          ct = millis();
-        }
-        motor.stop_all();
-        */
-        //state = 23;//exp
-
-        //hanFlyo.dropBridge1(dropTheBridgePin); // dropping the first bridge will include backing up to the right distance
-        //state = 0;//experiment
-        //updateState();
       }
 
 
@@ -221,7 +172,7 @@ void loop() {
     case 3 :
       long st = millis();
       long et = st;
-      while (et - st < 500){
+      while (et - st < bt){
         hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
       }
       motor.stop_all();
