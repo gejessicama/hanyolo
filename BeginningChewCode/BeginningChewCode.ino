@@ -43,6 +43,7 @@ void setup() {
   pinMode(toSoloPin, OUTPUT);
   //attachInterrupt(digitalPinToInterrupt(fromSoloPin), pickUpStuffy, RISING);
 //  attachInterrupt(digitalPinToInterrupt(dropTheBridgePin), dropBridge, RISING);
+  grabbyBoi.pickUpLeft();
 }
 
 void loop() {
