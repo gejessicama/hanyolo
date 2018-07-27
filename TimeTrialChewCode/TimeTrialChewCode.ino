@@ -32,7 +32,7 @@ void setup() {
   pinMode(leftTriggerPin, OUTPUT);
   pinMode(toSoloPin, OUTPUT);
   bridge.attach(bridgeDropPin);
-  //bridge.write(0);
+  bridge.write(0);
   attachInterrupt(digitalPinToInterrupt(dropTheBridgePin), dropBridge, RISING);
   Serial.println("setup");
 }
@@ -60,7 +60,8 @@ boolean readInSonar(uint8_t trig, uint8_t echo) {
 
 void dropBridge() {
   if(!firstBridgeDropped){
-    bridge.write(30);
+    
+    bridge.write(120);
     firstBridgeDropped = true;
     Serial.println("drop first bridge");
   }else{
