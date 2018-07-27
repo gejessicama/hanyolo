@@ -13,7 +13,7 @@ class Crossing{
   public:
     Crossing(uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t);
     boolean cliff();
-    void backUp(uint8_t);
+    void backUp(long);
     void turnRight();
     void dropBridge1(uint8_t);
     void dropBridge2(uint8_t);

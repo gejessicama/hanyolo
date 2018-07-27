@@ -53,6 +53,29 @@ void Motion::followTape(uint8_t rightQRD, uint8_t leftQRD, uint8_t proportionalG
   pidControl(proportionalGain, derivativeGain);
 }
 
+void Motion::followRightEdge(uint8_t outQRD, uint8_t inQRD, uint8_t proportionalGain,
+                             uint8_t derivativeGain) {
+
+  rVal = isOverCliff(outQRD);
+  lVal = isOnWhite(inQRD);
+
+  if (rVal && !lVal) { // We are over the cliff all is good
+    currentError = 0;
+    lastState = 0;
+  } //else if (!rVal && !lVal) { // We are too far left
+    else if (!rVal){
+    currentError = -1;
+    lastOn = -1;
+  } //else if (rVal && lVal) { // We are too far right
+    else if(lVal){
+    currentError = 1;
+    lastOn = 1;
+  }
+
+  pidControl(proportionalGain, derivativeGain);
+}
+
+
 void Motion::pidControl(uint8_t proportionalGain, uint8_t derivativeGain) {
   proportionalTerm = proportionalGain * currentError;
   derivativeTerm = derivativeGain * (currentError - lastState) * 1.0 / count;
@@ -75,6 +98,11 @@ boolean Motion::isOnWhite (uint8_t qrdPin) {
   } else {
     return false;
   }
+}
+boolean Motion::isOverCliff (uint8_t qrdPin) {
+  if (analogRead(qrdPin) > CLIFF)
+    return true;
+  return false;
 }
 
 int debouncing = 10000;
