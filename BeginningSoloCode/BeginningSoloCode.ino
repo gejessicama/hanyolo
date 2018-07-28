@@ -92,7 +92,6 @@ int setupStage = 0;
 int vel = 100;
 int bt = 0; // 390-410 - optimal
 void loop() {
-
   switch (state) {
 
     case 0 : // START BUTTON NOT YET PRESSED
@@ -131,9 +130,9 @@ void loop() {
       if (setupStage == 3) {
         vel = 255.0 * knob(7) / 1024.0;
         bt = 10 * knob(6);
-        LCD.print("vel");
-        LCD.print(vel);
-        LCD.print(" bt ");
+        /*LCD.print("vel");
+        LCD.print(vel);*/
+        LCD.print(" ft ");
         LCD.print(bt);
       }
       if (startbutton()) {
@@ -151,36 +150,11 @@ void loop() {
       //hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
       hanMovo.driveMotors(vel);
       //hanMovo.followRightEdge(rightOutQRD,rightInQRD,pGainConst, dGainConst);
-      /*
-        if (stopbutton()) {
-        updateState();
-        //hanFlyo.dropBridge1(dropTheBridgePin); // dropping the first bridge will include backing up to the right distance
-        //state = 0;//experiment
-        }
-      */
 
-
-      //LCD.print(" L ");
-      //LCD.print(lPos);
-      //LCD.print("R ");
-      //LCD.print(rPos);
-      
       if (hanFlyo.cliff()) { // detect cliff then reverse for bt time
         hanFlyo.dropBridge1(toChewPin);
-        /*
-        long st = millis();
-        long ct = millis();
-        while (ct - st < bt) {
-          hanMovo.driveMotors(-255);
-          ct = millis();
-        }
-        motor.stop_all();
-        */
-        //state = 23;//exp
+        state = 3;
 
-        //hanFlyo.dropBridge1(dropTheBridgePin); // dropping the first bridge will include backing up to the right distance
-        //state = 0;//experiment
-        //updateState();
       }
 
 
@@ -194,6 +168,21 @@ void loop() {
       LCD.clear();
       LCD.print("Pick Up Stuffy");
       break;
+
+
+    case 3 :
+      long st = millis();
+      long et = st;
+      while (et - st < bt){
+        hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
+      }
+      motor.stop_all();
+      while (!hanFlyo.detectIR()){
+        LCD.print("1k");
+      }
+      LCD.print("10k");
+      break;
+
   }
 }
 

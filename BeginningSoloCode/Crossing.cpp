@@ -15,7 +15,7 @@ Crossing::Crossing(uint8_t rMotor, uint8_t lMotor, uint8_t rQRD, uint8_t lQRD, u
   leftQRD = lQRD;
   overTheCliff = overCliff;
   backUpDistance = backDist;
-  IRsig = sigIR;
+                    IRsig = sigIR;
 }
 int count = 0;
 int seq = 0;
@@ -79,7 +79,7 @@ void Crossing::dropBridge1(uint8_t communicationPin) {
   //wait for bridge to fall
 }
 
-void Crossing::backUp(long reverseTime = 400.0){
+void Crossing::backUp(long reverseTime){
   int vback = -255;
   //unsigned long reverseTime = 400.0;
   unsigned long startTime = millis();

@@ -135,23 +135,26 @@ void loop() {
       break;
 
     case 1 : // drive to second gap
-      hanMovo.driveMotors(bSpeed);
-
-      if (hanFlyo.cliff()) {
-        long st = millis();
-        long ct = millis();
-        while (ct - st < bt) {
-          hanMovo.driveMotors(-255);
-          ct = millis();
-        }
-        hanMovo.driveMotors(0);
-        delay(500);
-        RCServo0.write(180);
-        delay(500);
-        hanMovo.driveMotors(bSpeed);
-        state++;
-      }
-      break;
+      raiseBasket();
+      delay(3000);
+      lowerBasket();
+//      hanMovo.driveMotors(bSpeed);
+//
+//      if (hanFlyo.cliff()) {
+//        long st = millis();
+//        long ct = millis();
+//        while (ct - st < bt) {
+//          hanMovo.driveMotors(-255);
+//          ct = millis();
+//        }
+//        hanMovo.driveMotors(0);
+//        delay(500);
+//        RCServo0.write(180);
+//        delay(500);
+//        hanMovo.driveMotors(bSpeed);
+//        state++;
+//      }
+//      break;
     case 2 : //drive up bridge
       hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
       if (hanFlyo.cliff()) {
@@ -175,20 +178,20 @@ void loop() {
 }
 
 void raiseBasket(){
-  motor.speed(scissorLiftMotor, 255);
+  motor.speed(scissorLiftMotor, -255);
   while(digitalRead(scissorUpLimitPin) == HIGH){
     
   }
-  motor.speed(scissorLiftMotor, -255);
+  motor.speed(scissorLiftMotor, 255);
   motor.stop(scissorLiftMotor);
 }
 
 void lowerBasket(){
-  motor.speed(scissorLiftMotor,-255);
+  motor.speed(scissorLiftMotor,255);
   while(digitalRead(scissorDownLimitPin) == HIGH){
     
   }
-  motor.speed(scissorLiftMotor, 255);
+  motor.speed(scissorLiftMotor, -255);
   motor.stop(scissorLiftMotor);
 }
 
