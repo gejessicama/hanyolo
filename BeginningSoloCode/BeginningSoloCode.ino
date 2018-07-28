@@ -149,15 +149,15 @@ void loop() {
       break;
 
     case 1 : // STARTING STATE UNTIL FIRST GAP
-      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
+      //hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
       //hanMovo.driveMotors(vel);
-      //hanMovo.followRightEdge(rightOutQRD,rightInQRD,pGainConst, dGainConst);
+      hanMovo.followRightEdge(rightOutQRD,rightInQRD,pGainConst, dGainConst);/*
       if (hanFlyo.cliff()) { // detect cliff then reverse for bt time
         hanFlyo.dropBridge1(toChewPin);
         state = 3;
       }
 
-
+      */
       break;
     case 2 :
       motor.speed(rightMotor, -255);

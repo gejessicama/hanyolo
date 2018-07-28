@@ -70,9 +70,9 @@ boolean Crossing::cliff() {
 
 void Crossing::dropBridge1(uint8_t communicationPin) {
   //move back for some time
-  backUp(400);delay(1000);  
+  backUp(420);delay(2000);  
   RCServo0.write(40);
-  delay(1000);
+  delay(2000);
   /*
   digitalWrite(communicationPin, HIGH);
   digitalWrite(communicationPin, LOW);*/
