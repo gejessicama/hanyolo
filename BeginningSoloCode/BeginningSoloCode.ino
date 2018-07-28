@@ -151,13 +151,14 @@ void loop() {
       hanMovo.driveMotors(vel);
       //hanMovo.followRightEdge(rightOutQRD,rightInQRD,pGainConst, dGainConst);
 
+/*
       if (hanFlyo.cliff()) { // detect cliff then reverse for bt time
         hanFlyo.dropBridge1(toChewPin);
         state = 3;
 
       }
 
-
+      */
       break;
     case 2 :
       motor.speed(rightMotor, -255);
