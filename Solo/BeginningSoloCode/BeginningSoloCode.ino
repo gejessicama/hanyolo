@@ -1,3 +1,4 @@
+
 /*
    Code for the TINAH (Solo) that will only include up to the third stuffy, but can be added to as we gain more functionality
 
@@ -89,7 +90,7 @@ void loop() {
         hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
       }
       motor.stop_all();
-      while (!hanFlyo.detectIR()) {
+      while (!hanFlyo.detect10KIR()) {
         LCD.print("1k");
       }
       LCD.print("10k");
