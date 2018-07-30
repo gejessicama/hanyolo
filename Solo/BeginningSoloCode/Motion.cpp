@@ -89,8 +89,8 @@ void Motion::pidControl() {
   derivativeTerm = derivativeGain * (currentError - lastState) * 1.0 / count;
   gain = proportionalTerm + derivativeTerm;
 
-  motor.speed(rightMotor, powerMultiplier * (baseSpeed + gain));
-  motor.speed(leftMotor, powerMultiplier * (-baseSpeed + gain));
+  motor.speed(rightMotor, powerMult * (baseSpeed + gain));
+  motor.speed(leftMotor, powerMult * (-baseSpeed + gain));
 
   if (currentError != lastError) {
     lastState = lastError;

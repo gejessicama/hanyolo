@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <phys253.h>
+#include <EEPROM.h>
 #ifndef CROSSING_H
 #define CROSSING_H
 
@@ -7,17 +8,17 @@ class Crossing{
   private:
     uint8_t rightMotor, leftMotor;
     uint8_t rightQRD, leftQRD;
-    int overCliff;
+    int overCliff, backupTime;
 
     uint8_t IRsig;
    
   public:
-    Crossing(uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t,uint8_t);
+    Crossing(uint8_t, uint8_t, uint8_t, uint8_t, uint8_t);
+    void setConstants();
     boolean cliff();
-    void backUp(long);
+    void backUp();
     void turnRight();
-    void dropBridge1(uint8_t);
-    void dropBridge2(uint8_t);
+    void dropBridge(int, uint8_t);
     bool detectIR();
 };
 

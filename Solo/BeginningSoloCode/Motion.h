@@ -1,5 +1,6 @@
 #include<Arduino.h>
 #include<phys253.h>
+#include <EEPROM.h>
 #ifndef MOTION_H
 #define MOTION_H
 
@@ -27,7 +28,7 @@ class Motion {
     void followRightEdge(uint8_t, uint8_t);
 
     void reset();
-    void driveMotors(int);
+    void driveMotors();
 
 };
 

@@ -20,5 +20,6 @@
 
 #define fromChewPin 3
 #define toChewPin 8
+#define irSignalPin 4
 
 #endif

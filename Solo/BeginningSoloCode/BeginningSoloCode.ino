@@ -20,16 +20,20 @@ const uint8_t menuSize = 7;
 const uint8_t delayTime = 220;
 
 // OTHER VARIABLES
+byte baseSpeed, proportionalGain, derivativeGain;
+double powerMult;
+int onTape, overCliff, backupTime;
+
 volatile uint8_t state = 0;
-volatile uint8_t pstate = 0;
+//volatile uint8_t pstate = 0;
 volatile uint8_t rememberState;
-volatile uint16_t rightWheelDist, leftWheelDist;
+//volatile uint16_t rightWheelDist, leftWheelDist;
 
 Motion hanMovo(rightMotor, leftMotor);
-Crossing hanFlyo(rightMotor, leftMotor, rightMostQRD, leftMostQRD, overTheCliff, backUpBridgeDistance);
+Crossing hanFlyo(rightMotor, leftMotor, rightMostQRD, leftMostQRD, irSignalPin);
 
 //  HELPER FUNCTIONS
-void updateState();
+//void updateState();
 void raiseBasket();
 void lowerBasket();
 
@@ -41,9 +45,9 @@ void setup() {
   LCD.print("Setup");
   pinMode(fromChewPin, INPUT);
   pinMode(toChewPin, OUTPUT);
-  attachInterrupt(fromChewPin, changeState, CHANGE);//change does not work
+  //attachInterrupt(fromChewPin, changeState, CHANGE);//change does not work
 }
-long startTime = millis();
+//long startTime = millis();
 
 
 void loop() {
@@ -53,13 +57,14 @@ void loop() {
       while (!startbutton()) {
         eePromMenu();
       }
-      saveMenuValues();
+      hanMovo.setConstants();
+      hanFlyo.setConstants();
       state ++;
       break;
 
     case 1 : // STARTING STATE UNTIL FIRST GAP
       //hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
-      hanMovo.driveMotors(vel);
+      //hanMovo.driveMotors(vel);
       //hanMovo.followRightEdge(rightOutQRD,rightInQRD,pGainConst, dGainConst);
 
       /*
@@ -85,8 +90,8 @@ void loop() {
     case 3 :
       long st = millis();
       long et = st;
-      while (et - st < bt) {
-        hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
+      while (et - st < backupTime) {
+        hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
       }
       motor.stop_all();
       while (!hanFlyo.detectIR()) {
@@ -121,22 +126,22 @@ void changeState() {
   }
 }
 
-///*
-// * Modifies EEPROM values and saves them to a more descriptive variable name
-// */
-//void saveMenuValues(){
-//  baseSpeed = EEPROM[0];
-//  powerMult = EEPROM[1]/100.0;
-//  proportionalGain = EEPROM[2];
-//  derivativeGain = EEPROM[3];
-//  onTape = EEPROM[4]*10;
-//  overCliff = EEPROM[5]*10;
-//  backupTime = EEPROM[6]*3;
-//}
+/*
+   Modifies EEPROM values and saves them to a more descriptive variable name
+*/
+void saveMenuValues() {
+  baseSpeed = EEPROM[0];
+  powerMult = EEPROM[1] / 100.0;
+  proportionalGain = EEPROM[2];
+  derivativeGain = EEPROM[3];
+  onTape = EEPROM[4] * 10;
+  overCliff = EEPROM[5] * 10;
+  backupTime = EEPROM[6] * 3;
+}
 
 /*
- * Displays the EEPROM menu and lets the user edit values. Instructions at the top
- */
+   Displays the EEPROM menu and lets the user edit values. Instructions at the top
+*/
 void eePromMenu() {
   menuScreen = floor (menuSize * knob(7) / 1024.0);
   switch (menuScreen) {
@@ -234,8 +239,8 @@ void eePromMenu() {
 }
 
 /*
- * Displays a given name and value to the LCD
- */
+   Displays a given name and value to the LCD
+*/
 void displayMenu(String varName, double varValue) {
   delay(1);
   LCD.clear();
