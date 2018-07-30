@@ -11,12 +11,10 @@ void loop() {
   uint8_t val = digitalRead(IRsig);
   LCD.clear();
   LCD.println("signal");
-  if (val !=lval){
-    if (val == HIGH){
-      LCD.print("1K");
-    }else if(val == LOW){
-      LCD.println("10K");
-    }
+  //LCD.print(val);
+  if (val == HIGH){
+    LCD.print("1K");
+  }else if(val == LOW){
+    LCD.println("10K");
   }
-  lval = val;
 }
