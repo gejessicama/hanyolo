@@ -18,14 +18,8 @@ class Crossing{
     boolean cliff();
     void backUp();
     void turnRight();
-<<<<<<< HEAD
     void dropBridge(int, uint8_t);
-    bool detectIR();
-=======
-    void dropBridge1(uint8_t);
-    void dropBridge2(uint8_t);
     bool detect10KIR();
->>>>>>> 45e0488b18745bb47749d4c260ac2efad7286b28
 };
 
 #endif
