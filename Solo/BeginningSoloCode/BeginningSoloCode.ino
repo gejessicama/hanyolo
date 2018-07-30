@@ -26,8 +26,12 @@ volatile uint8_t pstate = 0;
 volatile uint8_t rememberState;
 volatile uint16_t rightWheelDist, leftWheelDist;
 
+byte baseSpeed, proportionalGain, derivativeGain;
+double powerMult;
+int onTape, overCliff, backupTime;
+
 Motion hanMovo(rightMotor, leftMotor);
-Crossing hanFlyo(rightMotor, leftMotor, rightMostQRD, leftMostQRD, overTheCliff, backUpBridgeDistance);
+Crossing hanFlyo(rightMotor, leftMotor, rightMostQRD, leftMostQRD,irSignalPin);
 
 //  HELPER FUNCTIONS
 void updateState();
@@ -59,8 +63,8 @@ void loop() {
       break;
 
     case 1 : // STARTING STATE UNTIL FIRST GAP
-      //hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
-      hanMovo.driveMotors(vel);
+      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+      //hanMovo.driveMotors(vel);
       //hanMovo.followRightEdge(rightOutQRD,rightInQRD,pGainConst, dGainConst);
 
       /*
@@ -86,8 +90,8 @@ void loop() {
     case 3 :
       long st = millis();
       long et = st;
-      while (et - st < bt) {
-        hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
+      while (et - st < backupTime) {
+        hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
       }
       motor.stop_all();
       while (!hanFlyo.detect10KIR()) {
