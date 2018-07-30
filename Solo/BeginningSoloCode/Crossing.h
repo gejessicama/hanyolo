@@ -19,9 +19,6 @@ class Crossing{
     void backUp();
     void turnRight();
     void dropBridge(int, uint8_t);
-    bool detectIR();
-    void dropBridge1(uint8_t);
-    void dropBridge2(uint8_t);
     bool detect10KIR();
 };
 
