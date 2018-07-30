@@ -69,10 +69,10 @@ bool Crossing::detect10KIR(){
       //LCD.clear();
       if (val == HIGH){
         //LCD.print("Not 10K");
-        return true;
+        return false;
       }else if(val == LOW){
         //LCD.println("10K");
-        return false;
+        return true;
       }
 }
 
