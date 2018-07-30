@@ -1,61 +1,31 @@
 /*
-   Solo code just for the first stage of the course with full functionality
+   Code for the TINAH (Solo) that will only include up to the third stuffy, but can be added to as we gain more functionality
+
+   Certian Values are stored in EEPROM, and there is a menu system for reading these in:
+    knob(7) scrolls through the values to change
+    stopbutton() lets you begin and finish editing a single value
+    startbutton() exits the menu and begins the robot code
 */
 
 #include <phys253.h>
+#include <EEPROM.h>
 #include "Motion.h"
 #include "Crossing.h"
+#include "Constants.h"
 
-#define rightMotor 0
-#define leftMotor 1
-#define scissorLiftMotor 2
+// VARIABLES FOR EEPROM MENU
+uint8_t menuScreen;
+byte temp;
+const uint8_t menuSize = 7;
+const uint8_t delayTime = 220;
 
-#define rightMostQRD 1
-#define rightMiddleQRD 2
-#define leftMiddleQRD 3
-#define leftMostQRD 4
-#define rightOutQRD 5
-#define rightInQRD 6
-
-//#define basketSensorPin
-//#define scissorUpLimitPin
-//#define scissorDownLimitPin
-//#define oneIRPin
-//#define tenIRPin
-
-#define rightEncoderPin 1
-#define leftEncoderPin 2
-
-#define rightEncoderPinA 0
-#define rightEncoderPinB 1
-#define leftEncoderPinA 2
-#define leftEncoderPinB 3
-
-
-#define fromChewPin 3
-#define toChewPin 8
-#define dropTheBridgePin 9
-
-
-
-#define bSpeed 255
-#define powerMult 0.4
-
-#define onTheTape 400
-#define overTheCliff 650
-
-uint8_t pGainConst =  54;
-uint8_t dGainConst  = 0;
-
-#define distanceToStormtroopers 36
-#define backUpBridgeDistance 2
-
+// OTHER VARIABLES
 volatile uint8_t state = 0;
 volatile uint8_t pstate = 0;
 volatile uint8_t rememberState;
 volatile uint16_t rightWheelDist, leftWheelDist;
 
-Motion hanMovo(rightMotor, leftMotor, onTheTape, overTheCliff, bSpeed, powerMult, leftEncoderPinA, leftEncoderPinB, rightEncoderPinA, rightEncoderPinB);
+Motion hanMovo(rightMotor, leftMotor);
 Crossing hanFlyo(rightMotor, leftMotor, rightMostQRD, leftMostQRD, overTheCliff, backUpBridgeDistance);
 
 //  HELPER FUNCTIONS
@@ -65,85 +35,26 @@ void lowerBasket();
 
 //  INTERRUPT FUNCTIONS
 void changeState();
-void incrementRightPos(); //just need to know how much distance corresponds to
-void incrementLeftPos(); //need to make sure wheels only turn forwards
 
 void setup() {
-  //#include <phys253setup.txt>
-  //  pinMode(rightEncoderPin, INPUT);
-  //  pinMode(leftEncoderPin, INPUT);
   LCD.begin();
   LCD.print("Setup");
-  //  pinMode(rightEncoderPinA, INPUT);
-  //  pinMode(rightEncoderPinB, INPUT);
-  //  pinMode(leftEncoderPinA, INPUT);
-  //  pinMode(leftEncoderPinB, INPUT);
-
   pinMode(fromChewPin, INPUT);
   pinMode(toChewPin, OUTPUT);
   attachInterrupt(fromChewPin, changeState, CHANGE);//change does not work
-  //  attachInterrupt(leftEncoderPinA,getEncoderLeftPosHere,RISING);
-  //  attachInterrupt(rightEncoderPinA,getEncoderRightPosHere,RISING);
 }
 long startTime = millis();
 
 
-int setupStage = 0;
-int vel = 100;
-int bt = 0; // 390-410 - optimal
 void loop() {
   switch (state) {
 
     case 0 : // START BUTTON NOT YET PRESSED
-      LCD.clear();
-      LCD.print("Start| Stop>nx");
-      LCD.println(setupStage);
-      if (stopbutton()) {
-        delay(200);
-        setupStage++;
-        //updateSetup();
+      while (!startbutton()) {
+        eePromMenu();
       }
-      if (setupStage == 0) {
-        hanMovo.powerMultiplier =  knob(6) / 1024.0;
-        hanMovo.baseSpeed = knob(7) / 1024.0 * 255;
-        LCD.print("Pow ");
-        LCD.print(hanMovo.powerMultiplier);
-        LCD.print(" Vel ");
-        LCD.print(hanMovo.baseSpeed);
-      }
-      if (setupStage == 1) {
-        pGainConst = knob(6) / 1024.0 * 200;
-        dGainConst = knob(7) / 1024.0 * 200;
-        LCD.print("kp");
-        LCD.print(pGainConst);
-        LCD.print("kd");
-        LCD.print(dGainConst);
-      }
-      if (setupStage == 2) {
-        hanMovo.ON =  knob(6);
-        hanMovo.CLIFF = knob(7);
-        LCD.print("ON ");
-        LCD.print(hanMovo.ON);
-        LCD.print(" CL ");
-        LCD.print(hanMovo.CLIFF);
-      }
-      if (setupStage == 3) {
-        vel = 255.0 * knob(7) / 1024.0;
-        bt = 10 * knob(6);
-        /*LCD.print("vel");
-        LCD.print(vel);*/
-        LCD.print(" ft ");
-        LCD.print(bt);
-      }
-      if (startbutton()) {
-        updateState();
-      }
-      break;
-    case 23 :
-      LCD.clear();
-      LCD.println(analogRead(leftMostQRD));
-      LCD.print(analogRead(rightMostQRD));
-      state = 23;
+      saveMenuValues();
+      state ++;
       break;
 
     case 1 : // STARTING STATE UNTIL FIRST GAP
@@ -151,12 +62,12 @@ void loop() {
       hanMovo.driveMotors(vel);
       //hanMovo.followRightEdge(rightOutQRD,rightInQRD,pGainConst, dGainConst);
 
-/*
-      if (hanFlyo.cliff()) { // detect cliff then reverse for bt time
-        hanFlyo.dropBridge1(toChewPin);
-        state = 3;
+      /*
+            if (hanFlyo.cliff()) { // detect cliff then reverse for bt time
+              hanFlyo.dropBridge1(toChewPin);
+              state = 3;
 
-      }
+            }
 
       */
       break;
@@ -174,11 +85,11 @@ void loop() {
     case 3 :
       long st = millis();
       long et = st;
-      while (et - st < bt){
+      while (et - st < bt) {
         hanMovo.followTape(rightMiddleQRD, leftMiddleQRD, pGainConst, dGainConst);
       }
       motor.stop_all();
-      while (!hanFlyo.detectIR()){
+      while (!hanFlyo.detectIR()) {
         LCD.print("1k");
       }
       LCD.print("10k");
@@ -210,51 +121,125 @@ void changeState() {
   }
 }
 
+///*
+// * Modifies EEPROM values and saves them to a more descriptive variable name
+// */
+//void saveMenuValues(){
+//  baseSpeed = EEPROM[0];
+//  powerMult = EEPROM[1]/100.0;
+//  proportionalGain = EEPROM[2];
+//  derivativeGain = EEPROM[3];
+//  onTape = EEPROM[4]*10;
+//  overCliff = EEPROM[5]*10;
+//  backupTime = EEPROM[6]*3;
+//}
 
-
-
-
-
-void getEncoderLeftPosHere() {
-  //if (millis() - lastTimeLeftEnc <10) return encoderLeftPos;
-  for (int i = 0; i < 0; i++) {
-    if (digitalRead(leftEncoderPinA) == LOW) {
-      return;
-    }
-  }
-  //int B = digitalRead(leftEncoderPinB);
-  /*  for(int i = 0; i < 2000; i++){
-        if(digitalRead(leftEncoderPinB) != B){
-          return;
+/*
+ * Displays the EEPROM menu and lets the user edit values. Instructions at the top
+ */
+void eePromMenu() {
+  menuScreen = floor (menuSize * knob(7) / 1024.0);
+  switch (menuScreen) {
+    case 0 :
+      displayMenu("BaseSpeed", EEPROM[0]);
+      if (stopbutton()) {
+        delay(delayTime);
+        while (!stopbutton()) {
+          temp = knob(6) / 1024.0 * 255;
+          displayMenu("BaseSp(E)", temp);
         }
-    }
-
-    if (B == LOW) {
-        hanMovo.encoderLeftPos--;
-      } else {
-        hanMovo.encoderLeftPos++;
+        delay(delayTime);
+        EEPROM[0] = temp;
       }
-  */  hanMovo.encoderLeftPos++;
-  //  LCD.clear();
-  //  LCD.print(" L ");
-  //   LCD.print(hanMovo.encoderLeftPos);
+      break;
+
+    case 1 :
+      displayMenu("PowerMult", EEPROM[1] / 100.0);
+      if (stopbutton()) {
+        delay(delayTime);
+        while (!stopbutton()) {
+          temp = knob(6) / 1024.0 * 100;
+          displayMenu("PowerM(E)", temp / 100.0);
+        }
+        delay(delayTime);
+        EEPROM[1] = temp;
+      }
+      break;
+
+    case 2 :
+      displayMenu("ProportionalGain", EEPROM[2]);
+      if (stopbutton()) {
+        delay(delayTime);
+        while (!stopbutton()) {
+          temp = knob(6) / 1024.0 * 255;
+          displayMenu("ProportionalG(E)", temp);
+        }
+        delay(delayTime);
+        EEPROM[2] = temp;
+      }
+      break;
+
+    case 3 :
+      displayMenu("DerivativeGain", EEPROM[3]);
+      if (stopbutton()) {
+        delay(delayTime);
+        while (!stopbutton()) {
+          temp = knob(6) / 1024.0 * 255;
+          displayMenu("DerivativeG(E)", temp);
+        }
+        delay(delayTime);
+        EEPROM[3] = temp;
+      }
+      break;
+
+    case 4 :
+      displayMenu("OnTape", EEPROM[4] * 10);
+      if (stopbutton()) {
+        delay(delayTime);
+        while (!stopbutton()) {
+          temp = knob(6) / 1024.0 * 150;
+          displayMenu("OnT(E)", temp * 10);
+        }
+        delay(delayTime);
+        EEPROM[4] = temp;
+      }
+      break;
+
+    case 5 :
+      displayMenu("OverCliff", EEPROM[5] * 10);
+      if (stopbutton()) {
+        delay(delayTime);
+        while (!stopbutton()) {
+          temp = knob(6) / 1024.0 * 150;
+          displayMenu("OverCl(E)", temp * 10);
+        }
+        delay(delayTime);
+        EEPROM[5] = temp;
+      }
+      break;
+
+    case 6 :
+      displayMenu("BackupTime", EEPROM[6] * 3);
+      if (stopbutton()) {
+        delay(delayTime);
+        while (!stopbutton()) {
+          temp = knob(6) / 1024.0 * 255;
+          displayMenu("BackupT(E)", temp * 3);
+        }
+        delay(delayTime);
+        EEPROM[6] = temp;
+      }
+      break;
+  }
 }
 
-void getEncoderRightPosHere() {
-  //if (millis() - lastTimeRightEnc < 10) return encoderRightPos;
-  for (int i; i < 2000; i++) {
-    if (digitalRead(rightEncoderPinA) == LOW) {
-      return;
-    }
-  }
-  if (digitalRead(rightEncoderPinB) == LOW) {
-    hanMovo.encoderRightPos--;
-  } else {
-    hanMovo.encoderRightPos++;
-  }
-
-  //hanMovo.encoderRightPos++;
-  //LCD.clear();
-  //LCD.print(" R ");
-  //LCD.print(hanMovo.encoderRightPos);
+/*
+ * Displays a given name and value to the LCD
+ */
+void displayMenu(String varName, double varValue) {
+  delay(1);
+  LCD.clear();
+  LCD.print(varName + ": ");
+  LCD.print(varValue);
 }
+

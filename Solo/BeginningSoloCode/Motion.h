@@ -5,43 +5,30 @@
 
 class Motion {
   private:
-    // VARIABLES FOR ALL
     uint8_t rightMotor, leftMotor;
-    
 
-    // VARIABLES FOR TAPE FOLLOWING, EDGE FOLLOWING
+    byte baseSpeed, proportionalGain, derivativeGain;
+    double powerMult;
+    int onTape, overCliff, backupTime;
+    
     int currentError, lastError, lastState, lastOn;
     int rVal, lVal;
     int proportionalTerm, derivativeTerm, gain;
     uint16_t count;
-
-    //encoders
-    int lEncA, lEncB, rEncA, rEncB;
     
-    int lEncALast = LOW, rEncALast = LOW;
-    
-
     boolean isOnWhite(uint8_t);
     boolean isOverCliff(uint8_t);
-    void pidControl(uint8_t, uint8_t);
+    void pidControl();
 
   public:
-    Motion(uint8_t, uint8_t, uint8_t, uint8_t, int, double, int,int,int,int);
-    void followTape(uint8_t, uint8_t, uint8_t, uint8_t);
-    void followRightEdge(uint8_t, uint8_t, uint8_t, uint8_t);
-    void bothWheelsForward(uint8_t, uint8_t, uint8_t, uint8_t); // pass both distances and PID to match
-    void bothWheelsBackward(int, int); // pass both distances and PID to match
-    boolean cliff();
+    Motion(uint8_t, uint8_t);
+    void setConstants();
+    void followTape(uint8_t, uint8_t);
+    void followRightEdge(uint8_t, uint8_t);
+
     void reset();
     void driveMotors(int);
-    
-    long getEncoderLeftPos();
-    long getEncoderRightPos();
-    void turn90Degrees();
-    int nL = LOW,nR = LOW;
-    int encoderLeftPos = 0, encoderRightPos = 0;
-    double powerMultiplier;
-    int ON, CLIFF, baseSpeed;
+
 };
 
 #endif

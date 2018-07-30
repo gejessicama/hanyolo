@@ -5,34 +5,40 @@
    Requires that motors are wired so that positive inputs make them go forwards
 */
 #include "Motion.h"
-static long lastTimeLeftEnc = millis();
-static long lastTimeRightEnc = millis();
 
-Motion::Motion(uint8_t rMotor, uint8_t lMotor, uint8_t onTape, uint8_t overCliff,
-               int v0, double powerMult,int leftEncA, int leftEncB,int rightEncA,int rightEncB) {
-
+/*
+   Initializes the motion object by declaring which pin drives which motor
+*/
+Motion::Motion(uint8_t rMotor, uint8_t lMotor) {
   rightMotor = rMotor;
   leftMotor = lMotor;
-  ON = onTape;
-  CLIFF = overCliff;
-  baseSpeed = v0;
-  powerMultiplier = powerMult;
-  lEncA = leftEncA;
-  lEncB = leftEncB;
-  rEncA = rightEncA;
-  rEncA = rightEncB;
 }
 
-void Motion::reset() {
-  lastError = 0;
-  lastState = 0;
-  lastOn = -1;
-  count = 0;
-
+/*
+   Sets necessary values for all the variables that motion depends on
+*/
+void Motion::setConstants() {
+  baseSpeed = EEPROM[0];
+  powerMult = EEPROM[1] / 100.0;
+  proportionalGain = EEPROM[2];
+  derivativeGain = EEPROM[3];
+  onTape = EEPROM[4] * 10;
+  overCliff = EEPROM[5] * 10;
+  backupTime = EEPROM[6] * 3;
 }
 
-void Motion::followTape(uint8_t rightQRD, uint8_t leftQRD, uint8_t proportionalGain,
-                        uint8_t derivativeGain) {
+//void Motion::reset() {
+//  lastError = 0;
+//  lastState = 0;
+//  lastOn = -1;
+//  count = 0;
+//
+//}
+
+/*
+ * Calculates the error values and such for following tape
+ */
+void Motion::followTape(uint8_t rightQRD, uint8_t leftQRD) {
 
   rVal = isOnWhite(rightQRD);
   lVal = isOnWhite(leftQRD);
@@ -50,33 +56,35 @@ void Motion::followTape(uint8_t rightQRD, uint8_t leftQRD, uint8_t proportionalG
     currentError = lastOn * 5;
   }
 
-  pidControl(proportionalGain, derivativeGain);
+  pidControl();
 }
 
-void Motion::followRightEdge(uint8_t outQRD, uint8_t inQRD, uint8_t proportionalGain,
-                             uint8_t derivativeGain) {
+/*
+ * Calculates errors and such for following the right edge of a cliff
+ */
+void Motion::followRightEdge(uint8_t outQRD, uint8_t inQRD) {
 
   rVal = isOverCliff(outQRD);
-  lVal = isOnWhite(inQRD);
+  lVal = isOverCliff(inQRD);
 
-  if (rVal && !lVal) { // We are over the cliff all is good
+  if (rVal && !lVal) { //all is good
     currentError = 0;
     lastState = 0;
-  } //else if (!rVal && !lVal) { // We are too far left
-    else if (!rVal){
+  } else if (!rVal) { // too far left
     currentError = -1;
     lastOn = -1;
-  } //else if (rVal && lVal) { // We are too far right
-    else if(lVal){
+  } else if (lVal) { // too far right
     currentError = 1;
     lastOn = 1;
   }
 
-  pidControl(proportionalGain, derivativeGain);
+  pidControl();
 }
 
-
-void Motion::pidControl(uint8_t proportionalGain, uint8_t derivativeGain) {
+/*
+ * Controls the motion of the robot based on the last calculated error values and such
+ */
+void Motion::pidControl() {
   proportionalTerm = proportionalGain * currentError;
   derivativeTerm = derivativeGain * (currentError - lastState) * 1.0 / count;
   gain = proportionalTerm + derivativeTerm;
@@ -92,78 +100,31 @@ void Motion::pidControl(uint8_t proportionalGain, uint8_t derivativeGain) {
   count ++;
 }
 
+/*
+   Returns true if the given QRD is over a white surface, false otherwise
+*/
 boolean Motion::isOnWhite (uint8_t qrdPin) {
-  if (analogRead(qrdPin) < ON) {
+  if (analogRead(qrdPin) < onTape) {
     return true;
   } else {
     return false;
   }
 }
-boolean Motion::isOverCliff (uint8_t qrdPin) {
-  if (analogRead(qrdPin) > CLIFF)
-    return true;
-  return false;
-}
 
-int debouncing = 10000;
-
-long Motion::getEncoderLeftPos() {
-  //if (millis() - lastTimeLeftEnc <5) return encoderLeftPos;
-  
-  nL = digitalRead(lEncA);
-  if ((lEncALast == LOW) && (nL == HIGH)) {
-    for(int i; i < debouncing; i++){
-      if(digitalRead(lEncA) == LOW){
-        return encoderLeftPos;
-      }
-    }
-    if (digitalRead(lEncB) == LOW) {
-      encoderLeftPos--;
-    } else {
-      encoderLeftPos++;
-    }
-  }
-  lEncALast = nL;
-  int posl = encoderLeftPos;
-  
-  lastTimeLeftEnc = millis();
-  return  -1*posl;
-}
-
-long Motion::getEncoderRightPos() {
-  //if (millis() - lastTimeRightEnc < 5) return encoderRightPos;
-  nR = digitalRead(rEncA);
-  if ((rEncALast == LOW) && (nR == HIGH)) {
-    for(int i; i < debouncing; i++){
-      if(digitalRead(rEncA) == LOW){
-        return encoderRightPos;
-      }
-    }
-    if (digitalRead(rEncB) == LOW) {
-      encoderRightPos--;
-    } else {
-      encoderRightPos++;
-    }
-  }
-  rEncALast = nR;
-  int posr = -1*encoderRightPos;
-  
-  lastTimeRightEnc = millis();
-  return posr;
-}
-
-
-void Motion::driveMotors(int vel){
-   motor.speed(rightMotor,vel);
-   motor.speed(leftMotor,-vel);
-}
 /*
-bool Motion::cliff() {
-  int lVal2 = analogRead(lQRD2);
-  int rVal2 = analogRead(rQRD2);
-  if (lVal2 > qrdcliff && rVal2 > qrdcliff) {
-    //dropBridge1();
+   Returns true if the given QRD is over a cliff, false otherwise
+*/
+boolean Motion::isOverCliff (uint8_t qrdPin) {
+  if (analogRead(qrdPin) > overCliff) {
     return true;
+  } else {
+    return false;
   }
-}*/
+}
+
+
+void Motion::driveMotors() {
+  motor.speed(rightMotor, baseSpeed * powerMult);
+  motor.speed(leftMotor, -baseSpeed * powerMult);
+}
 

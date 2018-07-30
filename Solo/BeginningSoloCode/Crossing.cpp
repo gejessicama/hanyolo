@@ -1,22 +1,25 @@
 /*
-   This will contain the necessary functions for crossing both of the gaps we face
-
-   For dropBridge1() and dropBridge2() the robot backs up to the right distance then
-   sends a signal to the Arduino to drop the bridge
+   This will contain the necessary functions related to crossing the first gap
 */
 
 #include "Crossing.h"
 
-Crossing::Crossing(uint8_t rMotor, uint8_t lMotor, uint8_t rQRD, uint8_t lQRD, uint8_t overCliff,
-                   uint8_t backDist,uint8_t sigIR) {
+/*
+ * Initializer for a Crossing Object
+ */
+Crossing::Crossing(uint8_t rMotor, uint8_t lMotor, uint8_t rQRD, uint8_t lQRD, uint8_t sigIR) {
   rightMotor = rMotor;
   leftMotor = lMotor;
   rightQRD = rQRD;
   leftQRD = lQRD;
-  overTheCliff = overCliff;
-  backUpDistance = backDist;
-                    IRsig = sigIR;
+  IRsig = sigIR;
 }
+
+void Crossing::setConstants(){
+  overCliff = EEPROM[5] * 10;
+}
+
+
 int count = 0;
 int seq = 0;
 long l = 0.0;
