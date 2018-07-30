@@ -64,9 +64,8 @@ void Crossing::backUp(){
 
 
 uint8_t lval;
-bool Crossing::detectIR(){
+bool Crossing::detect10KIR(){
   uint8_t val = digitalRead(IRsig);
-    if (val !=lval){
       //LCD.clear();
       if (val == HIGH){
         //LCD.print("Not 10K");
@@ -75,7 +74,5 @@ bool Crossing::detectIR(){
         //LCD.println("10K");
         return false;
       }
-    }
-  lval = val;
 }
 
