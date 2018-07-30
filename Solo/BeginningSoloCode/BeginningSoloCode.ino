@@ -31,7 +31,7 @@ double powerMult;
 int onTape, overCliff, backupTime;
 
 Motion hanMovo(rightMotor, leftMotor);
-Crossing hanFlyo(rightMotor, leftMotor, rightMostQRD, leftMostQRD, irSignalPin);
+Crossing hanFlyo(rightMotor, leftMotor, rightMostQRD, leftMostQRD,irSignalPin);
 
 //  HELPER FUNCTIONS
 void updateState();
@@ -46,7 +46,6 @@ void setup() {
   LCD.print("Setup");
   pinMode(fromChewPin, INPUT);
   pinMode(toChewPin, OUTPUT);
-  //attachInterrupt(fromChewPin, changeState, CHANGE);//change does not work
 }
 long startTime = millis();
 
@@ -59,23 +58,36 @@ void loop() {
       while (!startbutton()) {
         eePromMenu();
       }
+      delay(200);
       hanMovo.setConstants();
       hanFlyo.setConstants();
-      attachInterrupt(fromChewPin, changeState, CHANGE);
+      saveMenuValues();
+      attachInterrupt(fromChewPin, changeState, CHANGE);//change does not work
       state++;
+      
       break;
 
     case 1 : // STARTING STATE UNTIL FIRST GAP
-      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+      //hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+      LCD.print("Move");
+      hanMovo.driveMotors();
+      LCD.clear();
+      //hanMovo.followRightEdge(rightOutQRD,rightInQRD,pGainConst, dGainConst);
+
       
-//      if (hanFlyo.cliff()) { // detect cliff then reverse for bt time
-//        hanFlyo.dropBridge(1000.0,100.0);
-//        state = 3;
-//      }
+      if (hanFlyo.cliff()) { // detect cliff then reverse for bt time
+        hanFlyo.dropBridge(1000.0,100.0);
+        state = 3;
+      }
 
 
       break;
     case 2 :
+      motor.speed(rightMotor, -255);
+      motor.speed(leftMotor, 255);
+      motor.stop(rightMotor);
+      motor.stop(leftMotor);
+      motor.stop_all();
       LCD.clear();
       LCD.print("Pick Up Stuffy");
       break;
@@ -117,10 +129,6 @@ void changeState() {
   } else {
     //    rememberState = state;
     state = 2;
-    motor.speed(rightMotor, -255);
-      motor.speed(leftMotor, 255);
-      motor.stop(rightMotor);
-      motor.stop(leftMotor);
   }
 }
 
