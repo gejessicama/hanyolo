@@ -52,29 +52,34 @@ long startTime = millis();
 
 
 void loop() {
+  LCD.print(state);
   switch (state) {
 
     case 0 : // START BUTTON NOT YET PRESSED
       while (!startbutton()) {
         eePromMenu();
       }
+      delay(200);
+      hanMovo.setConstants();
+      hanFlyo.setConstants();
       saveMenuValues();
       state ++;
+      
       break;
 
     case 1 : // STARTING STATE UNTIL FIRST GAP
-      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-      //hanMovo.driveMotors(vel);
+      //hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+      LCD.print("Move");
+      hanMovo.driveMotors();
       //hanMovo.followRightEdge(rightOutQRD,rightInQRD,pGainConst, dGainConst);
 
-      /*
-            if (hanFlyo.cliff()) { // detect cliff then reverse for bt time
-              hanFlyo.dropBridge1(toChewPin);
-              state = 3;
+      
+      if (hanFlyo.cliff()) { // detect cliff then reverse for bt time
+        hanFlyo.dropBridge(1000.0,100.0);
+        state = 3;
+      }
 
-            }
 
-      */
       break;
     case 2 :
       motor.speed(rightMotor, -255);
