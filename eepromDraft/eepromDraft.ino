@@ -25,7 +25,7 @@ uint8_t menuScreen;
 uint8_t state = 0;
 byte temp;
 const uint8_t menuSize = 7;
-const uint8_t delayTime = 200;
+const uint8_t delayTime = 220;
 
 //byte baseSpeed = EEPROM[0]; //will never be more that 255
 //double powerMultiplier = EEPROM[1] / 100.0;

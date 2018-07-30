@@ -3,7 +3,7 @@
    When a stuffy is seen, chew writes a pin to high waits 3 seconds, writes that pin to low
 */
 
-#include <Servo.h>
+//#include <Servo.h>
 
 #define rightTriggerPin 4
 #define rightEchoPin 5
