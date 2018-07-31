@@ -17,7 +17,7 @@
 // VARIABLES FOR EEPROM MENU
 uint8_t menuScreen;
 byte temp;
-const uint8_t menuSize = 7;
+const uint8_t menuSize = 8;
 const uint8_t delayTime = 220;
 
 // OTHER VARIABLES
@@ -62,29 +62,30 @@ void loop() {
       hanMovo.setConstants();
       hanFlyo.setConstants();
       saveMenuValues();
-      attachInterrupt(fromChewPin, changeState, CHANGE);//change does not work
+      attachInterrupt(fromChewPin, changeState, CHANGE);//change does not work 
       state++;
       
       break;
 
     case 1 : // STARTING STATE UNTIL FIRST GAP
-      //hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
       LCD.print("Move");
-      hanMovo.driveMotors();
+      //hanMovo.driveMotors();
       LCD.clear();
       //hanMovo.followRightEdge(rightOutQRD,rightInQRD,pGainConst, dGainConst);
 
       
       if (hanFlyo.cliff()) { // detect cliff then reverse for bt time
-        hanFlyo.dropBridge(1000.0,100.0);
+        hanFlyo.dropBridge(1000,110);
         state = 3;
       }
 
 
       break;
     case 2 :
-      motor.speed(rightMotor, -255);
+      motor.speed(rightMotor, -240);
       motor.speed(leftMotor, 255);
+      delay(300);
       motor.stop(rightMotor);
       motor.stop(leftMotor);
       motor.stop_all();
@@ -96,9 +97,11 @@ void loop() {
     case 3 :
       long st = millis();
       long et = st;
-      while (et - st < backupTime) {
+      while (et - st < 2000.0) {
         hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
       }
+      motor.speed(rightMotor,-255);
+      motor.speed(leftMotor, 255);
       motor.stop_all();
       while (!hanFlyo.detect10KIR()) {
         LCD.print("1k");
@@ -239,6 +242,19 @@ void eePromMenu() {
         }
         delay(delayTime);
         EEPROM[6] = temp;
+      }
+      break;
+
+          case 7 :
+      displayMenu("BackupSpeed", EEPROM[7]);
+      if (stopbutton()) {
+        delay(delayTime);
+        while (!stopbutton()) {
+          temp = knob(6) / 1024.0 * 255;
+          displayMenu("BackupSp(E)", temp);
+        }
+        delay(delayTime);
+        EEPROM[7] = temp;
       }
       break;
   }
