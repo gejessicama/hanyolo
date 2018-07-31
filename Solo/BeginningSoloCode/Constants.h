@@ -18,7 +18,7 @@
 //#define oneIRPin
 //#define tenIRPin
 
-#define fromChewPin 3
+#define fromChewPin 2
 #define toChewPin 8
 #define irSignalPin 4
 
