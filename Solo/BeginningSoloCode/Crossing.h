@@ -8,7 +8,8 @@ class Crossing{
   private:
     uint8_t rightMotor, leftMotor;
     uint8_t rightQRD, leftQRD;
-    int overCliff, backupTime;
+    int overCliff, backupTime; 
+    uint8_t backupSpeed;
 
     uint8_t IRsig;
    

@@ -9,7 +9,7 @@
 #define leftTriggerPin 6
 #define leftEchoPin  7
 
-#define toSoloPin 0
+#define toSoloPin 1
 #define pauseForStuffy 3000
 
 const uint16_t stuffyLimit = 60000;

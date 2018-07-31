@@ -21,6 +21,7 @@ Crossing::Crossing(uint8_t rMotor, uint8_t lMotor, uint8_t rQRD, uint8_t lQRD, u
 void Crossing::setConstants(){
   overCliff = EEPROM[5] * 10;
   backupTime = EEPROM[6] * 3;
+  backupSpeed = EEPROM[7];
 }
 
 
@@ -33,20 +34,38 @@ void Crossing::setConstants(){
 
 boolean Crossing::cliff() {
   if (analogRead(rightQRD) > overCliff && analogRead(leftQRD) > overCliff) {
-    
-    motor.speed(rightMotor, -255);
-    motor.speed(leftMotor, 255);
+      motor.speed(leftMotor, backupSpeed);
+      motor.speed(rightMotor, 0);
+      delay(backupTime);
+      motor.speed(rightMotor, -backupSpeed);
+      motor.speed(leftMotor, 0);
+      delay(backupTime);
+//    motor.speed(rightMotor, -255);
+//    motor.speed(leftMotor, 255);
+//    delay(backupTime);
     motor.stop(rightMotor);
     motor.stop(leftMotor);
+
     return true;
   }
   return false;
 }
 
 void Crossing::dropBridge(int waitTime, uint8_t servoAngle) {
+//  while(true){
+
+//  }
   delay(waitTime);  
-  RCServo0.write(servoAngle);
+       for (int pos = servoAngle - 10; pos <= servoAngle; pos += 1) {
+    RCServo0.write(pos);              
+    delay(10);                       
+  }
+  //RCServo0.write(servoAngle);
   delay(waitTime);
+
+  motor.speed(leftMotor, -200);
+  motor.speed(rightMotor,  200);
+  delay(250);
 }
 
 void Crossing::backUp(){
