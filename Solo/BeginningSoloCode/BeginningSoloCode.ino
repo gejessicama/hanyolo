@@ -63,7 +63,7 @@ void loop() {
       hanFlyo.setConstants();
       //saveMenuValues();
       attachInterrupt(fromChewPin, changeState, CHANGE);
-      state++;
+      state=1;
       break;
 
     case 1 : // STARTING STATE UNTIL FIRST GAP
@@ -71,13 +71,12 @@ void loop() {
       //hanMovo.driveMotors();
       LCD.clear();
       LCD.print("moving");
-      hanMovo.driveMotors();
       //hanMovo.followRightEdge(rightOutQRD,rightInQRD,pGainConst, dGainConst);
-
-      if (hanFlyo.cliff()) { // detect cliff then reverse for bt time
-        hanFlyo.dropBridge(1000, 110); // TODO CHANGE THESE VALUES TO BE VARIABLES/MENU PROGRAMABLE VALUES
-        //state = 3;
-      }
+//
+//      if (hanFlyo.cliff()) { // detect cliff then reverse for bt time
+//        hanFlyo.dropBridge(1000, 110); // TODO CHANGE THESE VALUES TO BE VARIABLES/MENU PROGRAMABLE VALUES
+//        //state = 3;
+//      }
 
       break;
 
@@ -86,20 +85,20 @@ void loop() {
       LCD.print("Pick Up Stuffy");
       break;
 
-    case 3 :
-      long st = millis();
-      long et = st;
-      while (et - st < 2000.0) {
-        hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-      }
-      motor.speed(rightMotor, -255);
-      motor.speed(leftMotor, 255);
-      motor.stop_all();
-      while (!hanFlyo.detect10KIR()) {
-        LCD.print("1k");
-      }
-      LCD.print("10k");
-      break;
+//    case 3 :
+//      long st = millis();
+//      long et = st;
+//      while (et - st < 2000.0) {
+//        hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+//      }
+//      motor.speed(rightMotor, -255);
+//      motor.speed(leftMotor, 255);
+//      motor.stop_all();
+//      while (!hanFlyo.detect10KIR()) {
+//        LCD.print("1k");
+//      }
+//      LCD.print("10k");
+//      break;
 
   }
 }

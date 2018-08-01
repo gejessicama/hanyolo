@@ -4,53 +4,52 @@
 */
 
 
-#define rightTriggerPin 4
-#define rightEchoPin 5
-#define leftTriggerPin 6
-#define leftEchoPin  7
+#define rightLEDPin 4
+#define rightQSDPin 1
+#define leftLEDPin 6
+#define leftQSDPin  2
 
-#define toSoloPin 1
+#define toSoloPinRight 1
+#define toSoloPinLeft 1
 #define pauseForStuffy 3000
 
-const uint16_t stuffyLimit = 60000;
-const uint16_t objectLimit = 400;
-long duration;
+const int objectLimit = 650;
+int onValue, offValue;
 
-boolean readInSonar(uint8_t, uint8_t, uint16_t);
+//boolean readInQSD(uint8_t, uint8_t);
 
 void setup() {
   //Serial.begin(9600);
-  pinMode(rightTriggerPin, OUTPUT);
-  pinMode(leftTriggerPin, OUTPUT);
-  pinMode(toSoloPin, OUTPUT);
+  pinMode(rightLEDPin, OUTPUT);
+  pinMode(leftLEDPin, OUTPUT);
+  pinMode(toSoloPinRight, OUTPUT);
 }
 
 void loop() {
-
-  if (readInSonar(rightTriggerPin, rightEchoPin)) {
+  if (readInQSD(rightLEDPin, rightQSDPin)) {
     //Serial.println("Seen on right");
-    digitalWrite(toSoloPin, HIGH);
-    //digitalWrite(toSoloPin, LOW);
+    digitalWrite(toSoloPinRight, HIGH);
+    //digitalWrite(toSoloPinRight, LOW);
     delay(pauseForStuffy);
-    //digitalWrite(toSoloPin, HIGH);
-    digitalWrite(toSoloPin, LOW);
+    //digitalWrite(toSoloPinRight, HIGH);
+    digitalWrite(toSoloPinRight, LOW);
   }
-  if (readInSonar(leftTriggerPin, leftEchoPin)) {
+  if (readInQSD(leftLEDPin, leftQSDPin)) {
     //Serial.println("Seen on left");
-    digitalWrite(toSoloPin, HIGH);
-    //digitalWrite(toSoloPin, LOW);
+    digitalWrite(toSoloPinLeft, HIGH);
+    //digitalWrite(toSoloPinLeft, LOW);
     delay(pauseForStuffy);
-    //digitalWrite(toSoloPin, HIGH);
-    digitalWrite(toSoloPin, LOW);
+    //digitalWrite(toSoloPinLeft, HIGH);
+    digitalWrite(toSoloPinLeft, LOW);
   }
   //delay(500);
 }
 
-boolean readInSonar(uint8_t trig, uint8_t echo) {
-  digitalWrite(trig, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trig, LOW);
-  duration = pulseIn(echo, HIGH);
-  //Serial.println(duration);
-  return (duration > stuffyLimit || duration < objectLimit);
+boolean readInQSD(uint8_t ledPin, uint8_t qsdPin) {
+  digitalWrite(ledPin, HIGH);
+  onValue = analogRead(qsdPin);
+  delay(20);
+  digitalWrite(ledPin, LOW);
+  offValue = analogRead(qsdPin);
+  return ((onValue - offValue) > objectLimit);
 }
