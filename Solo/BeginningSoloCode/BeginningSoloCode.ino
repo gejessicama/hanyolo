@@ -31,7 +31,7 @@ double powerMult;
 int onTape, overCliff, backupTime;
 
 Motion hanMovo(rightMotor, leftMotor);
-Crossing hanFlyo(rightMotor, leftMotor, rightMostQRD, leftMostQRD,irSignalPin);
+Crossing hanFlyo(rightMotor, leftMotor, rightMostQRD, leftMostQRD, irSignalPin);
 
 //  HELPER FUNCTIONS
 void updateState();
@@ -46,12 +46,19 @@ void setup() {
   LCD.print("Setup");
   pinMode(fromChewPin, INPUT);
   pinMode(toChewPin, OUTPUT);
+  pinMode(irSignalPin, INPUT);
 }
 long startTime = millis();
 
 
 void loop() {
-  LCD.print(state);
+  LCD.clear();
+  LCD.print("state ");
+  LCD.println(state);
+  //  LCD.print(analogRead(leftMostQRD));
+  //  LCD.print(" ");
+  //  LCD.print(analogRead(rightMostQRD));
+
   switch (state) {
 
     case 0 : // START BUTTON NOT YET PRESSED
@@ -62,21 +69,21 @@ void loop() {
       hanMovo.setConstants();
       hanFlyo.setConstants();
       saveMenuValues();
-      attachInterrupt(fromChewPin, changeState, CHANGE);//change does not work 
+      attachInterrupt(fromChewPin, changeState, CHANGE);//change does not work
       state++;
-      
+
       break;
 
     case 1 : // STARTING STATE UNTIL FIRST GAP
       hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-      LCD.print("Move");
+      //LCD.print("Move");
       //hanMovo.driveMotors();
-      LCD.clear();
+      //LCD.clear();
       //hanMovo.followRightEdge(rightOutQRD,rightInQRD,pGainConst, dGainConst);
 
-      
+
       if (hanFlyo.cliff()) { // detect cliff then reverse for bt time
-        hanFlyo.dropBridge(1000,110);
+        hanFlyo.dropBridge(1000, 110);
         state = 3;
       }
 
@@ -93,20 +100,30 @@ void loop() {
       LCD.print("Pick Up Stuffy");
       break;
 
-
+    case 4 :
+      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+      if (hanFlyo.cliff()) {
+          
+      }
+      break;
     case 3 :
       long st = millis();
       long et = st;
-      while (et - st < 2000.0) {
+      while (et - st < 1250.0) {
         hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+        et = millis();
       }
-      motor.speed(rightMotor,-255);
-      motor.speed(leftMotor, 255);
+      //      motor.speed(rightMotor,-255);
+      //      motor.speed(leftMotor, 255);
       motor.stop_all();
       while (!hanFlyo.detect10KIR()) {
-        LCD.print("1k");
+        LCD.print("not 10k");
+        LCD.clear();
       }
+      LCD.clear();
       LCD.print("10k");
+      delay(1000);
+      state = 4;
       break;
 
   }
@@ -138,19 +155,19 @@ void changeState() {
 ///*
 // * Modifies EEPROM values and saves them to a more descriptive variable name
 // */
-void saveMenuValues(){
+void saveMenuValues() {
   baseSpeed = EEPROM[0];
-  powerMult = EEPROM[1]/100.0;
+  powerMult = EEPROM[1] / 100.0;
   proportionalGain = EEPROM[2];
   derivativeGain = EEPROM[3];
-  onTape = EEPROM[4]*10;
-  overCliff = EEPROM[5]*10;
-  backupTime = EEPROM[6]*3;
+  onTape = EEPROM[4] * 10;
+  overCliff = EEPROM[5] * 10;
+  backupTime = EEPROM[6] * 10;
 }
 
 /*
- * Displays the EEPROM menu and lets the user edit values. Instructions at the top
- */
+   Displays the EEPROM menu and lets the user edit values. Instructions at the top
+*/
 void eePromMenu() {
   menuScreen = floor (menuSize * knob(7) / 1024.0);
   switch (menuScreen) {
@@ -233,19 +250,19 @@ void eePromMenu() {
       break;
 
     case 6 :
-      displayMenu("BackupTime", EEPROM[6] * 3);
+      displayMenu("BackupTime", EEPROM[6] * 10);
       if (stopbutton()) {
         delay(delayTime);
         while (!stopbutton()) {
           temp = knob(6) / 1024.0 * 255;
-          displayMenu("BackupT(E)", temp * 3);
+          displayMenu("BackupT(E)", temp * 10);
         }
         delay(delayTime);
         EEPROM[6] = temp;
       }
       break;
 
-          case 7 :
+    case 7 :
       displayMenu("BackupSpeed", EEPROM[7]);
       if (stopbutton()) {
         delay(delayTime);
@@ -261,8 +278,8 @@ void eePromMenu() {
 }
 
 /*
- * Displays a given name and value to the LCD
- */
+   Displays a given name and value to the LCD
+*/
 void displayMenu(String varName, double varValue) {
   delay(1);
   LCD.clear();

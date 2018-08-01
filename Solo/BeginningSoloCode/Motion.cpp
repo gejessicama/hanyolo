@@ -24,7 +24,7 @@ void Motion::setConstants() {
   derivativeGain = EEPROM[3];
   onTape = EEPROM[4] * 10;
   overCliff = EEPROM[5] * 10;
-  backupTime = EEPROM[6] * 3;
+  backupTime = EEPROM[6] * 10;
 }
 
 //void Motion::reset() {

@@ -20,7 +20,7 @@ Crossing::Crossing(uint8_t rMotor, uint8_t lMotor, uint8_t rQRD, uint8_t lQRD, u
  */
 void Crossing::setConstants(){
   overCliff = EEPROM[5] * 10;
-  backupTime = EEPROM[6] * 3;
+  backupTime = EEPROM[6] * 10;
   backupSpeed = EEPROM[7];
 }
 
@@ -34,24 +34,16 @@ void Crossing::setConstants(){
 
 boolean Crossing::cliff() {
   if (analogRead(rightQRD) > overCliff && analogRead(leftQRD) > overCliff) {
-      motor.speed(leftMotor, backupSpeed);
-      motor.speed(rightMotor, 0);
-      delay(backupTime);
-      motor.speed(rightMotor, -backupSpeed);
-      motor.speed(leftMotor, 0);
-      delay(backupTime);
-//    motor.speed(rightMotor, -255);
-//    motor.speed(leftMotor, 255);
-//    delay(backupTime);
-    motor.stop(rightMotor);
-    motor.stop(leftMotor);
-
+    motor.speed(rightMotor, -255);
+    motor.speed(leftMotor, 255);
+    motor.stop_all();
     return true;
   }
   return false;
 }
 
 void Crossing::dropBridge(int waitTime, uint8_t servoAngle) {
+  backUp();
 //  while(true){
 
 //  }
@@ -69,28 +61,42 @@ void Crossing::dropBridge(int waitTime, uint8_t servoAngle) {
 }
 
 void Crossing::backUp(){
-  int vback = -255;
-  unsigned long reverseTime = 400.0;
-  unsigned long startTime = millis();
-  unsigned long endTime = millis();
-  while (endTime - startTime < reverseTime){
-    motor.speed(rightMotor, vback);
-    motor.speed(leftMotor, -vback);
-    endTime = millis();
-  }
-  motor.stop_all();
+    motor.speed(leftMotor, backupSpeed);
+    motor.speed(rightMotor, 0);
+    delay(backupTime/2.0);
+    motor.speed(rightMotor, -(backupSpeed)*0.6);
+    motor.speed(leftMotor, 0);
+    delay(backupTime/2.0);
+//    motor.speed(rightMotor, -255);
+//    motor.speed(leftMotor, 255);
+//    delay(backupTime);
+    motor.stop(rightMotor);
+    motor.stop(leftMotor);
+
+    
+//  int vback = -255;
+//  unsigned long reverseTime = 400.0;
+//  unsigned long startTime = millis();
+//  unsigned long endTime = millis();
+//  while (endTime - startTime < reverseTime){
+//    motor.speed(rightMotor, vback);
+//    motor.speed(leftMotor, -vback);
+//    endTime = millis();
+//  }
+//  motor.stop_all();
+
+  
 }
 
 
-uint8_t lval;
 bool Crossing::detect10KIR(){
   uint8_t val = digitalRead(IRsig);
       //LCD.clear();
       if (val == HIGH){
-        //LCD.print("Not 10K");
+        //LCD.print("10K");
         return false;
       }else if(val == LOW){
-        //LCD.println("10K");
+        //LCD.println("not10K");
         return true;
       }
 }
