@@ -13,12 +13,8 @@
 #include "Motion.h"
 #include "Crossing.h"
 #include "Constants.h"
+#include "Menu.h"
 
-// VARIABLES FOR EEPROM MENU
-uint8_t menuScreen;
-byte temp;
-const uint8_t menuSize = 8;
-const uint8_t delayTime = 220;
 
 // OTHER VARIABLES
 volatile uint8_t state = 0;
@@ -36,164 +32,29 @@ void updateState();
 void raiseBasket();
 void lowerBasket();
 
+//
+//// INTERRUPT FUNCTION
+//void changeState() {
+//  if (state == 2) {
+//    state = 1;
+//    //    state = rememberState;
+//  } else {
+////    motor.speed(rightMotor, -240);
+////    motor.speed(leftMotor, 255);
+////    delay(300);
+//    motor.speed(rightMotor,0);
+//    motor.speed(leftMotor,0);
+//    motor.stop_all();
+//    //    rememberState = state;
+//    state = 2;
+//  }
+//}
 
-// INTERRUPT FUNCTION
-void changeState() {
-  if (state == 2) {
-    state = 1;
-    //    state = rememberState;
-  } else {
-//    motor.speed(rightMotor, -240);
-//    motor.speed(leftMotor, 255);
-//    delay(300);
-    motor.speed(rightMotor,0);
-    motor.speed(leftMotor,0);
-    motor.stop_all();
-    //    rememberState = state;
-    state = 2;
-  }
-}
-
-/*
-   Displays the EEPROM menu and lets the user edit values. Instructions at the top
-*/
-void eePromMenu() {
-  menuScreen = floor (menuSize * knob(7) / 1024.0);
-  switch (menuScreen) {
-    case 0 :
-      displayMenu("BaseSpeed", EEPROM[0]);
-      if (stopbutton()) {
-        delay(delayTime);
-        while (!stopbutton()) {
-          temp = knob(6) / 1024.0 * 255;
-          displayMenu("BaseSp(E)", temp);
-        }
-        delay(delayTime);
-        EEPROM[0] = temp;
-      }
-      break;
-
-    case 1 :
-      displayMenu("PowerMult", EEPROM[1] / 100.0);
-      if (stopbutton()) {
-        delay(delayTime);
-        while (!stopbutton()) {
-          temp = knob(6) / 1024.0 * 100;
-          displayMenu("PowerM(E)", temp / 100.0);
-        }
-        delay(delayTime);
-        EEPROM[1] = temp;
-      }
-      break;
-
-    case 2 :
-      displayMenu("ProportionalGain", EEPROM[2]);
-      if (stopbutton()) {
-        delay(delayTime);
-        while (!stopbutton()) {
-          temp = knob(6) / 1024.0 * 255;
-          displayMenu("ProportionalG(E)", temp);
-        }
-        delay(delayTime);
-        EEPROM[2] = temp;
-      }
-      break;
-
-    case 3 :
-      displayMenu("DerivativeGain", EEPROM[3]);
-      if (stopbutton()) {
-        delay(delayTime);
-        while (!stopbutton()) {
-          temp = knob(6) / 1024.0 * 255;
-          displayMenu("DerivativeG(E)", temp);
-        }
-        delay(delayTime);
-        EEPROM[3] = temp;
-      }
-      break;
-
-    case 4 :
-      displayMenu("OnTape", EEPROM[4] * 10);
-      if (stopbutton()) {
-        delay(delayTime);
-        while (!stopbutton()) {
-          temp = knob(6) / 1024.0 * 150;
-          displayMenu("OnT(E)", temp * 10);
-        }
-        delay(delayTime);
-        EEPROM[4] = temp;
-      }
-      break;
-
-    case 5 :
-      displayMenu("OverCliff", EEPROM[5] * 10);
-      if (stopbutton()) {
-        delay(delayTime);
-        while (!stopbutton()) {
-          temp = knob(6) / 1024.0 * 150;
-          displayMenu("OverCl(E)", temp * 10);
-        }
-        delay(delayTime);
-        EEPROM[5] = temp;
-      }
-      break;
-
-    case 6 :
-      displayMenu("BackupTime", EEPROM[6] * 10);
-      if (stopbutton()) {
-        delay(delayTime);
-        while (!stopbutton()) {
-          temp = knob(6) / 1024.0 * 255;
-          displayMenu("BackupT(E)", temp * 10);
-        }
-        delay(delayTime);
-        EEPROM[6] = temp;
-      }
-      break;
-
-    case 7 :
-      displayMenu("BackupSpeed", EEPROM[7]);
-      if (stopbutton()) {
-        delay(delayTime);
-        while (!stopbutton()) {
-          temp = knob(6) / 1024.0 * 255;
-          displayMenu("BackupSp(E)", temp);
-        }
-        delay(delayTime);
-        EEPROM[7] = temp;
-      }
-      break;
-  }
-}
-
-/*
-   Displays a given name and value to the LCD
-*/
-void displayMenu(String varName, double varValue) {
-  delay(1);
-  LCD.clear();
-  LCD.print(varName + ": ");
-  LCD.print(varValue);
-}
-
-/*
-   Modifies EEPROM values and saves them to a more descriptive variable name
-   NEED TO ADD CONSTANTS FOR THESE MODIFIERS
-*/
-void saveMenuValues() {
-  baseSpeed = EEPROM[0];
-  powerMult = EEPROM[1] / 100.0;
-  proportionalGain = EEPROM[2];
-  derivativeGain = EEPROM[3];
-  onTape = EEPROM[4] * 10;
-  overCliff = EEPROM[5] * 10;
-  backupTime = EEPROM[6] * 10;
-
-}
 
 void setup() {
   LCD.begin();
   LCD.print("Setup");
+  Serial.begin(9600);
   pinMode(fromChewPin, INPUT);
   pinMode(toChewPin, OUTPUT);
   pinMode(irSignalPin, INPUT);
@@ -202,45 +63,45 @@ void setup() {
 
 void loop() {
 
-//  LCD.clear();
-//  LCD.print("state ");
-//  LCD.println(state);
-
   switch (state) {
 
     case 0 : // START BUTTON NOT YET PRESSED
       while (!startbutton()) {
-        eePromMenu();
+        Menu::eePromMenu();
       }
       delay(1000);
 
       hanMovo.setConstants();
       hanFlyo.setConstants();
 
-      //saveMenuValues();
-      attachInterrupt(fromChewPin, changeState, CHANGE);//change does not work
-      state=1;
-
+      //attachInterrupt(fromChewPin, changeState, CHANGE);//change does not work
+      state = 1;
       break;
 
     case 1 : // STARTING STATE UNTIL FIRST GAP
-      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+ //       Serial.println(digitalRead(fromChewPin));
       LCD.clear();
       LCD.print("Move");
-      
-      //hanMovo.followRightEdge(rightOutQRD,rightInQRD,pGainConst, dGainConst);
+      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
 //
-//
+
+      while (digitalRead(fromChewPin) == HIGH) {
+        motor.stop_all();
+        LCD.clear();
+        LCD.print("Pick up Stuffy");
+      }
+
+
 //      if (hanFlyo.cliff()) { // detect cliff then reverse for bt time
 //        hanFlyo.dropBridge(1000, 110);
 //        state = 3;
 //      }
-      break;
+//      break;
 
-    case 2 :
-      LCD.clear();
-      LCD.print("Pick Up Stuffy");
-      break;
+//    case 2 :
+//      LCD.clear();
+//      LCD.print("Pick Up Stuffy");
+//      break;
 
     case 4 :
       hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
