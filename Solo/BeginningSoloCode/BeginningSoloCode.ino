@@ -40,6 +40,9 @@ void lowerBasket();
 
 //  INTERRUPT FUNCTIONS
 void changeState();
+//long startTime = millis();
+
+// INTERRUPT FUNCTIONS
 void changeState() {
   if (state == 2) {
     state = 1;
