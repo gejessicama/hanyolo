@@ -93,10 +93,10 @@ bool Crossing::detect10KIR(){
   uint8_t val = digitalRead(IRsig);
       //LCD.clear();
       if (val == HIGH){
-        //LCD.print("10K");
+        //LCD.print("not10K");
         return false;
       }else if(val == LOW){
-        //LCD.println("not10K");
+        //LCD.println("10K");
         return true;
       }
 }

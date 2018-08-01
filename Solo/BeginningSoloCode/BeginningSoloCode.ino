@@ -240,10 +240,10 @@ void loop() {
       //hanMovo.followRightEdge(rightOutQRD,rightInQRD,pGainConst, dGainConst);
 
 
-      if (hanFlyo.cliff()) { // detect cliff then reverse for bt time
-        hanFlyo.dropBridge(1000, 110);
-        state = 3;
-      }
+//      if (hanFlyo.cliff()) { // detect cliff then reverse for bt time
+//        hanFlyo.dropBridge(1000, 110);
+//        state = 3;
+//      }
       break;
 
     case 2 :
