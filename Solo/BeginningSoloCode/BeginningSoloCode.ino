@@ -14,13 +14,18 @@
 
 const int bridgeDropWaitTime = 1000;
 const uint8_t firstBridgeServoAngle = 110;
+const double rightWheelPercentage1 = 0.6;
 
 // OTHER VARIABLES
 uint8_t state = 0;
-long moveTime, timeToIR;
+long moveTime;
 
-//byte baseSpeed, proportionalGain, derivativeGain;
+// EEPROM VARIABLES
+long timeToIR;
+//byte baseSpeed;
 //double powerMult;
+
+//, proportionalGain, derivativeGain;
 //int onTape, overCliff, backupTime;
 
 Motion hanMovo(rightMotor, leftMotor);
@@ -49,6 +54,7 @@ void loop() {
       }
 
       delay(1000);
+      saveMenuValues();
       hanMovo.setConstants();
       hanFlyo.setConstants();
       state = 1;
@@ -60,15 +66,17 @@ void loop() {
       hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
 
       while (digitalRead(fromChewPin) == HIGH) {
-        motor.speed(rightMotor, -255);
-        motor.speed(leftMotor, 255);
-        motor.stop_all();
+        hanMovo.stopMotors();
         LCD.clear();
         LCD.print("Pick up Stuffy");
       }
 
       if (hanFlyo.cliff()) {
-        hanFlyo.dropBridge(bridgeDropWaitTime, firstBridgeServoAngle);
+        hanMovo.stopMotors();
+        hanFlyo.dropBridge(bridgeDropWaitTime, firstBridgeServoAngle, rightWheelPercentage1);
+        hanMovo.driveMotors();
+          
+         // delay(250);
         state = 2;
         moveTime = millis() + timeToIR;
         // takes the current time and adds the amount of time until we should be in front of the IR signal

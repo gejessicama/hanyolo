@@ -12,7 +12,7 @@ static const uint8_t menuSize = 9;
 static const uint8_t delayTime = 220;
 
 /*
-   Displays the EEPROM menu and lets the user edit values. Instructions at the top
+   Displays the EEPROM menu and lets the user edit values.
 */
 void Menu::eePromMenu() {
   menuScreen = floor (menuSize * knob(7) / 1024.0);

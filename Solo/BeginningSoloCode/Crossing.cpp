@@ -24,70 +24,52 @@ void Crossing::setConstants() {
   backupSpeed = EEPROM[7];
 }
 
+/*
+   Tells us if we are over a cliff
+*/
 boolean Crossing::cliff() {
   if (analogRead(rightQRD) > overCliff && analogRead(leftQRD) > overCliff) {
-    motor.speed(rightMotor, -255);
-    motor.speed(leftMotor, 255);
-    motor.stop_all();
     return true;
+  } else {
+    return false;
   }
-  return false;
 }
 
-void Crossing::dropBridge(int waitTime, uint8_t servoAngle) {
-  
-  backUp();
+/*
+ * code for droping a bridge
+ */
+void Crossing::dropBridge(int waitTime, uint8_t servoAngle, double rightWheelPercentage) {
+
+  backUp(rightWheelPercentage);
+
   delay(waitTime);
-  
-  for (int pos = servoAngle - 10; pos <= servoAngle; pos += 1) {
+  for (int pos = servoAngle - 10; pos <= servoAngle; pos++) {
     RCServo0.write(pos);
     delay(10);
   }
-
   delay(waitTime);
-
-  motor.speed(leftMotor, -200);
-  motor.speed(rightMotor,  200);
-  delay(250);
 }
 
-void Crossing::backUp() {
-  motor.speed(leftMotor, backupSpeed);
+/*
+   Backs up while giving one motor slightly more power
+*/
+void Crossing::backUp(double rightMotorPercentage) {
   motor.speed(rightMotor, 0);
-  delay(backupTime / 2.0);
-  motor.speed(rightMotor, -(backupSpeed) * 0.6);
+  motor.speed(leftMotor, backupSpeed);
+  delay(backupTime / 2);
+
+  motor.speed(rightMotor, -(backupSpeed) * rightMotorPercentage);
   motor.speed(leftMotor, 0);
-  delay(backupTime / 2.0);
-  //    motor.speed(rightMotor, -255);
-  //    motor.speed(leftMotor, 255);
-  //    delay(backupTime);
-  motor.stop(rightMotor);
-  motor.stop(leftMotor);
+  delay(backupTime / 2);
 
-
-  //  int vback = -255;
-  //  unsigned long reverseTime = 400.0;
-  //  unsigned long startTime = millis();
-  //  unsigned long endTime = millis();
-  //  while (endTime - startTime < reverseTime){
-  //    motor.speed(rightMotor, vback);
-  //    motor.speed(leftMotor, -vback);
-  //    endTime = millis();
-  //  }
-  //  motor.stop_all();
-
-
+  motor.stop_all();
 }
 
 
 bool Crossing::detect10KIR() {
-  uint8_t val = digitalRead(IRsig);
-  //LCD.clear();
-  if (val == HIGH) {
-    //LCD.print("10K");
+  if (digitalRead(IRsig) == HIGH) {
     return false;
-  } else if (val == LOW) {
-    //LCD.println("not10K");
+  } else {
     return true;
   }
 }
