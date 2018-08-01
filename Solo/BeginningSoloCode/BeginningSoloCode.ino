@@ -38,9 +38,6 @@ void updateState();
 void raiseBasket();
 void lowerBasket();
 
-//  INTERRUPT FUNCTIONS
-void changeState();
-//long startTime = millis();
 
 // INTERRUPT FUNCTIONS
 void changeState() {
@@ -225,15 +222,14 @@ void loop() {
         eePromMenu();
       }
       delay(1000);
+
       hanMovo.setConstants();
       hanFlyo.setConstants();
 
-      saveMenuValues();
+      //saveMenuValues();
       attachInterrupt(fromChewPin, changeState, CHANGE);//change does not work
       state++;
-      //saveMenuValues();
-      attachInterrupt(fromChewPin, changeState, CHANGE);
-      state++;
+
       break;
 
     case 1 : // STARTING STATE UNTIL FIRST GAP
@@ -247,42 +243,43 @@ void loop() {
       if (hanFlyo.cliff()) { // detect cliff then reverse for bt time
         hanFlyo.dropBridge(1000, 110);
         state = 3;
-        break;
-
-      case 2 :
-        LCD.clear();
-        LCD.print("Pick Up Stuffy");
-        break;
-
-      case 4 :
-        hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-        if (hanFlyo.cliff());
-        break;
-
-      case 3 :
-        long st = millis();
-        long et = st;
-        while (et - st < 1250.0) {
-          hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-          et = millis();
-        }
-        //      motor.speed(rightMotor,-255);
-        //      motor.speed(leftMotor, 255);
-        motor.speed(rightMotor, -255);
-        motor.speed(leftMotor, 255);
-        motor.stop_all();
-        while (!hanFlyo.detect10KIR()) {
-          LCD.print("not 10k");
-          LCD.clear();
-        }
-        LCD.clear();
-        LCD.print("10k");
-        delay(1000);
-        state = 4;
-        break;
-
       }
+      break;
+
+    case 2 :
+      LCD.clear();
+      LCD.print("Pick Up Stuffy");
+      break;
+
+    case 4 :
+      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+      if (hanFlyo.cliff());
+      break;
+
+    case 3 :
+      long st = millis();
+      long et = st;
+      while (et - st < 1250.0) {
+        hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+        et = millis();
+      }
+      //      motor.speed(rightMotor,-255);
+      //      motor.speed(leftMotor, 255);
+      motor.speed(rightMotor, -255);
+      motor.speed(leftMotor, 255);
+      motor.stop_all();
+      while (!hanFlyo.detect10KIR()) {
+        LCD.print("not 10k");
+        LCD.clear();
+      }
+      LCD.clear();
+      LCD.print("10k");
+      delay(1000);
+      state = 4;
+      break;
+
   }
 }
+
 
 
