@@ -22,9 +22,7 @@ const uint8_t delayTime = 220;
 
 // OTHER VARIABLES
 volatile uint8_t state = 0;
-volatile uint8_t pstate = 0;
 volatile uint8_t rememberState;
-volatile uint16_t rightWheelDist, leftWheelDist;
 
 byte baseSpeed, proportionalGain, derivativeGain;
 double powerMult;
@@ -39,17 +37,18 @@ void raiseBasket();
 void lowerBasket();
 
 
-// INTERRUPT FUNCTIONS
+// INTERRUPT FUNCTION
 void changeState() {
   if (state == 2) {
     state = 1;
     //    state = rememberState;
   } else {
-    motor.speed(rightMotor, -240);
-    motor.speed(leftMotor, 255);
-    delay(300);
-    motor.stop(rightMotor);
-    motor.stop(leftMotor);
+//    motor.speed(rightMotor, -240);
+//    motor.speed(leftMotor, 255);
+//    delay(300);
+    motor.speed(rightMotor,0);
+    motor.speed(leftMotor,0);
+    motor.stop_all();
     //    rememberState = state;
     state = 2;
   }
@@ -176,11 +175,10 @@ void displayMenu(String varName, double varValue) {
   LCD.print(varName + ": ");
   LCD.print(varValue);
 }
-///*
-// * Modifies EEPROM values and saves them to a more descriptive variable name
-// */
+
 /*
    Modifies EEPROM values and saves them to a more descriptive variable name
+   NEED TO ADD CONSTANTS FOR THESE MODIFIERS
 */
 void saveMenuValues() {
   baseSpeed = EEPROM[0];
@@ -200,20 +198,13 @@ void setup() {
   pinMode(toChewPin, OUTPUT);
   pinMode(irSignalPin, INPUT);
 }
-//long startTime = millis();
 
 
 void loop() {
 
-  LCD.clear();
-  LCD.print("state ");
-  LCD.println(state);
-  //  LCD.print(analogRead(leftMostQRD));
-  //  LCD.print(" ");
-  //  LCD.print(analogRead(rightMostQRD));
-
-
-  //LCD.print(state);
+//  LCD.clear();
+//  LCD.print("state ");
+//  LCD.println(state);
 
   switch (state) {
 
@@ -228,22 +219,22 @@ void loop() {
 
       //saveMenuValues();
       attachInterrupt(fromChewPin, changeState, CHANGE);//change does not work
-      state++;
+      state=1;
 
       break;
 
     case 1 : // STARTING STATE UNTIL FIRST GAP
       hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-      //LCD.print("Move");
-      //hanMovo.driveMotors();
-      //LCD.clear();
+      LCD.clear();
+      LCD.print("Move");
+      
       //hanMovo.followRightEdge(rightOutQRD,rightInQRD,pGainConst, dGainConst);
-
-
-      if (hanFlyo.cliff()) { // detect cliff then reverse for bt time
-        hanFlyo.dropBridge(1000, 110);
-        state = 3;
-      }
+//
+//
+//      if (hanFlyo.cliff()) { // detect cliff then reverse for bt time
+//        hanFlyo.dropBridge(1000, 110);
+//        state = 3;
+//      }
       break;
 
     case 2 :
