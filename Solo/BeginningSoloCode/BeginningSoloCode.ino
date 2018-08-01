@@ -40,129 +40,19 @@ void lowerBasket();
 
 //  INTERRUPT FUNCTIONS
 void changeState();
-
-void setup() {
-  LCD.begin();
-  LCD.print("Setup");
-  pinMode(fromChewPin, INPUT);
-  pinMode(toChewPin, OUTPUT);
-  pinMode(irSignalPin, INPUT);
-}
-long startTime = millis();
-
-
-void loop() {
-  LCD.clear();
-  LCD.print("state ");
-  LCD.println(state);
-  //  LCD.print(analogRead(leftMostQRD));
-  //  LCD.print(" ");
-  //  LCD.print(analogRead(rightMostQRD));
-
-  switch (state) {
-
-    case 0 : // START BUTTON NOT YET PRESSED
-      while (!startbutton()) {
-        eePromMenu();
-      }
-      delay(200);
-      hanMovo.setConstants();
-      hanFlyo.setConstants();
-      saveMenuValues();
-      attachInterrupt(fromChewPin, changeState, CHANGE);//change does not work
-      state++;
-
-      break;
-
-    case 1 : // STARTING STATE UNTIL FIRST GAP
-      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-      //LCD.print("Move");
-      //hanMovo.driveMotors();
-      //LCD.clear();
-      //hanMovo.followRightEdge(rightOutQRD,rightInQRD,pGainConst, dGainConst);
-
-
-      if (hanFlyo.cliff()) { // detect cliff then reverse for bt time
-        hanFlyo.dropBridge(1000, 110);
-        state = 3;
-      }
-
-
-      break;
-    case 2 :
-      motor.speed(rightMotor, -240);
-      motor.speed(leftMotor, 255);
-      delay(300);
-      motor.stop(rightMotor);
-      motor.stop(leftMotor);
-      motor.stop_all();
-      LCD.clear();
-      LCD.print("Pick Up Stuffy");
-      break;
-
-    case 4 :
-      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-      if (hanFlyo.cliff()) {
-          
-      }
-      break;
-    case 3 :
-      long st = millis();
-      long et = st;
-      while (et - st < 1250.0) {
-        hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-        et = millis();
-      }
-      //      motor.speed(rightMotor,-255);
-      //      motor.speed(leftMotor, 255);
-      motor.stop_all();
-      while (!hanFlyo.detect10KIR()) {
-        LCD.print("not 10k");
-        LCD.clear();
-      }
-      LCD.clear();
-      LCD.print("10k");
-      delay(1000);
-      state = 4;
-      break;
-
-  }
-}
-
-void updateState() {
-  // Changed to Low then HIGH
-  digitalWrite(toChewPin, HIGH);
-  delayMicroseconds(2);
-  digitalWrite(toChewPin, LOW);
-  if (state == 0) {
-    state = 1;
-  } else {
-    state = 0;
-  }
-}
-
-// INTERRUPT FUNCTIONS
 void changeState() {
   if (state == 2) {
     state = 1;
     //    state = rememberState;
   } else {
+    motor.speed(rightMotor, -240);
+    motor.speed(leftMotor, 255);
+    delay(300);
+    motor.stop(rightMotor);
+    motor.stop(leftMotor);
     //    rememberState = state;
     state = 2;
   }
-}
-
-///*
-// * Modifies EEPROM values and saves them to a more descriptive variable name
-// */
-void saveMenuValues() {
-  baseSpeed = EEPROM[0];
-  powerMult = EEPROM[1] / 100.0;
-  proportionalGain = EEPROM[2];
-  derivativeGain = EEPROM[3];
-  onTape = EEPROM[4] * 10;
-  overCliff = EEPROM[5] * 10;
-  backupTime = EEPROM[6] * 10;
 }
 
 /*
@@ -286,4 +176,110 @@ void displayMenu(String varName, double varValue) {
   LCD.print(varName + ": ");
   LCD.print(varValue);
 }
+///*
+// * Modifies EEPROM values and saves them to a more descriptive variable name
+// */
+/*
+   Modifies EEPROM values and saves them to a more descriptive variable name
+*/
+void saveMenuValues() {
+  baseSpeed = EEPROM[0];
+  powerMult = EEPROM[1] / 100.0;
+  proportionalGain = EEPROM[2];
+  derivativeGain = EEPROM[3];
+  onTape = EEPROM[4] * 10;
+  overCliff = EEPROM[5] * 10;
+  backupTime = EEPROM[6] * 10;
+
+}
+
+void setup() {
+  LCD.begin();
+  LCD.print("Setup");
+  pinMode(fromChewPin, INPUT);
+  pinMode(toChewPin, OUTPUT);
+  pinMode(irSignalPin, INPUT);
+}
+//long startTime = millis();
+
+
+void loop() {
+
+  LCD.clear();
+  LCD.print("state ");
+  LCD.println(state);
+  //  LCD.print(analogRead(leftMostQRD));
+  //  LCD.print(" ");
+  //  LCD.print(analogRead(rightMostQRD));
+
+
+  //LCD.print(state);
+
+  switch (state) {
+
+    case 0 : // START BUTTON NOT YET PRESSED
+      while (!startbutton()) {
+        eePromMenu();
+      }
+      delay(1000);
+      hanMovo.setConstants();
+      hanFlyo.setConstants();
+
+      saveMenuValues();
+      attachInterrupt(fromChewPin, changeState, CHANGE);//change does not work
+      state++;
+      //saveMenuValues();
+      attachInterrupt(fromChewPin, changeState, CHANGE);
+      state++;
+      break;
+
+    case 1 : // STARTING STATE UNTIL FIRST GAP
+      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+      //LCD.print("Move");
+      //hanMovo.driveMotors();
+      //LCD.clear();
+      //hanMovo.followRightEdge(rightOutQRD,rightInQRD,pGainConst, dGainConst);
+
+
+      if (hanFlyo.cliff()) { // detect cliff then reverse for bt time
+        hanFlyo.dropBridge(1000, 110);
+        state = 3;
+        break;
+
+      case 2 :
+        LCD.clear();
+        LCD.print("Pick Up Stuffy");
+        break;
+
+      case 4 :
+        hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+        if (hanFlyo.cliff());
+        break;
+
+      case 3 :
+        long st = millis();
+        long et = st;
+        while (et - st < 1250.0) {
+          hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+          et = millis();
+        }
+        //      motor.speed(rightMotor,-255);
+        //      motor.speed(leftMotor, 255);
+        motor.speed(rightMotor, -255);
+        motor.speed(leftMotor, 255);
+        motor.stop_all();
+        while (!hanFlyo.detect10KIR()) {
+          LCD.print("not 10k");
+          LCD.clear();
+        }
+        LCD.clear();
+        LCD.print("10k");
+        delay(1000);
+        state = 4;
+        break;
+
+      }
+  }
+}
+
 
