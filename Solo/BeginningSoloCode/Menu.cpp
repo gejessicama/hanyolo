@@ -1,8 +1,14 @@
+/*
+ * knob(7) scrolls through the values to change
+    stopbutton() lets you begin and finish editing a single value
+    startbutton() exits the menu and begins the robot code
+ */
+
 #include "Menu.h"
 
 static uint8_t menuScreen;
 static byte temp;
-static const uint8_t menuSize = 8;
+static const uint8_t menuSize = 9;
 static const uint8_t delayTime = 220;
 
 /*
@@ -112,6 +118,18 @@ void Menu::eePromMenu() {
         }
         delay(delayTime);
         EEPROM[7] = temp;
+      }
+      break;
+    case 8 :
+      displayMenu("TimeToIR", EEPROM[8]*20);
+      if (stopbutton()) {
+        delay(delayTime);
+        while (!stopbutton()) {
+          temp = knob(6) / 1024.0 * 255;
+          displayMenu("TimeT(E)", temp*20);
+        }
+        delay(delayTime);
+        EEPROM[8] = temp;
       }
       break;
   }
