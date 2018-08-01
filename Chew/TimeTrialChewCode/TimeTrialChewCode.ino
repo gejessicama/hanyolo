@@ -13,7 +13,8 @@
 #define toSoloPinLeft 1
 #define pauseForStuffy 3000
 
-const int objectLimit = 650;
+const int objectLimit = 300;
+const int readWait = 1000;
 int onValue, offValue;
 
 //boolean readInQSD(uint8_t, uint8_t);
@@ -23,36 +24,28 @@ void setup() {
   pinMode(rightLEDPin, OUTPUT);
   pinMode(leftLEDPin, OUTPUT);
   pinMode(toSoloPinRight, OUTPUT);
- 
-  //digitalWrite(toSoloPinRight, LOW);
 }
 
 void loop() {
   if (readInQSD(rightLEDPin, rightQSDPin)) {
-    //Serial.println("Seen on right");
     digitalWrite(toSoloPinRight, HIGH);
-    //digitalWrite(toSoloPinRight, LOW);
     delay(pauseForStuffy);
-    //digitalWrite(toSoloPinRight, HIGH);
     digitalWrite(toSoloPinRight, LOW);
   }
-//  if (readInQSD(leftLEDPin, leftQSDPin)) {
-//    //Serial.println("Seen on left");
-//    digitalWrite(toSoloPinLeft, HIGH);
-//    //digitalWrite(toSoloPinLeft, LOW);
-//    delay(pauseForStuffy);
-//    //digitalWrite(toSoloPinLeft, HIGH);
-//    digitalWrite(toSoloPinLeft, LOW);
-//  }
-//  delay(500);
+  if (readInQSD(leftLEDPin, leftQSDPin)) {
+    digitalWrite(toSoloPinLeft, HIGH);
+    delay(pauseForStuffy);
+    digitalWrite(toSoloPinLeft, LOW);
+  }
+ // delay(500);
 }
 
 boolean readInQSD(uint8_t ledPin, uint8_t qsdPin) {
   digitalWrite(ledPin, HIGH);
-  delay(20);
+  delayMicroseconds(readWait);
   onValue = analogRead(qsdPin);
   digitalWrite(ledPin, LOW);
-  delay(20);
+  delayMicroseconds(readWait);
   offValue = analogRead(qsdPin);
 //  Serial.print(onValue);
 //  Serial.print(", ");
