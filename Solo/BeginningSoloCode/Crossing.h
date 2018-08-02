@@ -21,7 +21,8 @@ class Crossing{
     boolean cliff();
     void backUp(double);
     void turnRight();
-    void dropBridge(int, uint8_t, double);
+    void dropBridge1(int, uint8_t, double);
+    void dropBridge2(int, uint8_t, double);
     bool detect10KIR();
     void alignStep();
 };

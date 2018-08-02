@@ -12,6 +12,7 @@
 
 const int bridgeDropWaitTime = 1000;
 const uint8_t firstBridgeServoAngle = 110;
+const uint8_t secondBridgeServoAngle = 150;
 
 // OTHER VARIABLES
 uint8_t state = 0;
@@ -69,9 +70,9 @@ void loop() {
       }
 
       if (hanFlyo.cliff()) {
-        hanFlyo.dropBridge(bridgeDropWaitTime, firstBridgeServoAngle, 0.6);
+        hanFlyo.dropBridge1(bridgeDropWaitTime, firstBridgeServoAngle, 0.6);
         state = 2;
-        moveTime = millis() + timeToIR;
+        //moveTime = millis() + timeToIR;
         // takes the current time and adds the amount of time until we should be in front of the IR signal
       }
       break;
@@ -146,6 +147,13 @@ void loop() {
         hanFlyo.alignStep();
         state = 5;
         break;
+      }
+    case 5 : {
+        
+        hanMovo.driveMotors();
+        if (hanFlyo.cliff()){
+          hanFlyo.dropBridge2(bridgeDropWaitTime,secondBridgeServoAngle,1.0);
+        }
       }
 
       //    case 5 : {

@@ -38,7 +38,7 @@ boolean Crossing::cliff() {
 /*
  * code for droping a bridge
  */
-void Crossing::dropBridge(int waitTime, uint8_t servoAngle, double rightWheelPercentage) {
+void Crossing::dropBridge1(int waitTime, uint8_t servoAngle, double rightWheelPercentage) {
 
   backUp(rightWheelPercentage);
 
@@ -50,6 +50,16 @@ void Crossing::dropBridge(int waitTime, uint8_t servoAngle, double rightWheelPer
   delay(waitTime);
 }
 
+void Crossing::dropBridge2(int waitTime, uint8_t servoAngle, double rightWheelPercentage){
+  backUp(rightWheelPercentage);
+
+  delay(waitTime);
+  for (int pos = servoAngle- 10; pos <= servoAngle; pos--) {
+    RCServo0.write(pos);
+    delay(10);
+  }
+  delay(waitTime);
+}
 /*
    Backs up while giving one motor slightly more power
 */
