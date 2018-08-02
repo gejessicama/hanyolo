@@ -25,7 +25,9 @@ class Motion {
     Motion(uint8_t, uint8_t);
     
     void followTape(uint8_t, uint8_t);
+    void followTapeFour(uint8_t, uint8_t, uint8_t, uint8_t);
     void followRightEdge(uint8_t, uint8_t);
+    boolean findTape(uint8_t, uint8_t, uint8_t, uint8_t);
     void setConstants();
     void driveMotors();
     void stopMotors();

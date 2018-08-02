@@ -56,6 +56,31 @@ void Motion::followTape(uint8_t rightQRD, uint8_t leftQRD) {
 }
 
 /*
+ * Uses all four QRDs to follow tape
+ */
+void followTapeFour(uint8_t rightMostQRD, uint8_t rightMidQRD, uint8_t leftMostQRD, uint8_t leftMidQRD){
+//  bool rrVal = isOnWhite(rightMostQRD);
+//  bool rmVal = isOnWhite(rightMidQRD);
+//  bool rmVal = isOnWhite(rightMidQRD);
+//  bool rrVal = isOnWhite(rightMostQRD);
+  
+//  if (!rVal && !lVal) { // We are on the tape and all is good
+//    currentError = 0;
+//    lastState = 0;
+//  } else if (!rVal && lVal) { // We are too far left
+//    currentError = -1;
+//    lastOn = -1;
+//  } else if (rVal && !lVal) { // We are too far right
+//    currentError = 1;
+//    lastOn = 1;
+//  } else { // Both are off the tape
+//    currentError = lastOn * 5;
+//  }
+//
+//  pidControl();
+}
+
+/*
    Calculates errors and such for following the right edge of a cliff
 */
 void Motion::followRightEdge(uint8_t outQRD, uint8_t inQRD) {
@@ -76,6 +101,21 @@ void Motion::followRightEdge(uint8_t outQRD, uint8_t inQRD) {
 
   pidControl();
 }
+
+//boolean findTape(uint8_t rightMostQRD, uint8_t rightMidQRD, uint8_t leftMidQRD, uint8_t leftMostQRD){
+//  /*
+//   * if the middle ones are over the tape, no problem
+//   * if the two right ones are over the tape, too far left
+//   * if the two left ones are over the tape, too far right
+//   * if only the right most is over the tape, way far left
+//   * if only the left most is over the tape, way far right
+//   * if none are on the tape, sweep to the right, try again
+//   * if none are on the tape, sweep to the left, try again
+//   */
+//
+//   rrVal = isOnTape
+//  
+//}
 
 /*
    Controls the motion of the robot based on the last calculated error values and such
