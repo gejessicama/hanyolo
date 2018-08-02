@@ -69,8 +69,7 @@ void Crossing::alignStep(){
   motor.speed(leftMotor, backupSpeed);
   motor.speed(rightMotor, backupSpeed);
   delay(backupTime*1.5);
-  motor.stop(rightMotor);
-  motor.stop(leftMotor);
+  motor.stop_all();
 }
 
 bool Crossing::detect10KIR() {

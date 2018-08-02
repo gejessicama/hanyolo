@@ -78,26 +78,32 @@ void loop() {
 
     case 2 : {
         long str0 = millis();
-        long etr0 = str0;
-        while (etr0 - str0 < 500) {
+        while (millis() - str0 < 500) {
           hanMovo.driveMotors();
-          etr0 = millis();
         }
-        long str = millis();
-
-        while (millis() - str < timeToIR) {
+        //        long str = millis();
+        //
+        //        while (millis() - str < timeToIR) {
+        //          hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+        //
+        //          while (digitalRead(fromChewPin) == HIGH) {
+        //            hanMovo.stopMotors();
+        //            LCD.clear();
+        //            LCD.print("Pick up Stuffy");
+        //          }
+        //        }
+        while (digitalRead(fromChewPin) == LOW) {
           hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-
-          while (digitalRead(fromChewPin) == HIGH) {
-            hanMovo.stopMotors();
-            LCD.clear();
-            LCD.print("Pick up Stuffy");
-
-          }
-
+        }
+        while (digitalRead(fromChewPin) == HIGH) {
+          hanMovo.stopMotors();
+          LCD.clear();
+          LCD.print("Pick up Stuffy");
         }
 
         hanMovo.stopMotors();
+        digitalWrite(toChewPinRight, LOW);
+        digitalWrite(toChewPinLeft, LOW);
 
         while (!hanFlyo.detect10KIR()) {
           LCD.print("not 10k");
@@ -119,18 +125,15 @@ void loop() {
         }
         digitalWrite(toChewPinRight, LOW);
         digitalWrite(toChewPinLeft, HIGH);
-        while (true) {
+
+        while (!hanFlyo.cliff()) {
+
           hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-
           while (digitalRead(fromChewPin) == HIGH) {
-
             hanMovo.stopMotors();
-
             LCD.clear();
             LCD.print("Pick up Stuffy");
           }
-
-          if (hanFlyo.cliff()) break;
         }
         state = 4;
         break;
