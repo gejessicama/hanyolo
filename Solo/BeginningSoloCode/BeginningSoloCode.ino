@@ -1,8 +1,6 @@
 
 /*
    Code for the TINAH (Solo) that will only include up to the third stuffy, but can be added to as we gain more functionality
-
-   Certian Values are stored in EEPROM, and there is a menu system for reading these in:
 */
 
 #include <phys253.h>
@@ -17,7 +15,7 @@ const uint8_t firstBridgeServoAngle = 110;
 
 // OTHER VARIABLES
 uint8_t state = 0;
-long moveTime, timeToIR;
+long moveTime, timeToIR, startTime;
 
 //byte baseSpeed, proportionalGain, derivativeGain;
 //double powerMult;
@@ -53,99 +51,72 @@ void loop() {
       saveMenuValues();
       hanMovo.setConstants();
       hanFlyo.setConstants();
+      digitalWrite(toChewPinRight, HIGH);
+      digitalWrite(toChewPinLeft, LOW);
       state = 1;
       break;
 
-    case 1 : { // STARTING STATE UNTIL FIRST GAP: follows tape and responds to signal from Arduino
-        LCD.clear();
-        LCD.print("Move");
-        hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-        digitalWrite(toChewPinRight, HIGH);
-        digitalWrite(toChewPinLeft, LOW);
-        while (digitalRead(fromChewPin) == HIGH) {
-          digitalWrite(toChewPinRight, HIGH);
-          digitalWrite(toChewPinLeft, LOW);
-          //motor.speed(rightMotor, -255);
-          //motor.speed(leftMotor, 255);
-          motor.stop_all();
-          LCD.clear();
-          LCD.print("Pick up Stuffy");
-        }
+    case 1 :  // STARTING STATE UNTIL FIRST GAP: follows tape and responds to signal from Arduino
+      LCD.clear();
+      LCD.print("Move");
+      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
 
-        //      if (hanFlyo.cliff()) { // detect cliff then reverse for bt time
-        //        hanFlyo.dropBridge(1000, 110);
-        //        state = 3;
-        //      }
-        if (hanFlyo.cliff()) {
-          hanFlyo.dropBridge(bridgeDropWaitTime, firstBridgeServoAngle, 0.6);
-          state = 2;
-          //moveTime = millis() + timeToIR;
-          // takes the current time and adds the amount of time until we should be in front of the IR signal
-        }
-        break;
+      while (digitalRead(fromChewPin) == HIGH) {
+        //motor.stop_all();
+        hanMovo.stopMotors();
+        LCD.clear();
+        LCD.print("Pick up Stuffy");
       }
 
+      if (hanFlyo.cliff()) {
+        hanFlyo.dropBridge(bridgeDropWaitTime, firstBridgeServoAngle, 0.6);
+        state = 2;
+        moveTime = millis() + timeToIR;
+        // takes the current time and adds the amount of time until we should be in front of the IR signal
+      }
+      break;
 
     case 2 : {
         long str = millis();
-        long etr = str;
-        while (etr - str < timeToIR) {
-          digitalWrite(toChewPinRight, HIGH);
-          digitalWrite(toChewPinLeft, LOW);
+        while (millis() - str < timeToIR) {
           hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-          if (digitalRead(fromChewPin) == HIGH) {
-            while (digitalRead(fromChewPin) == HIGH) {
-              digitalWrite(toChewPinRight, HIGH);
-              digitalWrite(toChewPinLeft, LOW);
-              //motor.speed(rightMotor, -255);
-              //motor.speed(leftMotor, 255);
-              motor.stop_all();
-              LCD.clear();
-              LCD.print("Pick up Stuffy");
-            }
+
+          while (digitalRead(fromChewPin) == HIGH) {
+            hanMovo.stopMotors();
+            LCD.clear();
+            LCD.print("Pick up Stuffy");
           }
-          etr = millis();
+
         }
 
-        //motor.speed(rightMotor, -255);
-        //motor.speed(leftMotor, 255);
-        motor.stop_all();
+        hanMovo.stopMotors();
+
         while (!hanFlyo.detect10KIR()) {
           LCD.print("not 10k");
           LCD.clear();
         }
         LCD.clear();
         LCD.print("10k");
-        //delay(1000);
         state = 3;
         break;
       }
 
+
     case 3 : {
         long st = millis();
-        long et = st;
-        while (et - st < 4000) {
-
-          digitalWrite(toChewPinRight, LOW);
-          digitalWrite(toChewPinLeft, LOW);
-
+        digitalWrite(toChewPinRight, LOW);
+        digitalWrite(toChewPinLeft, LOW);
+        while (millis() - st < 4000) {
           hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-          et = millis();
         }
+        digitalWrite(toChewPinRight, LOW);
+        digitalWrite(toChewPinLeft, HIGH);
         while (true) {
           hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
 
-          digitalWrite(toChewPinRight, LOW);
-          digitalWrite(toChewPinLeft, HIGH);
-
           while (digitalRead(fromChewPin) == HIGH) {
 
-            digitalWrite(toChewPinRight, LOW);
-            digitalWrite(toChewPinLeft, HIGH);
-
-            //motor.speed(rightMotor, -255);
-            //motor.speed(leftMotor, 255);
-            motor.stop_all();
+            hanMovo.stopMotors();
 
             LCD.clear();
             LCD.print("Pick up Stuffy");
@@ -163,12 +134,14 @@ void loop() {
         hanFlyo.backUp(1.0);
         hanFlyo.alignStep();
         state = 5;
+        break;
       }
 
-    case 5 : {
-        LCD.clear();
-        LCD.print("Aligned");
-      }
+      //    case 5 : {
+      //        LCD.clear();
+      //        LCD.print("Aligned");
+      //      }
+
 
       //    case 2 :
       //      LCD.clear();
@@ -176,19 +149,16 @@ void loop() {
       //      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
       //
       //      while (digitalRead(fromChewPin) == HIGH) {
-      //        motor.speed(rightMotor, -255);
-      //        motor.speed(leftMotor, 255);
-      //        motor.stop_all();
+      //        hanMovo.stopMotors();
       //        LCD.clear();
       //        LCD.print("Pick up Stuffy");
       //      }
       //
       //      if (millis() > moveTime) {
-      //        motor.speed(rightMotor, -255);
-      //        motor.speed(leftMotor, 255);
-      //        motor.stop_all();
+      //        hanMovo.stopMotors();
       //        //next state??? Where we wait for the IR signal
       //      }
+      //      break;
       //
       //
       //    case 3:
