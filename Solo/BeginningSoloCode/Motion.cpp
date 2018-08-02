@@ -1,8 +1,5 @@
 /*
-   The Motion Class contains functions that let us follow tape, follow an edge
-
-   Cannot follow both tape and edge at the same time.
-   Requires that motors are wired so that positive inputs make them go forwards
+   Contains functions related to motion: tapeFollowing, edgeFollowing, driving forwards, stopping the motors
 */
 #include "Motion.h"
 
@@ -24,7 +21,6 @@ void Motion::setConstants() {
   derivativeGain = EEPROM[3];
   onTape = EEPROM[4] * 10;
   overCliff = EEPROM[5] * 10;
-  backupTime = EEPROM[6] * 10;
 }
 
 //void Motion::reset() {
@@ -36,8 +32,8 @@ void Motion::setConstants() {
 //}
 
 /*
- * Calculates the error values and such for following tape
- */
+   Calculates the error values and such for following tape
+*/
 void Motion::followTape(uint8_t rightQRD, uint8_t leftQRD) {
 
   rVal = isOnWhite(rightQRD);
@@ -60,8 +56,8 @@ void Motion::followTape(uint8_t rightQRD, uint8_t leftQRD) {
 }
 
 /*
- * Calculates errors and such for following the right edge of a cliff
- */
+   Calculates errors and such for following the right edge of a cliff
+*/
 void Motion::followRightEdge(uint8_t outQRD, uint8_t inQRD) {
 
   rVal = isOverCliff(outQRD);
@@ -82,8 +78,8 @@ void Motion::followRightEdge(uint8_t outQRD, uint8_t inQRD) {
 }
 
 /*
- * Controls the motion of the robot based on the last calculated error values and such
- */
+   Controls the motion of the robot based on the last calculated error values and such
+*/
 void Motion::pidControl() {
   proportionalTerm = proportionalGain * currentError;
   derivativeTerm = derivativeGain * (currentError - lastState) * 1.0 / count;
@@ -112,6 +108,23 @@ boolean Motion::isOnWhite (uint8_t qrdPin) {
 }
 
 /*
+ * Drives both motors forward at a constant rate
+ */
+void Motion::driveMotors() {
+  motor.speed(rightMotor, baseSpeed * powerMult);
+  motor.speed(leftMotor, -baseSpeed * powerMult);
+}
+
+/*
+ * Hard stop to motors
+ */
+void Motion::stopMotors() {
+  motor.speed(rightMotor, -255);
+  motor.speed(leftMotor, 255);
+  motor.stop_all();
+}
+
+/*
    Returns true if the given QRD is over a cliff, false otherwise
 */
 boolean Motion::isOverCliff (uint8_t qrdPin) {
@@ -121,12 +134,4 @@ boolean Motion::isOverCliff (uint8_t qrdPin) {
     return false;
   }
 }
-
-
-void Motion::driveMotors() {
-  motor.speed(rightMotor, baseSpeed * powerMult);
-  motor.speed(leftMotor, -baseSpeed * powerMult);
-}
-
-
 

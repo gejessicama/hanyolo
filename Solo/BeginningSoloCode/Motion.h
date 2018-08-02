@@ -10,7 +10,7 @@ class Motion {
 
     byte baseSpeed, proportionalGain, derivativeGain;
     double powerMult;
-    int onTape, overCliff, backupTime;
+    int onTape, overCliff;
     
     int currentError, lastError, lastState, lastOn;
     int rVal, lVal;
@@ -23,12 +23,14 @@ class Motion {
 
   public:
     Motion(uint8_t, uint8_t);
-    void setConstants();
+    
     void followTape(uint8_t, uint8_t);
     void followRightEdge(uint8_t, uint8_t);
-
-    void reset();
+    void setConstants();
     void driveMotors();
+    void stopMotors();
+    
+    void reset();
 
 };
 

@@ -73,7 +73,7 @@ void loop() {
         //        state = 3;
         //      }
         if (hanFlyo.cliff()) {
-          hanFlyo.dropBridge(bridgeDropWaitTime, firstBridgeServoAngle);
+          hanFlyo.dropBridge(bridgeDropWaitTime, firstBridgeServoAngle,0.6);
           state = 2;
           //moveTime = millis() + timeToIR;
           // takes the current time and adds the amount of time until we should be in front of the IR signal
@@ -116,7 +116,7 @@ void loop() {
     case 3 : {
         long st = millis();
         long et = st;
-        while (et - st < 2000) {
+        while (et - st < 3000) {
           hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
           et = millis();
         }
@@ -138,7 +138,7 @@ void loop() {
       }
 
       case 4 :{
-        hanFlyo.backUp();
+        hanFlyo.backUp(1.0);
         hanFlyo.alignStep();
         state = 5;
       }

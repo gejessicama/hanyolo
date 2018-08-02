@@ -12,14 +12,16 @@ class Crossing{
     
     int overCliff, backupTime; 
     uint8_t backupSpeed;
+    
+    
 
   public:
     Crossing(uint8_t, uint8_t, uint8_t, uint8_t, uint8_t);
     void setConstants();
     boolean cliff();
-    void backUp();
+    void backUp(double);
     void turnRight();
-    void dropBridge(int, uint8_t);
+    void dropBridge(int, uint8_t, double);
     bool detect10KIR();
     void alignStep();
 };
