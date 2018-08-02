@@ -36,7 +36,8 @@ void setup() {
   LCD.clear();
   pinMode(fromChewPin, INPUT);
   pinMode(irSignalPin, INPUT);
-  pinMode(toChewPin, OUTPUT);
+  pinMode(toChewPinLeft, OUTPUT);
+  pinMode(toChewPinRight, OUTPUT);
 }
 
 
@@ -59,8 +60,11 @@ void loop() {
         LCD.clear();
         LCD.print("Move");
         hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-
+        digitalWrite(toChewPinRight, HIGH);
+        digitalWrite(toChewPinLeft, LOW);
         while (digitalRead(fromChewPin) == HIGH) {
+          digitalWrite(toChewPinRight, HIGH);
+          digitalWrite(toChewPinLeft, LOW);
           //motor.speed(rightMotor, -255);
           //motor.speed(leftMotor, 255);
           motor.stop_all();
@@ -73,7 +77,7 @@ void loop() {
         //        state = 3;
         //      }
         if (hanFlyo.cliff()) {
-          hanFlyo.dropBridge(bridgeDropWaitTime, firstBridgeServoAngle,0.6);
+          hanFlyo.dropBridge(bridgeDropWaitTime, firstBridgeServoAngle, 0.6);
           state = 2;
           //moveTime = millis() + timeToIR;
           // takes the current time and adds the amount of time until we should be in front of the IR signal
@@ -86,9 +90,13 @@ void loop() {
         long str = millis();
         long etr = str;
         while (etr - str < timeToIR) {
+          digitalWrite(toChewPinRight, HIGH);
+          digitalWrite(toChewPinLeft, LOW);
           hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
           if (digitalRead(fromChewPin) == HIGH) {
             while (digitalRead(fromChewPin) == HIGH) {
+              digitalWrite(toChewPinRight, HIGH);
+              digitalWrite(toChewPinLeft, LOW);
               //motor.speed(rightMotor, -255);
               //motor.speed(leftMotor, 255);
               motor.stop_all();
@@ -116,17 +124,29 @@ void loop() {
     case 3 : {
         long st = millis();
         long et = st;
-        while (et - st < 3000) {
+        while (et - st < 4000) {
+
+          digitalWrite(toChewPinRight, LOW);
+          digitalWrite(toChewPinLeft, LOW);
+
           hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
           et = millis();
         }
         while (true) {
           hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
 
+          digitalWrite(toChewPinRight, LOW);
+          digitalWrite(toChewPinLeft, HIGH);
+
           while (digitalRead(fromChewPin) == HIGH) {
+
+            digitalWrite(toChewPinRight, LOW);
+            digitalWrite(toChewPinLeft, HIGH);
+
             //motor.speed(rightMotor, -255);
             //motor.speed(leftMotor, 255);
             motor.stop_all();
+
             LCD.clear();
             LCD.print("Pick up Stuffy");
           }
@@ -137,13 +157,15 @@ void loop() {
         break;
       }
 
-      case 4 :{
+    case 4 : {
+        digitalWrite(toChewPinRight, LOW);
+        digitalWrite(toChewPinLeft, LOW);
         hanFlyo.backUp(1.0);
         hanFlyo.alignStep();
         state = 5;
       }
 
-      case 5 :{
+    case 5 : {
         LCD.clear();
         LCD.print("Aligned");
       }

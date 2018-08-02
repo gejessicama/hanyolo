@@ -18,8 +18,10 @@
 //#define oneIRPin
 //#define tenIRPin
 
-#define fromChewPin 2
-#define toChewPin 8
+#define fromChewPin 6
+#define toChewPinLeft 8
+#define toChewPinRight 9
 #define irSignalPin 4
+
 
 #endif
