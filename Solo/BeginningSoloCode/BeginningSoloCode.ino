@@ -62,7 +62,7 @@ void loop() {
       hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
 
       while (digitalRead(fromChewPin) == HIGH) {
-        //motor.stop_all();
+
         hanMovo.stopMotors();
         LCD.clear();
         LCD.print("Pick up Stuffy");
@@ -77,7 +77,14 @@ void loop() {
       break;
 
     case 2 : {
+        long str0 = millis();
+        long etr0 = str0;
+        while (etr0 - str0 < 500) {
+          hanMovo.driveMotors();
+          etr0 = millis();
+        }
         long str = millis();
+
         while (millis() - str < timeToIR) {
           hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
 
@@ -85,6 +92,7 @@ void loop() {
             hanMovo.stopMotors();
             LCD.clear();
             LCD.print("Pick up Stuffy");
+
           }
 
         }
