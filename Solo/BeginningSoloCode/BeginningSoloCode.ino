@@ -63,8 +63,6 @@ void loop() {
         digitalWrite(toChewPinRight, HIGH);
         digitalWrite(toChewPinLeft, LOW);
         while (digitalRead(fromChewPin) == HIGH) {
-          digitalWrite(toChewPinRight, HIGH);
-          digitalWrite(toChewPinLeft, LOW);
           //motor.speed(rightMotor, -255);
           //motor.speed(leftMotor, 255);
           motor.stop_all();
@@ -87,16 +85,22 @@ void loop() {
 
 
     case 2 : {
+        long str0 = millis();
+        long etr0 = str0;
+        while (etr0 - str0 < 500) {
+          hanMovo.driveMotors();
+          etr0 = millis();
+        }
         long str = millis();
         long etr = str;
         while (etr - str < timeToIR) {
+          hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+          
           digitalWrite(toChewPinRight, HIGH);
           digitalWrite(toChewPinLeft, LOW);
-          hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+          
           if (digitalRead(fromChewPin) == HIGH) {
             while (digitalRead(fromChewPin) == HIGH) {
-              digitalWrite(toChewPinRight, HIGH);
-              digitalWrite(toChewPinLeft, LOW);
               //motor.speed(rightMotor, -255);
               //motor.speed(leftMotor, 255);
               motor.stop_all();
@@ -139,9 +143,6 @@ void loop() {
           digitalWrite(toChewPinLeft, HIGH);
 
           while (digitalRead(fromChewPin) == HIGH) {
-
-            digitalWrite(toChewPinRight, LOW);
-            digitalWrite(toChewPinLeft, HIGH);
 
             //motor.speed(rightMotor, -255);
             //motor.speed(leftMotor, 255);
