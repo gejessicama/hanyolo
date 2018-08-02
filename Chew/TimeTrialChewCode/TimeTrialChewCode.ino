@@ -45,7 +45,7 @@ const int readWait = 1000;
 int onValue, offValue;
 Servo susan, base, elbow, grip;
 
-//boolean readInQSD(uint8_t, uint8_t);
+boolean readInQSD(uint8_t, uint8_t);
 
 void setup() {
   //Serial.begin(9600);
