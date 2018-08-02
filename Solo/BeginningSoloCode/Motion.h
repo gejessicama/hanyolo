@@ -13,8 +13,6 @@ class Motion {
     int onTape, overCliff;
     
     int currentError, lastError, lastState, lastOn;
-    int rVal, lVal;
-    int proportionalTerm, derivativeTerm, gain;
     uint16_t count;
     
     boolean isOnWhite(uint8_t);

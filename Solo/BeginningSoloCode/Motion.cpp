@@ -23,21 +23,24 @@ void Motion::setConstants() {
   overCliff = EEPROM[5] * 10;
 }
 
-//void Motion::reset() {
-//  lastError = 0;
-//  lastState = 0;
-//  lastOn = -1;
-//  count = 0;
-//
-//}
+/*
+   Resets PID values so that new tape following doesnt deal with old stuff
+*/
+void Motion::reset() {
+  lastError = 0;
+  lastState = 0;
+  lastOn = -1;
+  count = 0;
+
+}
 
 /*
    Calculates the error values and such for following tape
 */
 void Motion::followTape(uint8_t rightQRD, uint8_t leftQRD) {
 
-  rVal = isOnWhite(rightQRD);
-  lVal = isOnWhite(leftQRD);
+  bool rVal = isOnWhite(rightQRD);
+  bool lVal = isOnWhite(leftQRD);
 
   if (!rVal && !lVal) { // We are on the tape and all is good
     currentError = 0;
@@ -56,28 +59,35 @@ void Motion::followTape(uint8_t rightQRD, uint8_t leftQRD) {
 }
 
 /*
- * Uses all four QRDs to follow tape
- */
-void followTapeFour(uint8_t rightMostQRD, uint8_t rightMidQRD, uint8_t leftMostQRD, uint8_t leftMidQRD){
-//  bool rrVal = isOnWhite(rightMostQRD);
-//  bool rmVal = isOnWhite(rightMidQRD);
-//  bool rmVal = isOnWhite(rightMidQRD);
-//  bool rrVal = isOnWhite(rightMostQRD);
-  
-//  if (!rVal && !lVal) { // We are on the tape and all is good
-//    currentError = 0;
-//    lastState = 0;
-//  } else if (!rVal && lVal) { // We are too far left
-//    currentError = -1;
-//    lastOn = -1;
-//  } else if (rVal && !lVal) { // We are too far right
-//    currentError = 1;
-//    lastOn = 1;
-//  } else { // Both are off the tape
-//    currentError = lastOn * 5;
-//  }
-//
-//  pidControl();
+   Uses all four QRDs to follow tape
+*/
+void Motion::followTapeFour(uint8_t rightMostQRD, uint8_t rightMidQRD, uint8_t leftMostQRD, uint8_t leftMidQRD) {
+  bool rrVal = isOnWhite(rightMostQRD);
+  bool rmVal = isOnWhite(rightMidQRD);
+  bool lmVal = isOnWhite(leftMidQRD);
+  bool llVal = isOnWhite(leftMostQRD);
+
+  if (!rmVal && !lmVal) { // We are on the tape and all is good
+    currentError = 0;
+    lastState = 0;
+  } else if (!rmVal) { // We are too far left
+    currentError = -1;
+    lastOn = -1;
+  } else if (!lmVal) { // We are too far right
+    currentError = 1;
+    lastOn = 1;
+  } else if (!rrVal) { // Way too far left
+    currentError = -5;
+    lastOn = -1;
+  } else if (!llVal) { // Way too far right
+    currentError = 5;
+    lastOn = 1;
+  } else { // OH BOY I DON'T EVEN KNOW WHERE I AM
+    currentError = 10 * lastOn;
+    lastOn = -1 * lastOn; // this will cause us to sweep??? Maybe
+  }
+
+  pidControl();
 }
 
 /*
@@ -85,8 +95,8 @@ void followTapeFour(uint8_t rightMostQRD, uint8_t rightMidQRD, uint8_t leftMostQ
 */
 void Motion::followRightEdge(uint8_t outQRD, uint8_t inQRD) {
 
-  rVal = isOverCliff(outQRD);
-  lVal = isOverCliff(inQRD);
+  bool rVal = isOverCliff(outQRD);
+  bool lVal = isOverCliff(inQRD);
 
   if (rVal && !lVal) { //all is good
     currentError = 0;
@@ -114,16 +124,16 @@ void Motion::followRightEdge(uint8_t outQRD, uint8_t inQRD) {
 //   */
 //
 //   rrVal = isOnTape
-//  
+//
 //}
 
 /*
    Controls the motion of the robot based on the last calculated error values and such
 */
 void Motion::pidControl() {
-  proportionalTerm = proportionalGain * currentError;
-  derivativeTerm = derivativeGain * (currentError - lastState) * 1.0 / count;
-  gain = proportionalTerm + derivativeTerm;
+  int proportionalTerm = proportionalGain * currentError;
+  int derivativeTerm = derivativeGain * (currentError - lastState) * 1.0 / count;
+  int gain = proportionalTerm + derivativeTerm;
 
   motor.speed(rightMotor, powerMult * (baseSpeed + gain));
   motor.speed(leftMotor, powerMult * (-baseSpeed + gain));
@@ -148,16 +158,16 @@ boolean Motion::isOnWhite (uint8_t qrdPin) {
 }
 
 /*
- * Drives both motors forward at a constant rate
- */
+   Drives both motors forward at a constant rate
+*/
 void Motion::driveMotors() {
   motor.speed(rightMotor, baseSpeed * powerMult);
   motor.speed(leftMotor, -baseSpeed * powerMult);
 }
 
 /*
- * Hard stop to motors
- */
+   Hard stop to motors
+*/
 void Motion::stopMotors() {
   motor.speed(rightMotor, -255);
   motor.speed(leftMotor, 255);
