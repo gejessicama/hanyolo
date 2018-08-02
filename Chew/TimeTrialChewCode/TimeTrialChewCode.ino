@@ -15,9 +15,9 @@
 #define clawElbowPin 12
 #define clawGripPin 11
 
-#define toSoloPinRight 1
-#define toSoloPinLeft 1
-#define pauseForStuffy 3000
+#define toSoloPin 1
+#define fromSoloRightPin 2
+#define fromSoloLeftPin 3
 
 #define deLae 500
 #define susanRight 5
@@ -41,17 +41,19 @@
 #define gripClose 0
 
 const int objectLimit = 300;
-const int readWait = 1000;
+const int readWait = 1000; //In microseconds
+
 int onValue, offValue;
+
 Servo susan, base, elbow, grip;
 
-//boolean readInQSD(uint8_t, uint8_t);
+boolean readInQSD(uint8_t, uint8_t);
 
 void setup() {
   //Serial.begin(9600);
   pinMode(rightLEDPin, OUTPUT);
   pinMode(leftLEDPin, OUTPUT);
-  pinMode(toSoloPinRight, OUTPUT);
+  pinMode(toSoloPin, OUTPUT);
 
   startClaw();
   travel();
@@ -59,15 +61,16 @@ void setup() {
 }
 
 void loop() {
-  if (readInQSD(rightLEDPin, rightQSDPin)) {
-    digitalWrite(toSoloPinRight, HIGH);
+  if (digitalRead(fromSoloRightPin) == HIGH && readInQSD(rightLEDPin, rightQSDPin)) {
+    digitalWrite(toSoloPin, HIGH);
     pickUpRight();
-    digitalWrite(toSoloPinRight, LOW);
+    digitalWrite(toSoloPin, LOW);
   }
-  if (readInQSD(leftLEDPin, leftQSDPin)) {
-    digitalWrite(toSoloPinLeft, HIGH);
+
+  if (digitalRead(fromSoloLeftPin) == HIGH && readInQSD(leftLEDPin, leftQSDPin)) {
+    digitalWrite(toSoloPin, HIGH);
     pickUpLeft();
-    digitalWrite(toSoloPinLeft, LOW);
+    digitalWrite(toSoloPin, LOW);
   }
 }
 
@@ -78,14 +81,14 @@ boolean readInQSD(uint8_t ledPin, uint8_t qsdPin) {
   digitalWrite(ledPin, LOW);
   delayMicroseconds(readWait);
   offValue = analogRead(qsdPin);
-//  Serial.print(onValue);
-//  Serial.print(", ");
-//  Serial.println(offValue);
+  //  Serial.print(onValue);
+  //  Serial.print(", ");
+  //  Serial.println(offValue);
   return ((offValue - onValue) > objectLimit);
 }
 
 // Pick up something from the right
-void pickUpRight(){
+void pickUpRight() {
   startClaw();
   swivel();
   moveClaw(susan, susanRight);
@@ -99,7 +102,7 @@ void pickUpRight(){
 }
 
 // Pickup something from the left
-void pickUpLeft(){
+void pickUpLeft() {
   startClaw();
   swivel();
   moveClaw(susan, susanLeft);
@@ -113,7 +116,7 @@ void pickUpLeft(){
 }
 
 // Pickup something from the front
-void pickUpFront(){
+void pickUpFront() {
   swivel();
   moveClaw(susan, susanFront);
   openGrip();
@@ -125,7 +128,7 @@ void pickUpFront(){
 }
 
 // Drops stuff off in the basket
-void dropoff(){
+void dropoff() {
   moveClaw(susan, susanBasket);
   moveClaw(base, baseDropoff);
   moveClaw(elbow, elbowDropoff);
@@ -134,50 +137,45 @@ void dropoff(){
 }
 
 // The position for the claw to be in while we're just running the course
-void travel(){
+void travel() {
   moveClaw(susan, susanTravel);
   moveClaw(base, baseTravel);
   moveClaw(elbow, elbowTravel);
-  closeGrip();
-  }
+  moveClaw(grip, gripClose);
+}
 
 // Opens the grippers
-void openGrip(){
+void openGrip() {
   moveClaw(grip, gripOpen);
 }
 
 // Closes the grippers
-void closeGrip(){
+void closeGrip() {
   moveClaw(grip, gripClose);
 }
 
 // Position before susan moves so that we don't hit anything
-void swivel(){
+void swivel() {
   moveClaw(base, baseSwivel);
   moveClaw(elbow, elbowSwivel);
   closeGrip();
-  }
+}
 
-// Delay to put between servo movements so they're not too jerky
-void chill(){
-  delay(deLae);
-  }
-
-void moveClaw(Servo servo, uint8_t pos){
+void moveClaw(Servo servo, uint8_t pos) {
   servo.write(pos);
   delay(deLae);
 }
 
-void startClaw(){
+void startClaw() {
   base.attach(clawBasePin);
   elbow.attach(clawElbowPin);
   grip.attach(clawGripPin);
   susan.attach(clawSusanPin);
-  }
+}
 
-void endClaw(){
+void endClaw() {
   base.detach();
   elbow.detach();
   grip.detach();
   susan.detach();
-  }
+}
