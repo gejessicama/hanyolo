@@ -156,53 +156,6 @@ void loop() {
           hanFlyo.dropBridge2(bridgeDropWaitTime,secondBridgeServoAngle,1.0);
         }
       }
-
-      //    case 5 : {
-      //        LCD.clear();
-      //        LCD.print("Aligned");
-      //      }
-
-
-      //    case 2 :
-      //      LCD.clear();
-      //      LCD.print("ToSignal");
-      //      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-      //
-      //      while (digitalRead(fromChewPin) == HIGH) {
-      //        hanMovo.stopMotors();
-      //        LCD.clear();
-      //        LCD.print("Pick up Stuffy");
-      //      }
-      //
-      //      if (millis() > moveTime) {
-      //        hanMovo.stopMotors();
-      //        //next state??? Where we wait for the IR signal
-      //      }
-      //      break;
-      //
-      //
-      //    case 3:
-      //      if (hanFlyo.detect10KIR()){
-      //        //update state here??
-      //      }
-      //
-      //      while (!hanFlyo.detect10KIR()) {
-      //        LCD.print("not 10k");
-      //        LCD.clear();
-      //      }
-      //      LCD.clear();
-      //      LCD.print("10k");
-      //      delay(1000);
-      //      state = 4;
-      //      break;
-
-      //    case 4 :
-      //      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-      //      if (hanFlyo.cliff());
-      //      break;
-
-
-
   }
 }
 
