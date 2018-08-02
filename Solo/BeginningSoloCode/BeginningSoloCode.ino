@@ -11,8 +11,8 @@
 #include "Menu.h"
 
 const int bridgeDropWaitTime = 1000;
-const uint8_t firstBridgeServoAngle = 110;
-const uint8_t secondBridgeServoAngle = 150;
+const uint8_t firstBridgeServoAngle = 90;
+const uint8_t secondBridgeServoAngle = 180;
 
 // OTHER VARIABLES
 uint8_t state = 0;
@@ -144,7 +144,8 @@ void loop() {
         digitalWrite(toChewPinRight, LOW);
         digitalWrite(toChewPinLeft, LOW);
         hanFlyo.backUp(1.0);
-        hanFlyo.alignStep();
+        hanMovo.turnRight();
+        //hanFlyo.alignStep();
         state = 5;
         break;
       }

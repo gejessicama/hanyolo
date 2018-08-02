@@ -154,8 +154,8 @@ void Motion::stopMotors() {
    Tells the robot to exectute a right turn by stopping the left wheel and backing up the right wheel
 */
 void Motion::turnRight() {
+  motor.speed(rightMotor, -backUpSpeed);
   motor.speed(leftMotor, 0);
-  motor.speed(rightMotor, backUpSpeed);
   delay(turningTime);
   motor.stop_all();
 }
