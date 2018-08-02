@@ -19,25 +19,25 @@
 #define toSoloPinLeft 1
 #define pauseForStuffy 3000
 
-#define deLae 700
-#define susanRight 160
+#define deLae 500
+#define susanRight 5
 #define baseRightDown 100
 #define elbowRightDown 180 // END RIGHT
-#define susanFront 108
+#define susanFront 145
 #define baseFrontDown 70
 #define elbowFrontDown 150 // END DOWN
-#define susanLeft 60
+#define susanLeft 100
 #define baseLeftDown 90
 #define elbowLeftDown 180 // END LEFT
-#define susanBasket 20
+#define susanBasket 50
 #define baseDropoff 0
 #define elbowDropoff 0 // END BASKET
-#define susanTravel 20
+#define susanTravel 50
 #define baseTravel 0
-#define elbowTravel 0 // END TRAVEL
+#define elbowTravel 80 // END TRAVEL
 #define baseSwivel 0
 #define elbowSwivel 0 // END SWIVEL
-#define gripOpen 120
+#define gripOpen 180
 #define gripClose 0
 
 const int objectLimit = 300;
@@ -52,6 +52,10 @@ void setup() {
   pinMode(rightLEDPin, OUTPUT);
   pinMode(leftLEDPin, OUTPUT);
   pinMode(toSoloPinRight, OUTPUT);
+
+  startClaw();
+  travel();
+  endClaw();
 }
 
 void loop() {
@@ -65,7 +69,6 @@ void loop() {
     pickUpLeft();
     digitalWrite(toSoloPinLeft, LOW);
   }
- // delay(500);
 }
 
 boolean readInQSD(uint8_t ledPin, uint8_t qsdPin) {
@@ -166,15 +169,15 @@ void moveClaw(Servo servo, uint8_t pos){
 }
 
 void startClaw(){
-  susan.attach(clawSusanPin);
   base.attach(clawBasePin);
   elbow.attach(clawElbowPin);
   grip.attach(clawGripPin);
+  susan.attach(clawSusanPin);
   }
 
 void endClaw(){
-  susan.detach();
   base.detach();
   elbow.detach();
   grip.detach();
+  susan.detach();
   }
