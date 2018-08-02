@@ -21,6 +21,8 @@ void Motion::setConstants() {
   derivativeGain = EEPROM[3];
   onTape = EEPROM[4] * 10;
   overCliff = EEPROM[5] * 10;
+  backUpSpeed = EEPROM[7];
+  turningTime = EEPROM[9] * 10;
 }
 
 /*
@@ -112,21 +114,6 @@ void Motion::followRightEdge(uint8_t outQRD, uint8_t inQRD) {
   pidControl();
 }
 
-//boolean findTape(uint8_t rightMostQRD, uint8_t rightMidQRD, uint8_t leftMidQRD, uint8_t leftMostQRD){
-//  /*
-//   * if the middle ones are over the tape, no problem
-//   * if the two right ones are over the tape, too far left
-//   * if the two left ones are over the tape, too far right
-//   * if only the right most is over the tape, way far left
-//   * if only the left most is over the tape, way far right
-//   * if none are on the tape, sweep to the right, try again
-//   * if none are on the tape, sweep to the left, try again
-//   */
-//
-//   rrVal = isOnTape
-//
-//}
-
 /*
    Controls the motion of the robot based on the last calculated error values and such
 */
@@ -147,17 +134,6 @@ void Motion::pidControl() {
 }
 
 /*
-   Returns true if the given QRD is over a white surface, false otherwise
-*/
-boolean Motion::isOnWhite (uint8_t qrdPin) {
-  if (analogRead(qrdPin) < onTape) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
-/*
    Drives both motors forward at a constant rate
 */
 void Motion::driveMotors() {
@@ -172,6 +148,27 @@ void Motion::stopMotors() {
   motor.speed(rightMotor, -255);
   motor.speed(leftMotor, 255);
   motor.stop_all();
+}
+
+/*
+   Tells the robot to exectute a right turn by stopping the left wheel and backing up the right wheel
+*/
+void Motion::turnRight() {
+  motor.speed(leftMotor, 0);
+  motor.speed(rightMotor, backUpSpeed);
+  delay(turningTime);
+  motor.stop_all();
+}
+
+/*
+   Returns true if the given QRD is over a white surface, false otherwise
+*/
+boolean Motion::isOnWhite (uint8_t qrdPin) {
+  if (analogRead(qrdPin) < onTape) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 /*

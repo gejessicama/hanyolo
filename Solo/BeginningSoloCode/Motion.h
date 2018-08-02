@@ -8,9 +8,9 @@ class Motion {
   private:
     uint8_t rightMotor, leftMotor;
 
-    byte baseSpeed, proportionalGain, derivativeGain;
+    byte baseSpeed, proportionalGain, derivativeGain, backUpSpeed;
     double powerMult;
-    int onTape, overCliff;
+    int onTape, overCliff, turningTime;
     
     int currentError, lastError, lastState, lastOn;
     uint16_t count;
@@ -21,17 +21,15 @@ class Motion {
 
   public:
     Motion(uint8_t, uint8_t);
+    void setConstants();
+    void reset();
     
     void followTape(uint8_t, uint8_t);
     void followTapeFour(uint8_t, uint8_t, uint8_t, uint8_t);
     void followRightEdge(uint8_t, uint8_t);
-    boolean findTape(uint8_t, uint8_t, uint8_t, uint8_t);
-    void setConstants();
     void driveMotors();
     void stopMotors();
-    
-    void reset();
-
+    void turnRight();
 };
 
 #endif
