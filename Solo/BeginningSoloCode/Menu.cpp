@@ -8,7 +8,7 @@
 
 static uint8_t menuScreen;
 static byte temp;
-static const uint8_t menuSize = 9;
+static const uint8_t menuSize = 10;
 static const uint8_t delayTime = 220;
 
 /*
@@ -130,6 +130,19 @@ void Menu::eePromMenu() {
         }
         delay(delayTime);
         EEPROM[8] = temp;
+      }
+      break;
+
+      case 9 :
+      displayMenu("TurningTime", EEPROM[9]*10);
+      if (stopbutton()) {
+        delay(delayTime);
+        while (!stopbutton()) {
+          temp = knob(6) / 1024.0 * 255;
+          displayMenu("TurningT(E)", temp*10);
+        }
+        delay(delayTime);
+        EEPROM[9] = temp;
       }
       break;
   }
