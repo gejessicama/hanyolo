@@ -8,11 +8,11 @@ class Crossing{
   private:
     uint8_t rightMotor, leftMotor;
     uint8_t rightQRD, leftQRD;
+    uint8_t IRsig;
+    
     int overCliff, backupTime; 
     uint8_t backupSpeed;
 
-    uint8_t IRsig;
-   
   public:
     Crossing(uint8_t, uint8_t, uint8_t, uint8_t, uint8_t);
     void setConstants();
@@ -21,6 +21,7 @@ class Crossing{
     void turnRight();
     void dropBridge(int, uint8_t);
     bool detect10KIR();
+    void alignStep();
 };
 
 #endif

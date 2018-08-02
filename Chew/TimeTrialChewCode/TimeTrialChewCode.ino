@@ -23,6 +23,8 @@ void setup() {
   pinMode(rightLEDPin, OUTPUT);
   pinMode(leftLEDPin, OUTPUT);
   pinMode(toSoloPinRight, OUTPUT);
+ 
+  //digitalWrite(toSoloPinRight, LOW);
 }
 
 void loop() {
@@ -34,22 +36,26 @@ void loop() {
     //digitalWrite(toSoloPinRight, HIGH);
     digitalWrite(toSoloPinRight, LOW);
   }
-  if (readInQSD(leftLEDPin, leftQSDPin)) {
-    //Serial.println("Seen on left");
-    digitalWrite(toSoloPinLeft, HIGH);
-    //digitalWrite(toSoloPinLeft, LOW);
-    delay(pauseForStuffy);
-    //digitalWrite(toSoloPinLeft, HIGH);
-    digitalWrite(toSoloPinLeft, LOW);
-  }
-  //delay(500);
+//  if (readInQSD(leftLEDPin, leftQSDPin)) {
+//    //Serial.println("Seen on left");
+//    digitalWrite(toSoloPinLeft, HIGH);
+//    //digitalWrite(toSoloPinLeft, LOW);
+//    delay(pauseForStuffy);
+//    //digitalWrite(toSoloPinLeft, HIGH);
+//    digitalWrite(toSoloPinLeft, LOW);
+//  }
+//  delay(500);
 }
 
 boolean readInQSD(uint8_t ledPin, uint8_t qsdPin) {
   digitalWrite(ledPin, HIGH);
-  onValue = analogRead(qsdPin);
   delay(20);
+  onValue = analogRead(qsdPin);
   digitalWrite(ledPin, LOW);
+  delay(20);
   offValue = analogRead(qsdPin);
-  return ((onValue - offValue) > objectLimit);
+//  Serial.print(onValue);
+//  Serial.print(", ");
+//  Serial.println(offValue);
+  return ((offValue - onValue) > objectLimit);
 }
