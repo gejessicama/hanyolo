@@ -134,3 +134,4 @@ boolean Motion::isOverCliff (uint8_t qrdPin) {
     return false;
   }
 }
+

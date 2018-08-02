@@ -17,7 +17,7 @@ static const uint8_t delayTime = 220;
 void Menu::eePromMenu() {
   menuScreen = floor (menuSize * knob(7) / 1024.0);
   switch (menuScreen) {
-    case 0 :
+    case 0 : //142.00
       displayMenu("BaseSpeed", EEPROM[0]);
       if (stopbutton()) {
         delay(delayTime);
@@ -30,7 +30,7 @@ void Menu::eePromMenu() {
       }
       break;
 
-    case 1 :
+    case 1 ://0.76
       displayMenu("PowerMult", EEPROM[1] / 100.0);
       if (stopbutton()) {
         delay(delayTime);
@@ -43,7 +43,7 @@ void Menu::eePromMenu() {
       }
       break;
 
-    case 2 :
+    case 2 :// 50
       displayMenu("ProportionalGain", EEPROM[2]);
       if (stopbutton()) {
         delay(delayTime);
@@ -56,7 +56,7 @@ void Menu::eePromMenu() {
       }
       break;
 
-    case 3 :
+    case 3 ://24
       displayMenu("DerivativeGain", EEPROM[3]);
       if (stopbutton()) {
         delay(delayTime);
@@ -69,7 +69,7 @@ void Menu::eePromMenu() {
       }
       break;
 
-    case 4 :
+    case 4 ://400
       displayMenu("OnTape", EEPROM[4] * 10);
       if (stopbutton()) {
         delay(delayTime);
@@ -82,7 +82,7 @@ void Menu::eePromMenu() {
       }
       break;
 
-    case 5 :
+    case 5 ://620
       displayMenu("OverCliff", EEPROM[5] * 10);
       if (stopbutton()) {
         delay(delayTime);
@@ -95,7 +95,7 @@ void Menu::eePromMenu() {
       }
       break;
 
-    case 6 :
+    case 6 ://1250
       displayMenu("BackupTime", EEPROM[6] * 10);
       if (stopbutton()) {
         delay(delayTime);
@@ -108,7 +108,7 @@ void Menu::eePromMenu() {
       }
       break;
 
-    case 7 :
+    case 7 ://201
       displayMenu("BackupSpeed", EEPROM[7]);
       if (stopbutton()) {
         delay(delayTime);
@@ -120,7 +120,7 @@ void Menu::eePromMenu() {
         EEPROM[7] = temp;
       }
       break;
-    case 8 :
+    case 8 ://3000
       displayMenu("TimeToIR", EEPROM[8]*20);
       if (stopbutton()) {
         delay(delayTime);

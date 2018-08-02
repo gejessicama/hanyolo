@@ -14,18 +14,13 @@
 
 const int bridgeDropWaitTime = 1000;
 const uint8_t firstBridgeServoAngle = 110;
-const double rightWheelPercentage1 = 0.6;
 
 // OTHER VARIABLES
 uint8_t state = 0;
-long moveTime;
+long moveTime, timeToIR;
 
-// EEPROM VARIABLES
-long timeToIR;
-//byte baseSpeed;
+//byte baseSpeed, proportionalGain, derivativeGain;
 //double powerMult;
-
-//, proportionalGain, derivativeGain;
 //int onTape, overCliff, backupTime;
 
 Motion hanMovo(rightMotor, leftMotor);
@@ -60,84 +55,134 @@ void loop() {
       state = 1;
       break;
 
-    case 1 : // STARTING STATE UNTIL FIRST GAP: follows tape and responds to signal from Arduino
-      LCD.clear();
-      LCD.print("Move");
-      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-
-      while (digitalRead(fromChewPin) == HIGH) {
-        hanMovo.stopMotors();
+    case 1 : { // STARTING STATE UNTIL FIRST GAP: follows tape and responds to signal from Arduino
         LCD.clear();
-        LCD.print("Pick up Stuffy");
-      }
-
-      if (hanFlyo.cliff()) {
-        hanMovo.stopMotors();
-        hanFlyo.dropBridge(bridgeDropWaitTime, firstBridgeServoAngle, rightWheelPercentage1);
-        hanMovo.driveMotors();
-          
-         // delay(250);
-        state = 2;
-        moveTime = millis() + timeToIR;
-        // takes the current time and adds the amount of time until we should be in front of the IR signal
-      }
-      break;
-
-    case 2 :
-      long st = millis();
-      long et = st;
-      while (et - st < 1250.0) {
+        LCD.print("Move");
         hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-        et = millis();
-      }
-      motor.speed(rightMotor, -255);
-      motor.speed(leftMotor, 255);
-      motor.stop_all();
-      while (!hanFlyo.detect10KIR()) {
-        LCD.print("not 10k");
-        LCD.clear();
-      }
-      LCD.clear();
-      LCD.print("10k");
-      delay(1000);
-      state = 4;
-      break;
 
-//    case 2 :
-//      LCD.clear();
-//      LCD.print("ToSignal");
-//      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-//
-//      while (digitalRead(fromChewPin) == HIGH) {
-//        motor.speed(rightMotor, -255);
-//        motor.speed(leftMotor, 255);
-//        motor.stop_all();
-//        LCD.clear();
-//        LCD.print("Pick up Stuffy");
-//      }
-//
-//      if (millis() > moveTime) {
-//        motor.speed(rightMotor, -255);
-//        motor.speed(leftMotor, 255);
-//        motor.stop_all();
-//        //next state??? Where we wait for the IR signal
-//      }
-//
-//
-//    case 3:
-//      if (hanFlyo.detect10KIR()){
-//        //update state here??
-//      }
-//
-//      while (!hanFlyo.detect10KIR()) {
-//        LCD.print("not 10k");
-//        LCD.clear();
-//      }
-//      LCD.clear();
-//      LCD.print("10k");
-//      delay(1000);
-//      state = 4;
-//      break;
+        while (digitalRead(fromChewPin) == HIGH) {
+          //motor.speed(rightMotor, -255);
+          //motor.speed(leftMotor, 255);
+          motor.stop_all();
+          LCD.clear();
+          LCD.print("Pick up Stuffy");
+        }
+
+        //      if (hanFlyo.cliff()) { // detect cliff then reverse for bt time
+        //        hanFlyo.dropBridge(1000, 110);
+        //        state = 3;
+        //      }
+        if (hanFlyo.cliff()) {
+          hanFlyo.dropBridge(bridgeDropWaitTime, firstBridgeServoAngle,0.6);
+          state = 2;
+          //moveTime = millis() + timeToIR;
+          // takes the current time and adds the amount of time until we should be in front of the IR signal
+        }
+        break;
+      }
+
+
+    case 2 : {
+        long str = millis();
+        long etr = str;
+        while (etr - str < timeToIR) {
+          hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+          if (digitalRead(fromChewPin) == HIGH) {
+            while (digitalRead(fromChewPin) == HIGH) {
+              //motor.speed(rightMotor, -255);
+              //motor.speed(leftMotor, 255);
+              motor.stop_all();
+              LCD.clear();
+              LCD.print("Pick up Stuffy");
+            }
+          }
+          etr = millis();
+        }
+
+        //motor.speed(rightMotor, -255);
+        //motor.speed(leftMotor, 255);
+        motor.stop_all();
+        while (!hanFlyo.detect10KIR()) {
+          LCD.print("not 10k");
+          LCD.clear();
+        }
+        LCD.clear();
+        LCD.print("10k");
+        //delay(1000);
+        state = 3;
+        break;
+      }
+
+    case 3 : {
+        long st = millis();
+        long et = st;
+        while (et - st < 3000) {
+          hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+          et = millis();
+        }
+        while (true) {
+          hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+
+          while (digitalRead(fromChewPin) == HIGH) {
+            //motor.speed(rightMotor, -255);
+            //motor.speed(leftMotor, 255);
+            motor.stop_all();
+            LCD.clear();
+            LCD.print("Pick up Stuffy");
+          }
+
+          if (hanFlyo.cliff()) break;
+        }
+        state = 4;
+        break;
+      }
+
+      case 4 :{
+        hanFlyo.backUp(1.0);
+        hanFlyo.alignStep();
+        state = 5;
+      }
+
+      case 5 :{
+        LCD.clear();
+        LCD.print("Aligned");
+      }
+
+      //    case 2 :
+      //      LCD.clear();
+      //      LCD.print("ToSignal");
+      //      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+      //
+      //      while (digitalRead(fromChewPin) == HIGH) {
+      //        motor.speed(rightMotor, -255);
+      //        motor.speed(leftMotor, 255);
+      //        motor.stop_all();
+      //        LCD.clear();
+      //        LCD.print("Pick up Stuffy");
+      //      }
+      //
+      //      if (millis() > moveTime) {
+      //        motor.speed(rightMotor, -255);
+      //        motor.speed(leftMotor, 255);
+      //        motor.stop_all();
+      //        //next state??? Where we wait for the IR signal
+      //      }
+      //
+      //
+      //    case 3:
+      //      if (hanFlyo.detect10KIR()){
+      //        //update state here??
+      //      }
+      //
+      //      while (!hanFlyo.detect10KIR()) {
+      //        LCD.print("not 10k");
+      //        LCD.clear();
+      //      }
+      //      LCD.clear();
+      //      LCD.print("10k");
+      //      delay(1000);
+      //      state = 4;
+      //      break;
 
       //    case 4 :
       //      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);

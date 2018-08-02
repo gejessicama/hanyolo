@@ -65,12 +65,21 @@ void Crossing::backUp(double rightMotorPercentage) {
   motor.stop_all();
 }
 
+void Crossing::alignStep(){
+  motor.speed(leftMotor, backupSpeed);
+  motor.speed(rightMotor, backupSpeed);
+  delay(backupTime*1.5);
+  motor.stop(rightMotor);
+  motor.stop(leftMotor);
+}
 
 bool Crossing::detect10KIR() {
+  uint8_t val = digitalRead(IRsig);
   if (digitalRead(IRsig) == HIGH) {
     return false;
   } else {
     return true;
   }
+
 }
 
