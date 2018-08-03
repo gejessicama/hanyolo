@@ -33,6 +33,7 @@ void lowerBasket();
 void setup() {
   LCD.begin();
   LCD.clear();
+  RCServo0.write(0);
   pinMode(fromChewPin, INPUT);
   pinMode(irSignalPin, INPUT);
   pinMode(toChewPinLeft, OUTPUT);

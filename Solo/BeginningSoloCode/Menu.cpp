@@ -44,7 +44,7 @@ void Menu::eePromMenu() {
       break;
 
     case 2 :// 50
-      displayMenu("ProportionalGain", EEPROM[2]);
+      displayMenu("PGain", EEPROM[2]);
       if (stopbutton()) {
         delay(delayTime);
         while (!stopbutton()) {
@@ -57,7 +57,7 @@ void Menu::eePromMenu() {
       break;
 
     case 3 ://24
-      displayMenu("DerivativeGain", EEPROM[3]);
+      displayMenu("DGain", EEPROM[3]);
       if (stopbutton()) {
         delay(delayTime);
         while (!stopbutton()) {
@@ -154,6 +154,6 @@ void Menu::eePromMenu() {
 void Menu::displayMenu(String varName, double varValue) {
   delay(1);
   LCD.clear();
-  LCD.print(varName + ": ");
+  LCD.println(varName + ": ");
   LCD.print(varValue);
 }
