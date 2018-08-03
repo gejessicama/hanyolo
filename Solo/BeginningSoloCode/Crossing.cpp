@@ -47,12 +47,7 @@ void Crossing::dropBridge1(int waitTime, uint8_t servoAngle, double rightWheelPe
   motor.stop_all();
 
   delay(waitTime);
-  //  for (int pos = servoAngle - 10; pos <= servoAngle; pos++) {
-  //    RCServo0.write(pos);
-  //    delay(10);
-  //  }
   RCServo0.write(servoAngle);
-  //RCServo0.detach();
   delay(waitTime);
 }
 
@@ -66,6 +61,7 @@ void Crossing::dropBridge2(int waitTime, uint8_t servoAngle, double rightWheelPe
   }
   delay(waitTime);
 }
+
 /*
    Backs up while giving one motor slightly more power
 */

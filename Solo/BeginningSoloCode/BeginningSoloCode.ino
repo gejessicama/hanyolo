@@ -72,37 +72,32 @@ void loop() {
       }
 
       if (hanFlyo.cliff()) {
+        //hanMovo.stopMotors();
         hanFlyo.dropBridge1(bridgeDropWaitTime, firstBridgeServoAngle, backupPercentage);
         state = 2;
       }
       break;
 
     case 2 : {
-//        long str0 = millis();
-//        while (millis() - str0 < 500) {
-//          hanMovo.driveMotors();
-//        }
+      // We don't want to follow tape on the bridge because that throws us off. Instead we drive staight over the bridge
         hanMovo.driveMotors();
-        //delay(500);
-        while(!hanFlyo.cliff()){
-          
-        }
+        while(!hanFlyo.cliff());
         delay(400);
+        // After the end of the bridge, we need to drive a little farther and then perform a sweep to find the tape
+        
         hanMovo.findTape(rightMiddleQRD, leftMiddleQRD, 1700);
-        //unsigned int resetTime = 500;
         hanMovo.reset(-1);
         while (digitalRead(fromChewPin) == LOW) {
-          //hanMovo.followTapeFour(rightMostQRD, rightMiddleQRD, leftMiddleQRD, leftMostQRD);
-         // hanMovo.findTape(rightMiddleQRD, leftMiddleQRD, 1000);
           hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
         }
+        
         while (digitalRead(fromChewPin) == HIGH) {
           hanMovo.stopMotors();
           LCD.clear();
           LCD.print("Pick up Stuffy");
         }
 
-        //hanMovo.stopMotors();
+        // after we see the stuffy, we need to tell the claw not to pick anything up and wait for the signal change
         digitalWrite(toChewPinRight, LOW);
         digitalWrite(toChewPinLeft, LOW);
 
@@ -118,25 +113,27 @@ void loop() {
 
 
     case 3 : {
-        long st = millis();
         digitalWrite(toChewPinRight, LOW);
         digitalWrite(toChewPinLeft, LOW);
-        //hanMovo.reset();
+        
+        long st = millis();
         while (millis() - st < 2500) {
           hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
         }
+        
         digitalWrite(toChewPinRight, LOW);
         digitalWrite(toChewPinLeft, HIGH);
 
         while (!hanFlyo.cliff()) {
-
           hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+          
           while (digitalRead(fromChewPin) == HIGH) {
             hanMovo.stopMotors();
             LCD.clear();
             LCD.print("Pick up Stuffy");
           }
         }
+        //hanMovo.stopMotors();
         state = 4;
         break;
       }
@@ -146,17 +143,16 @@ void loop() {
         digitalWrite(toChewPinLeft, LOW);
         hanFlyo.backUp(1.0);
         hanMovo.turnRight();
-        //hanFlyo.alignStep();
         state = 5;
         break;
       }
-    case 5 : {
+    case 5 :
         
         hanMovo.driveMotors();
         if (hanFlyo.cliff()){
+          //hanMovo.stopMotors();
           hanFlyo.dropBridge2(bridgeDropWaitTime,secondBridgeServoAngle,1.0);
         }
-      }
   }
 }
 
