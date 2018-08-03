@@ -22,7 +22,7 @@ class Motion {
   public:
     Motion(uint8_t, uint8_t);
     void setConstants();
-    void reset();
+    void reset(uint8_t);
     
     void followTape(uint8_t, uint8_t);
     void followTapeFour(uint8_t, uint8_t, uint8_t, uint8_t);
@@ -30,6 +30,8 @@ class Motion {
     void driveMotors();
     void stopMotors();
     void turnRight();
+
+    bool findTape(uint8_t, uint8_t, unsigned int);
 };
 
 #endif

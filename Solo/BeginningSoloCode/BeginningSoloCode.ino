@@ -10,13 +10,14 @@
 #include "Constants.h"
 #include "Menu.h"
 
-const int bridgeDropWaitTime = 1000;
+const int bridgeDropWaitTime = 2000;
 const uint8_t firstBridgeServoAngle = 90;
 const uint8_t secondBridgeServoAngle = 180;
 
 // OTHER VARIABLES
 uint8_t state = 0;
-long moveTime, timeToIR, startTime;
+long moveTime, startTime;
+double backupPercentage;
 
 //byte baseSpeed, proportionalGain, derivativeGain;
 //double powerMult;
@@ -71,30 +72,28 @@ void loop() {
       }
 
       if (hanFlyo.cliff()) {
-        hanFlyo.dropBridge1(bridgeDropWaitTime, firstBridgeServoAngle, 0.6);
+        hanFlyo.dropBridge1(bridgeDropWaitTime, firstBridgeServoAngle, backupPercentage);
         state = 2;
-        //moveTime = millis() + timeToIR;
-        // takes the current time and adds the amount of time until we should be in front of the IR signal
       }
       break;
 
     case 2 : {
-        long str0 = millis();
-        while (millis() - str0 < 500) {
-          hanMovo.driveMotors();
+//        long str0 = millis();
+//        while (millis() - str0 < 500) {
+//          hanMovo.driveMotors();
+//        }
+        hanMovo.driveMotors();
+        //delay(500);
+        while(!hanFlyo.cliff()){
+          
         }
-        //        long str = millis();
-        //
-        //        while (millis() - str < timeToIR) {
-        //          hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-        //
-        //          while (digitalRead(fromChewPin) == HIGH) {
-        //            hanMovo.stopMotors();
-        //            LCD.clear();
-        //            LCD.print("Pick up Stuffy");
-        //          }
-        //        }
+        delay(400);
+        hanMovo.findTape(rightMiddleQRD, leftMiddleQRD, 1700);
+        //unsigned int resetTime = 500;
+        hanMovo.reset(-1);
         while (digitalRead(fromChewPin) == LOW) {
+          //hanMovo.followTapeFour(rightMostQRD, rightMiddleQRD, leftMiddleQRD, leftMostQRD);
+         // hanMovo.findTape(rightMiddleQRD, leftMiddleQRD, 1000);
           hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
         }
         while (digitalRead(fromChewPin) == HIGH) {
@@ -103,7 +102,7 @@ void loop() {
           LCD.print("Pick up Stuffy");
         }
 
-        hanMovo.stopMotors();
+        //hanMovo.stopMotors();
         digitalWrite(toChewPinRight, LOW);
         digitalWrite(toChewPinLeft, LOW);
 
@@ -122,7 +121,8 @@ void loop() {
         long st = millis();
         digitalWrite(toChewPinRight, LOW);
         digitalWrite(toChewPinLeft, LOW);
-        while (millis() - st < 4000) {
+        //hanMovo.reset();
+        while (millis() - st < 2500) {
           hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
         }
         digitalWrite(toChewPinRight, LOW);
@@ -161,7 +161,7 @@ void loop() {
 }
 
 void saveMenuValues() {
-  timeToIR = EEPROM[8] * 20;
+  backupPercentage = EEPROM[8] /100.0;
 }
 
 

@@ -40,8 +40,8 @@
 #define gripOpen 180
 #define gripClose 0
 
-const int objectLimit = 300;
-const int readWait = 1000; //In microseconds
+const int objectLimit = 250;
+const int readWait = 800; //In microseconds
 
 int onValue, offValue;
 

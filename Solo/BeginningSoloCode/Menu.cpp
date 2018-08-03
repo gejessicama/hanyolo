@@ -121,12 +121,12 @@ void Menu::eePromMenu() {
       }
       break;
     case 8 ://3000
-      displayMenu("TimeToIR", EEPROM[8]*20);
+      displayMenu("BackUpRight", EEPROM[8]/100.0);
       if (stopbutton()) {
         delay(delayTime);
         while (!stopbutton()) {
-          temp = knob(6) / 1024.0 * 255;
-          displayMenu("TimeT(E)", temp*20);
+          temp = knob(6) / 1024.0 * 100;
+          displayMenu("BackUpRi(E)", temp/100.0);
         }
         delay(delayTime);
         EEPROM[8] = temp;

@@ -36,25 +36,31 @@ boolean Crossing::cliff() {
 }
 
 /*
- * code for droping a bridge
- */
+   code for droping a bridge
+*/
 void Crossing::dropBridge1(int waitTime, uint8_t servoAngle, double rightWheelPercentage) {
 
   backUp(rightWheelPercentage);
+  motor.speed(rightMotor, 100);
+  motor.speed(leftMotor, -100);
+  delay(150);
+  motor.stop_all();
 
   delay(waitTime);
-  for (int pos = servoAngle - 10; pos <= servoAngle; pos++) {
-    RCServo0.write(pos);
-    delay(10);
-  }
+  //  for (int pos = servoAngle - 10; pos <= servoAngle; pos++) {
+  //    RCServo0.write(pos);
+  //    delay(10);
+  //  }
+  RCServo0.write(servoAngle);
+  //RCServo0.detach();
   delay(waitTime);
 }
 
-void Crossing::dropBridge2(int waitTime, uint8_t servoAngle, double rightWheelPercentage){
+void Crossing::dropBridge2(int waitTime, uint8_t servoAngle, double rightWheelPercentage) {
   backUp(rightWheelPercentage);
 
   delay(waitTime);
-  for (int pos = servoAngle- 10; pos <= servoAngle; pos--) {
+  for (int pos = servoAngle - 10; pos <= servoAngle; pos--) {
     RCServo0.write(pos);
     delay(10);
   }
@@ -75,10 +81,10 @@ void Crossing::backUp(double rightMotorPercentage) {
   motor.stop_all();
 }
 
-void Crossing::alignStep(){
+void Crossing::alignStep() {
   motor.speed(leftMotor, backupSpeed);
   motor.speed(rightMotor, backupSpeed);
-  delay(backupTime*1.5);
+  delay(backupTime * 1.5);
   motor.stop_all();
 }
 

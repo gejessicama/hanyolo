@@ -28,12 +28,39 @@ void Motion::setConstants() {
 /*
    Resets PID values so that new tape following doesnt deal with old stuff
 */
-void Motion::reset() {
+void Motion::reset(uint8_t last) {
   lastError = 0;
   lastState = 0;
-  lastOn = -1;
+  lastOn = last;
+  // WATCH OUT FOR THIS
   count = 0;
 
+}
+
+bool Motion::findTape(uint8_t rightQRD, uint8_t leftQRD, unsigned int searchTime) {
+  double mult = 0.5;
+  unsigned long startTime = millis();
+  if(!isOnWhite(rightQRD) || !isOnWhite(leftQRD)){
+      return true;
+    }  
+  motor.speed(rightMotor, powerMult * baseSpeed * mult);
+  motor.speed(leftMotor, powerMult * baseSpeed * mult);
+  while ((millis() < startTime + searchTime / 2)) {
+    if(!isOnWhite(rightQRD) || !isOnWhite(leftQRD)){
+      motor.stop_all();
+      return true;
+    }   
+  }
+  startTime = millis();
+  motor.speed(rightMotor, -powerMult * baseSpeed* mult);
+  motor.speed(leftMotor, -powerMult * baseSpeed* mult);
+  while ((millis() < startTime + searchTime)) {
+    if(!isOnWhite(rightQRD) || !isOnWhite(leftQRD)){
+      motor.stop_all();
+      return true;
+    }   
+  }
+ return false;
 }
 
 /*
@@ -86,7 +113,7 @@ void Motion::followTapeFour(uint8_t rightMostQRD, uint8_t rightMidQRD, uint8_t l
     lastOn = 1;
   } else { // OH BOY I DON'T EVEN KNOW WHERE I AM
     currentError = 10 * lastOn;
-    lastOn = -1 * lastOn; // this will cause us to sweep??? Maybe
+    //lastOn = -1 * lastOn; // this will cause us to sweep??? Maybe
   }
 
   pidControl();
@@ -155,7 +182,7 @@ void Motion::stopMotors() {
 */
 void Motion::turnRight() {
   motor.speed(rightMotor, -backUpSpeed);
-  motor.speed(leftMotor, 0);
+  motor.speed(leftMotor, -backUpSpeed);
   delay(turningTime);
   motor.stop_all();
 }
