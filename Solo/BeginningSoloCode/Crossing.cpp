@@ -43,7 +43,7 @@ void Crossing::dropBridge1(int waitTime, uint8_t servoAngle, double rightWheelPe
   backUp(rightWheelPercentage);
 
   delay(waitTime);
-  for (int pos = servoAngle - 10; pos <= servoAngle; pos++) {
+  for (int pos = 0; pos <= servoAngle; pos++) {
     RCServo0.write(pos);
     delay(10);
   }

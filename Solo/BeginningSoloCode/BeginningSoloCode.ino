@@ -31,6 +31,7 @@ void raiseBasket();
 void lowerBasket();
 
 void setup() {
+  Serial.begin(9600);
   LCD.begin();
   LCD.clear();
   RCServo0.write(0);
@@ -42,6 +43,15 @@ void setup() {
 
 
 void loop() {
+
+  Serial.print("lout ");
+  Serial.print(analogRead(leftMostQRD));
+  Serial.print(" Rout ");
+  Serial.print(analogRead(rightMostQRD));
+  Serial.print(" lmid ");
+  Serial.print(analogRead(leftMiddleQRD));
+  Serial.print(" Rmid ");
+  Serial.println(analogRead(rightMiddleQRD));
   switch (state) {
 
     case 0 : // START BUTTON NOT YET PRESSED: calls the menu until we press start
@@ -151,10 +161,10 @@ void loop() {
         break;
       }
     case 5 : {
-        
+
         hanMovo.driveMotors();
-        if (hanFlyo.cliff()){
-          hanFlyo.dropBridge2(bridgeDropWaitTime,secondBridgeServoAngle,1.0);
+        if (hanFlyo.cliff()) {
+          hanFlyo.dropBridge2(bridgeDropWaitTime, secondBridgeServoAngle, 1.0);
         }
       }
   }
