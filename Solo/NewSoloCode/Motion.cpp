@@ -65,6 +65,39 @@ bool Motion::findTape(uint8_t rightQRD, uint8_t leftQRD, unsigned int searchTime
   return false;
 }
 
+bool Motion::findRightEdge(uint8_t outQRD, uint8_t inQRD, unsigned int searchTime) {
+  double multr = 0.45;
+  double multl = 0.9;
+  if (isOverCliff(outQRD) && !isOverCliff(inQRD)) {
+    return true;
+  }
+  else if (!isOverCliff(outQRD)) {
+    unsigned long startTime = millis();
+    motor.speed(rightMotor, powerMult * baseSpeed * multr);
+    motor.speed(leftMotor, -powerMult * baseSpeed * multl);
+    while (millis() < startTime + searchTime) {
+      if (isOverCliff(outQRD)) {
+        motor.speed(leftMotor, 255);
+        motor.speed(rightMotor, -255);
+        motor.stop_all();
+        return true;
+      }
+    }
+  }
+  //  else{
+  //    unsigned long startTime = millis();
+  //    motor.speed(rightMotor, powerMult * baseSpeed * mult);
+  //    motor.speed(leftMotor, powerMult * baseSpeed * mult);
+  //    while (millis() < startTime + searchTime) {
+  //      if (!isOverCliff(inQRD)) {
+  //        motor.stop_all();
+  //        return true;
+  //      }
+  //    }
+  //  }
+  return false;
+}
+
 /*
    Calculates the error values and such for following tape
 */
@@ -165,9 +198,9 @@ void Motion::pidControl() {
 /*
    Drives both motors forward at a constant rate
 */
-void Motion::driveMotors() {
-  motor.speed(rightMotor, baseSpeed * powerMult);
-  motor.speed(leftMotor, -baseSpeed * powerMult);
+void Motion::driveMotors(double multiplier) {
+  motor.speed(rightMotor, baseSpeed * multiplier);
+  motor.speed(leftMotor, -baseSpeed * multiplier);
 }
 
 /*

@@ -27,11 +27,12 @@ class Motion {
     void followTape(uint8_t, uint8_t);
     void followTapeFour(uint8_t, uint8_t, uint8_t, uint8_t);
     void followRightEdge(uint8_t, uint8_t);
-    void driveMotors();
+    void driveMotors(double);
     void stopMotors();
     void turnRight();
 
     bool findTape(uint8_t, uint8_t, unsigned int);
+    bool findRightEdge(uint8_t, uint8_t, unsigned int);
 };
 
 #endif

@@ -20,9 +20,9 @@
 #include "Constants.h"
 #include "Menu.h"
 
-const int bridgeDropWaitTime = 2000;
+const int bridgeDropWaitTime = 1500;
 const uint8_t firstBridgeServoAngle = 90;
-const uint8_t secondBridgeServoAngle = 180;
+const uint8_t secondBridgeServoAngle = 170;
 
 // OTHER VARIABLES
 uint8_t state = 0;
@@ -30,7 +30,7 @@ long moveTime, startTime;
 double backupPercentage;
 
 //byte baseSpeed, proportionalGain, derivativeGain;
-//double powerMult;
+double powerMult;
 //int onTape, overCliff, backupTime;
 
 Motion hanMovo(rightMotor, leftMotor);
@@ -44,7 +44,7 @@ void lowerBasket();
 void setup() {
   LCD.begin();
   LCD.clear();
-  RCServo0.write(0);
+  RCServo0.write(90);
   pinMode(fromChewPin, INPUT);
   pinMode(irSignalPin, INPUT);
   pinMode(toChewPinLeft, OUTPUT);
@@ -66,102 +66,108 @@ void loop() {
 
 //firstEwok:
   LCD.clear();
-  LCD.print("Move");
-  digitalWrite(toChewPinRight, HIGH);
-  digitalWrite(toChewPinLeft, LOW);
-  // this tells the arduino to only look for ewoks on the right side
-
-  while (!hanFlyo.cliff()) {
-    hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-
-    if (digitalRead(fromChewPin) == HIGH) {
-      
-      hanMovo.stopMotors();
-      LCD.clear();
-      LCD.print("Stuffy");
-      while (digitalRead(fromChewPin) == HIGH);
-    }
-  }
-  hanMovo.stopMotors();
-
-
-//firstBridge:
-  hanFlyo.dropBridge1(bridgeDropWaitTime, firstBridgeServoAngle, backupPercentage);
-  LCD.clear();
-  LCD.print("Bridge");
-  hanMovo.driveMotors();
-  while (!hanFlyo.cliff()); // "cliff" signals end of the bridge
-  delay(400);
-
-
-//toTheIR:
-  hanMovo.findTape(rightMiddleQRD, leftMiddleQRD, 1700);
-  hanMovo.reset(-1);
-
-  while (digitalRead(fromChewPin) == LOW) {
-    hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-  }
-  hanMovo.stopMotors();
-  while (digitalRead(fromChewPin) == HIGH);
-
-  // tells the arduino not to look for any stuffies
-  digitalWrite(toChewPinRight, LOW);
-  digitalWrite(toChewPinLeft, LOW);
-  LCD.clear();
-  LCD.print("IR");
-  while (!hanFlyo.detect10KIR());
-
-
-//stormtrooperRoom:
-  digitalWrite(toChewPinRight, LOW);
-  digitalWrite(toChewPinLeft, LOW);
-
-  LCD.clear();
-  LCD.print("Storm");
-  {
-    unsigned long startTime = millis();
-    while (millis() - startTime < 2500) {
-      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-    }
-  }
-
-  // now that we are past the stormtroopers we look for a stuffy on the left
-  digitalWrite(toChewPinRight, LOW);
-  digitalWrite(toChewPinLeft, HIGH);
-
-  while (!hanFlyo.cliff()) {
-    hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-
-    if (digitalRead(fromChewPin) == HIGH) {
-      hanMovo.stopMotors();
-      while (digitalRead(fromChewPin) == HIGH);
-    }
-  }
-  hanMovo.stopMotors();
-  //goto beforeStart;
+//
+//  digitalWrite(toChewPinRight, HIGH);
+//  digitalWrite(toChewPinLeft, LOW);
+//  // this tells the arduino to only look for ewoks on the right side
+//
+//  while (!hanFlyo.cliff()) {
+//    hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+//
+//    if (digitalRead(fromChewPin) == HIGH) {
+//      
+//      hanMovo.stopMotors();
+//      LCD.clear();
+//      LCD.print("Stuffy");
+//      while (digitalRead(fromChewPin) == HIGH);
+//    }
+//  }
+//  hanMovo.stopMotors();
+//
+//
+////firstBridge:
+//  hanFlyo.dropBridge1(bridgeDropWaitTime, firstBridgeServoAngle, backupPercentage);
+//
+//  hanMovo.driveMotors(powerMult);
+//  while (!hanFlyo.cliff()); // "cliff" signals end of the bridge
+//  delay(400);
+//
+//
+////toTheIR:
+//  hanMovo.findTape(rightMiddleQRD, leftMiddleQRD, 1700);
+//  hanMovo.reset(-1);
+//
+//  while (digitalRead(fromChewPin) == LOW) {
+//    hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+//  }
+//  hanMovo.stopMotors();
+//  while (digitalRead(fromChewPin) == HIGH);
+//
+//  // tells the arduino not to look for any stuffies
+//  digitalWrite(toChewPinRight, LOW);
+//  digitalWrite(toChewPinLeft, LOW);
+//
+//  while (!hanFlyo.detect10KIR());
+//
+//
+////stormtrooperRoom:
+//  digitalWrite(toChewPinRight, LOW);
+//  digitalWrite(toChewPinLeft, LOW);
+//
+//  hanMovo.findTape(rightMiddleQRD, leftMiddleQRD, 1700);
+//  hanMovo.reset(-1);
+//  {
+//    unsigned long startTime = millis();
+//    while (millis() - startTime < 2500) {
+//      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+//    }
+//  }
+//
+//  // now that we are past the stormtroopers we look for a stuffy on the left
+//  digitalWrite(toChewPinRight, LOW);
+//  digitalWrite(toChewPinLeft, HIGH);
+//
+//  while (!hanFlyo.cliff()) {
+//    hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+//
+//    if (digitalRead(fromChewPin) == HIGH) {
+//      hanMovo.stopMotors();
+//      while (digitalRead(fromChewPin) == HIGH);
+//    }
+//  }
+//  hanMovo.stopMotors();
+//  //goto beforeStart;
 
 
 //secondBridge:
 //  hanFlyo.backUp(2);
 //  hanFlyo.backUp(1);
 //
-//  hanMovo.driveMotors();
+//  hanMovo.driveMotors(powerMult);
 //  while (!hanFlyo.cliff());
 //
 //  hanMovo.stopMotors();
-//  hanFlyo.dropBridge2(bridgeDropWaitTime, secondBridgeServoAngle, 1);
-//  hanMovo.driveMotors();
+//  hanFlyo.backUp(backupPercentage);
+//  hanFlyo.dropBridge2(bridgeDropWaitTime, secondBridgeServoAngle, backupPercentage);
+//// need to drop it and then back up
+//  hanMovo.driveMotors(1.0);
 //  while (!hanFlyo.cliff()); // "cliff" signals end of the bridge
-//  delay(400);
+//  delay(1000);
+//
+//  hanMovo.stopMotors();
+//  hanMovo.reset(0);
 //
 //
 //firstTower:
-//  //assuming we can sense this ewok on our side
-//  while (digitalRead(fromChewPin) == LOW) {
-//    hanMovo.followRightEdge(rightOutQRD, rightInQRD);
-//  }
+  digitalWrite(toChewPinRight, LOW);
+  digitalWrite(toChewPinLeft, HIGH);
+  //assuming we can sense this ewok on our side
+  hanMovo.findRightEdge(rightOutQRD, rightInQRD, 1000);
+  while (digitalRead(fromChewPin) == LOW) {
+    hanMovo.followRightEdge(rightOutQRD, rightInQRD);
+  }
 //
-//  hanMovo.stopMotors();
+  hanMovo.stopMotors();
 //  while (digitalRead(fromChewPin) == HIGH);
 //
 //secondTower:
@@ -191,6 +197,7 @@ void loop() {
 }
 
 void saveMenuValues() {
+  powerMult = EEPROM[1] / 100.0;
   backupPercentage = EEPROM[8] / 100.0;
 }
 

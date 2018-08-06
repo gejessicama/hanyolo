@@ -52,14 +52,25 @@ void Crossing::dropBridge1(int waitTime, uint8_t servoAngle, double rightWheelPe
 }
 
 void Crossing::dropBridge2(int waitTime, uint8_t servoAngle, double rightWheelPercentage) {
-  backUp(rightWheelPercentage);
+//  backUp(rightWheelPercentage);
+//  //motor.stop_all();
 
   delay(waitTime);
-  for (int pos = servoAngle - 10; pos <= servoAngle; pos--) {
-    RCServo0.write(pos);
-    delay(10);
-  }
+//  for (int pos = servoAngle - 10; pos <= servoAngle; pos--) {
+//    RCServo0.write(pos);
+//    delay(10);
+//  }
+
+  RCServo0.write(servoAngle);
+delay(waitTime);
+  motor.speed(rightMotor, -80);
+  motor.speed(leftMotor, 100);
+  delay(backupTime);
+  motor.speed(rightMotor, 0);
+  motor.speed(leftMotor, 0);
   delay(waitTime);
+  
+  
 }
 
 /*
