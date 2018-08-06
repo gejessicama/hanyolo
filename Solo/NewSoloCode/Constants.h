@@ -4,10 +4,13 @@
  * BASE SPEED: 161
  * POWER MULT: 0.76
  * P GAIN: 20
+ * P Gain for the edge following: 25
  * D GAIN: 12
  * ON TAPE: 400
  * OVER CLIFF: 460
+ * over cliff for edge following: 650
  * BACKUP TIME: 1610
+ * backup time for after dropping the second bridge: 520
  * BACKUP SPEED: 238
  * BACKUP RIGHT: 0.47
  * TURNING TIME: 80
