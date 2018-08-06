@@ -19,24 +19,31 @@
 #define fromSoloRightPin 2
 #define fromSoloLeftPin 3
 
-#define deLae 500
-#define susanRight 5
+#define moveDelay 500
+
+
+#define susanRight 43
+#define susanFront 0
+#define susanLeft 142
+#define susanBasket 100
+#define susanTravelRight 100
+#define susanTravelLeft 142
+
 #define baseRightDown 100
-#define elbowRightDown 180 // END RIGHT
-#define susanFront 145
-#define baseFrontDown 70
-#define elbowFrontDown 150 // END DOWN
-#define susanLeft 100
-#define baseLeftDown 90
-#define elbowLeftDown 180 // END LEFT
-#define susanBasket 50
-#define baseDropoff 0
-#define elbowDropoff 0 // END BASKET
-#define susanTravel 50
-#define baseTravel 0
-#define elbowTravel 80 // END TRAVEL
-#define baseSwivel 0
-#define elbowSwivel 0 // END SWIVEL
+#define elbowRightDown 180
+
+#define baseLeftDown 100
+#define elbowLeftDown 180
+
+#define baseDropoff 180
+#define elbowDropoff 0
+
+#define baseTravel 180
+#define elbowTravel 80
+
+#define baseSwivel 180
+#define elbowSwivel 0
+
 #define gripOpen 180
 #define gripClose 0
 
@@ -44,34 +51,34 @@ const int objectLimit = 250;
 const int readWait = 800; //In microseconds
 
 int onValue, offValue;
-
 Servo susan, base, elbow, grip;
-
 boolean readInQSD(uint8_t, uint8_t);
+void pickUpRight();
+void pickUpLeft();
+void travelRight();
+void travelLeft();
+void dropoff();
+void swivel();
+void startClaw();
+void endClaw();
+void moveClaw(Servo, uint8_t);
 
 void setup() {
-  //Serial.begin(9600);
   pinMode(rightLEDPin, OUTPUT);
   pinMode(leftLEDPin, OUTPUT);
   pinMode(toSoloPin, OUTPUT);
-
-//  startClaw();
-//  travel();
-//  endClaw();
 }
 
 void loop() {
   if (digitalRead(fromSoloRightPin) == HIGH && readInQSD(rightLEDPin, rightQSDPin)) {
     digitalWrite(toSoloPin, HIGH);
     delay(3000);
-    //pickUpRight();
     digitalWrite(toSoloPin, LOW);
   }
 
   if (digitalRead(fromSoloLeftPin) == HIGH && readInQSD(leftLEDPin, leftQSDPin)) {
     digitalWrite(toSoloPin, HIGH);
     delay(3000);
-    //pickUpLeft();
     digitalWrite(toSoloPin, LOW);
   }
 }
@@ -94,12 +101,13 @@ void pickUpRight() {
   startClaw();
   swivel();
   moveClaw(susan, susanRight);
-  openGrip();
+  moveClaw(grip, gripOpen);
   moveClaw(base, baseRightDown);
   moveClaw(elbow, elbowRightDown);
-  closeGrip();
+  moveClaw(grip, gripClose);
   swivel();
   dropoff();
+  travelRight();
   endClaw();
 }
 
@@ -108,25 +116,14 @@ void pickUpLeft() {
   startClaw();
   swivel();
   moveClaw(susan, susanLeft);
-  openGrip();
+  moveClaw(grip, gripOpen);
   moveClaw(base, baseLeftDown);
   moveClaw(elbow, elbowLeftDown);
-  closeGrip();
+  moveClaw(grip, gripClose);
   swivel();
   dropoff();
+  travelLeft();
   endClaw();
-}
-
-// Pickup something from the front
-void pickUpFront() {
-  swivel();
-  moveClaw(susan, susanFront);
-  openGrip();
-  moveClaw(base, baseFrontDown);
-  moveClaw(elbow, elbowFrontDown);
-  closeGrip();
-  swivel();
-  dropoff();
 }
 
 // Drops stuff off in the basket
@@ -134,25 +131,21 @@ void dropoff() {
   moveClaw(susan, susanBasket);
   moveClaw(base, baseDropoff);
   moveClaw(elbow, elbowDropoff);
-  openGrip();
-  travel();
+  moveClaw(grip, gripOpen);
 }
 
 // The position for the claw to be in while we're just running the course
-void travel() {
-  moveClaw(susan, susanTravel);
+void travelRight() {
+  moveClaw(susan, susanTravelRight);
   moveClaw(base, baseTravel);
   moveClaw(elbow, elbowTravel);
   moveClaw(grip, gripClose);
 }
 
-// Opens the grippers
-void openGrip() {
-  moveClaw(grip, gripOpen);
-}
-
-// Closes the grippers
-void closeGrip() {
+void travelLeft() {
+  moveClaw(susan, susanTravelLeft);
+  moveClaw(base, baseTravel);
+  moveClaw(elbow, elbowTravel);
   moveClaw(grip, gripClose);
 }
 
@@ -160,14 +153,16 @@ void closeGrip() {
 void swivel() {
   moveClaw(base, baseSwivel);
   moveClaw(elbow, elbowSwivel);
-  closeGrip();
+  moveClaw(grip, gripClose);
 }
 
+// Moves a servo to a given position, with a delay to allow for smoother movement
 void moveClaw(Servo servo, uint8_t pos) {
   servo.write(pos);
-  delay(deLae);
+  delay(moveDelay);
 }
 
+// Attaches all servos, right before movement for power saving
 void startClaw() {
   base.attach(clawBasePin);
   elbow.attach(clawElbowPin);
@@ -175,6 +170,7 @@ void startClaw() {
   susan.attach(clawSusanPin);
 }
 
+// Detaches all servos, after movement, for power saving
 void endClaw() {
   base.detach();
   elbow.detach();
