@@ -10,13 +10,14 @@
 #include "Constants.h"
 #include "Menu.h"
 
-const int bridgeDropWaitTime = 1000;
+const int bridgeDropWaitTime = 2000;
 const uint8_t firstBridgeServoAngle = 90;
 const uint8_t secondBridgeServoAngle = 180;
 
 // OTHER VARIABLES
 uint8_t state = 0;
-long moveTime, timeToIR, startTime;
+long moveTime, startTime;
+double backupPercentage;
 
 //byte baseSpeed, proportionalGain, derivativeGain;
 //double powerMult;
@@ -43,15 +44,15 @@ void setup() {
 
 
 void loop() {
-//
-//  Serial.print("lout ");
-//  Serial.print(analogRead(leftMostQRD));
-//  Serial.print(" Rout ");
-//  Serial.print(analogRead(rightMostQRD));
-//  Serial.print(" lmid ");
-//  Serial.print(analogRead(leftMiddleQRD));
-//  Serial.print(" Rmid ");
-//  Serial.println(analogRead(rightMiddleQRD));
+  //
+  //  Serial.print("lout ");
+  //  Serial.print(analogRead(leftMostQRD));
+  //  Serial.print(" Rout ");
+  //  Serial.print(analogRead(rightMostQRD));
+  //  Serial.print(" lmid ");
+  //  Serial.print(analogRead(leftMiddleQRD));
+  //  Serial.print(" Rmid ");
+  //  Serial.println(analogRead(rightMiddleQRD));
   switch (state) {
 
     case 0 : // START BUTTON NOT YET PRESSED: calls the menu until we press start
@@ -81,39 +82,32 @@ void loop() {
       }
 
       if (hanFlyo.cliff()) {
-        hanFlyo.dropBridge1(bridgeDropWaitTime, firstBridgeServoAngle, 0.6);
+        //hanMovo.stopMotors();
+        hanFlyo.dropBridge1(bridgeDropWaitTime, firstBridgeServoAngle, backupPercentage);
         state = 2;
-        //moveTime = millis() + timeToIR;
-        // takes the current time and adds the amount of time until we should be in front of the IR signal
       }
       break;
 
     case 2 : {
-        long str0 = millis();
-        while (millis() - str0 < 500) {
-          hanMovo.driveMotors();
-        }
-        //        long str = millis();
-        //
-        //        while (millis() - str < timeToIR) {
-        //          hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-        //
-        //          while (digitalRead(fromChewPin) == HIGH) {
-        //            hanMovo.stopMotors();
-        //            LCD.clear();
-        //            LCD.print("Pick up Stuffy");
-        //          }
-        //        }
+        // We don't want to follow tape on the bridge because that throws us off. Instead we drive staight over the bridge
+        hanMovo.driveMotors();
+        while (!hanFlyo.cliff());
+        delay(450);
+        // After the end of the bridge, we need to drive a little farther and then perform a sweep to find the tape
+
+        hanMovo.findTape(rightMiddleQRD, leftMiddleQRD, 1700);
+        hanMovo.reset(-1);
         while (digitalRead(fromChewPin) == LOW) {
           hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
         }
+
         while (digitalRead(fromChewPin) == HIGH) {
           hanMovo.stopMotors();
           LCD.clear();
           LCD.print("Pick up Stuffy");
         }
 
-        hanMovo.stopMotors();
+        // after we see the stuffy, we need to tell the claw not to pick anything up and wait for the signal change
         digitalWrite(toChewPinRight, LOW);
         digitalWrite(toChewPinLeft, LOW);
 
@@ -129,24 +123,27 @@ void loop() {
 
 
     case 3 : {
-        long st = millis();
         digitalWrite(toChewPinRight, LOW);
         digitalWrite(toChewPinLeft, LOW);
-        while (millis() - st < 4000) {
+
+        long st = millis();
+        while (millis() - st < 2500) {
           hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
         }
+
         digitalWrite(toChewPinRight, LOW);
         digitalWrite(toChewPinLeft, HIGH);
 
         while (!hanFlyo.cliff()) {
-
           hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+
           while (digitalRead(fromChewPin) == HIGH) {
             hanMovo.stopMotors();
             LCD.clear();
             LCD.print("Pick up Stuffy");
           }
         }
+        //hanMovo.stopMotors();
         state = 4;
         break;
       }
@@ -156,22 +153,23 @@ void loop() {
         digitalWrite(toChewPinLeft, LOW);
         hanFlyo.backUp(1.0);
         hanMovo.turnRight();
-        //hanFlyo.alignStep();
         state = 5;
         break;
       }
-    case 5 : {
 
+    case 5 : {
         hanMovo.driveMotors();
         if (hanFlyo.cliff()) {
+          //hanMovo.stopMotors();
           hanFlyo.dropBridge2(bridgeDropWaitTime, secondBridgeServoAngle, 1.0);
+
         }
       }
   }
 }
 
 void saveMenuValues() {
-  timeToIR = EEPROM[8] * 20;
+  backupPercentage = EEPROM[8] / 100.0;
 }
 
 

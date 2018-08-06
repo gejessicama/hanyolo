@@ -47,9 +47,7 @@ void Crossing::dropBridge1(int waitTime, uint8_t servoAngle, double rightWheelPe
   motor.stop_all();
 
   delay(waitTime);
-
   RCServo0.write(servoAngle);
-
   delay(waitTime);
 }
 

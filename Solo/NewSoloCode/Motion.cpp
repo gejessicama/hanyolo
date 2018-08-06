@@ -39,28 +39,30 @@ void Motion::reset(uint8_t last) {
 
 bool Motion::findTape(uint8_t rightQRD, uint8_t leftQRD, unsigned int searchTime) {
   double mult = 0.5;
+  if (!isOnWhite(rightQRD) || !isOnWhite(leftQRD)) {
+    return true;
+  }
+  //turns left first, is possible to go too far left
   unsigned long startTime = millis();
-  if(!isOnWhite(rightQRD) || !isOnWhite(leftQRD)){
-      return true;
-    }  
   motor.speed(rightMotor, powerMult * baseSpeed * mult);
   motor.speed(leftMotor, powerMult * baseSpeed * mult);
   while ((millis() < startTime + searchTime / 2)) {
-    if(!isOnWhite(rightQRD) || !isOnWhite(leftQRD)){
+    if (!isOnWhite(rightQRD) || !isOnWhite(leftQRD)) {
       motor.stop_all();
       return true;
-    }   
+    }
   }
+  //turns right second, is possible to go too far right
   startTime = millis();
-  motor.speed(rightMotor, -powerMult * baseSpeed* mult);
-  motor.speed(leftMotor, -powerMult * baseSpeed* mult);
+  motor.speed(rightMotor, -powerMult * baseSpeed * mult);
+  motor.speed(leftMotor, -powerMult * baseSpeed * mult);
   while ((millis() < startTime + searchTime)) {
-    if(!isOnWhite(rightQRD) || !isOnWhite(leftQRD)){
+    if (!isOnWhite(rightQRD) || !isOnWhite(leftQRD)) {
       motor.stop_all();
       return true;
-    }   
+    }
   }
- return false;
+  return false;
 }
 
 /*

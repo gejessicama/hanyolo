@@ -12,33 +12,32 @@ uint8_t servoAngle2 = 180;
 
 void loop() {
   
-//  uint8_t val = digitalRead(IRsig);
-//  LCD.clear();
-//  LCD.println("signal");
-//  //LCD.print(val);
-//  if (val == HIGH){
-//    LCD.print("1K");
-
-//  }else if(val == LOW){
-//    LCD.println("10K");
-//  }
+  uint8_t val = digitalRead(IRsig);
+  LCD.clear();
+  LCD.println("signal");
+  //LCD.print(val);
+  if (val == HIGH){
+    LCD.print("1K");
+  }else if(val == LOW){
+    LCD.println("10K");
+  }
 
 //    int val = knob(6)/1024.0 *180;
 //    RCServo0.write(val);
 //    LCD.clear();
 //    LCD.print(val);
 //    
-  for (int pos = servoAngle1 - 10; pos <= servoAngle1; pos++) {
-    RCServo0.write(pos);
-    delay(10);
-  }
-
-  delay(2000);
-
-  for (int pos = servoAngle2 - 10; pos <= servoAngle2; pos--) {
-    RCServo0.write(pos);
-    delay(10);
-  }
+//  for (int pos = servoAngle1 - 10; pos <= servoAngle1; pos++) {
+//    RCServo0.write(pos);
+//    delay(10);
+//  }
+//
+//  delay(2000);
+//
+//  for (int pos = servoAngle2 - 10; pos <= servoAngle2; pos--) {
+//    RCServo0.write(pos);
+//    delay(10);
+//  }
 //  LCD.clear();
 //  LCD.println("run");
 //  int sp1 = knob(7)/1024.0 *255*2-255;

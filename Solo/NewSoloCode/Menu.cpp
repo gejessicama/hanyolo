@@ -2,6 +2,10 @@
  * knob(7) scrolls through the values to change
     stopbutton() lets you begin and finish editing a single value
     startbutton() exits the menu and begins the robot code
+
+
+    wish list:
+    find tape speed
  */
 
 #include "Menu.h"
@@ -43,7 +47,7 @@ void Menu::eePromMenu() {
       }
       break;
 
-    case 2 :// 12
+    case 2 :// 50
       displayMenu("PGain", EEPROM[2]);
       if (stopbutton()) {
         delay(delayTime);
@@ -82,7 +86,7 @@ void Menu::eePromMenu() {
       }
       break;
 
-    case 5 ://450
+    case 5 ://620
       displayMenu("OverCliff", EEPROM[5] * 10);
       if (stopbutton()) {
         delay(delayTime);
