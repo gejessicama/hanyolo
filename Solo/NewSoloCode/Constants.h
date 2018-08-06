@@ -1,19 +1,25 @@
 /*
  * CURRENT MENU VALUES AS OF 8/2/18
  * 
- * BASE SPEED: 161
+ * BASE SPEED: 151
  * POWER MULT: 0.76
+ * power for approaching second gap: 0.48
  * P GAIN: 20
  * P Gain for the edge following: 25
  * D GAIN: 12
  * ON TAPE: 400
  * OVER CLIFF: 460
+ * cliff in the morning sun: 50 with a cardboard box helping
  * over cliff for edge following: 650
  * BACKUP TIME: 1610
  * backup time for after dropping the second bridge: 520
+ * backup time to before dropping second bridge 420
  * BACKUP SPEED: 238
- * BACKUP RIGHT: 0.47
- * TURNING TIME: 80
+ * 241 for second gap
+ * BACKUP RIGHT: 0.65
+ * now it is set at 0.61
+ * TURNING TIME: 90
+ * backup cliff: 840
  */
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
@@ -30,7 +36,7 @@
 #define rightInQRD 4
 
 #define basketSensorPin 7
-#define scissorUpLimitPin 2
+#define scissorUpLimitPin 4
 #define scissorDownLimitPin 3
 
 #define fromChewPin 6

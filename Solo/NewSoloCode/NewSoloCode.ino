@@ -26,10 +26,10 @@ const uint8_t secondBridgeServoAngle = 170;
 const uint16_t findTapeWaitTime = 1700;
 
 // OTHER VARIABLES
-long moveTime, startTime, backupCliffTime;
+long moveTime, startTime, backupCliffTime, backupTime;
 double backupPercentage;
 
-//byte baseSpeed, proportionalGain, derivativeGain;
+byte baseSpeed; //proportionalGain, derivativeGain;
 double powerMult;
 //int onTape, overCliff, backupTime;
 
@@ -55,6 +55,7 @@ void setup() {
 void loop() {
 
 //beforeStart:
+// add in a bit before the menu that displays our qrd values so we can tune tape/cliff values to the current conditions
   while (!startbutton()) {
     Menu::eePromMenu();
   }
@@ -65,7 +66,15 @@ void loop() {
 
 
 //firstEwok:
-  LCD.clear();
+//  LCD.clear();
+//  while(true){
+//    LCD.clear();
+//    LCD.print(analogRead(rightMostQRD));
+//    LCD.print(" ");
+//    LCD.print(analogRead(leftMostQRD));
+//    delay(5);
+//  }
+
 
 //  digitalWrite(toChewPinRight, HIGH);
 //  digitalWrite(toChewPinLeft, LOW);
@@ -120,43 +129,48 @@ void loop() {
 //      hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
 //    }
 //  }
-
-  // now that we are past the stormtroopers we look for a stuffy on the left
-  digitalWrite(toChewPinRight, LOW);
-  digitalWrite(toChewPinLeft, HIGH);
-
-  while (digitalRead(fromChewPin) == LOW && !hanFlyo.cliff()){
-    hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-  }
-  if (digitalRead(fromChewPin) == HIGH) {
-      hanMovo.stopMotors();
-      while (digitalRead(fromChewPin) == HIGH);
-      digitalWrite(toChewPinLeft, LOW);
-  }
-  while(!hanFlyo.cliff()){
-    hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
-  }
-  hanMovo.stopMotors();
-  //goto beforeStart;
-
-
-//secondBridge:
-  hanMovo.driveMotors(-powerMult);
-  delay(backupCliffTime);
-  hanMovo.turnRight();
+//
+//  // now that we are past the stormtroopers we look for a stuffy on the left
+//  digitalWrite(toChewPinRight, LOW);
+//  digitalWrite(toChewPinLeft, HIGH);
+//
+//  while (digitalRead(fromChewPin) == LOW && !hanFlyo.cliff()){
+//    hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+//  }
+//  if (digitalRead(fromChewPin) == HIGH) {
+//      hanMovo.stopMotors();
+//      while (digitalRead(fromChewPin) == HIGH);
+//      digitalWrite(toChewPinLeft, LOW);
+//  }
+//  while(!hanFlyo.cliff()){
+//    hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
+//  }
+//  hanMovo.stopMotors();
+//  //goto beforeStart;
+//
+//
+////secondBridge:
+//  hanMovo.driveMotors(-powerMult);
+//  delay(backupCliffTime);
+//  hanMovo.turnRight();
   hanMovo.driveMotors(powerMult);
   while (!hanFlyo.cliff());
 
   hanMovo.stopMotors();
-  //hanFlyo.backUp(backupPercentage);
+  hanMovo.driveMotors(-0.75);
+  delay(backupTime);
+  motor.stop(rightMotor);
+  delay(1);
+  motor.stop(leftMotor);
   hanFlyo.dropBridge2(bridgeDropWaitTime, secondBridgeServoAngle, backupPercentage);
-// need to drop it and then back up
+  RCServo0.detach();
+//// need to drop it and then back up
   hanMovo.driveMotors(1.0);
   while (!hanFlyo.cliff()); // "cliff" signals end of the bridge
   delay(1000);
 
   hanMovo.stopMotors();
-//  hanMovo.reset(0);
+  hanMovo.reset(0);
 //
 //
 //firstTower:
@@ -198,22 +212,24 @@ void loop() {
 }
 
 void saveMenuValues() {
+  baseSpeed = EEPROM[0];
   powerMult = EEPROM[1] / 100.0;
+  backupTime = EEPROM[6] * 10;
   backupPercentage = EEPROM[8] / 100.0;
   backupCliffTime = EEPROM[10] * 10;
 }
 
 void raiseBasket() {
-  motor.speed(scissorLiftMotor, 255);
-  while(digitalRead(scissorUpLimitPin) == HIGH);
   motor.speed(scissorLiftMotor, -255);
+  while(digitalRead(scissorUpLimitPin));
+  motor.speed(scissorLiftMotor, 255);
   motor.stop(scissorLiftMotor);
 }
 
 void lowerBasket() {
-  motor.speed(scissorLiftMotor, -255);
-  while(digitalRead(scissorDownLimitPin) == HIGH);
   motor.speed(scissorLiftMotor, 255);
+  while(digitalRead(scissorDownLimitPin) == HIGH);
+  motor.speed(scissorLiftMotor, -255);
   motor.stop(scissorLiftMotor);
 }
 
