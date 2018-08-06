@@ -41,9 +41,9 @@ boolean Crossing::cliff() {
 void Crossing::dropBridge1(int waitTime, uint8_t servoAngle, double rightWheelPercentage) {
 
   backUp(rightWheelPercentage);
-  motor.speed(rightMotor, 100);
-  motor.speed(leftMotor, -100);
-  delay(150);
+//  motor.speed(rightMotor, 100);
+//  motor.speed(leftMotor, -100);
+//  delay(150);
   motor.stop_all();
 
   delay(waitTime);

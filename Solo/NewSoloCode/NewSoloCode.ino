@@ -42,8 +42,8 @@ void raiseBasket();
 void lowerBasket();
 
 void setup() {
-  //  LCD.begin();
-  //  LCD.clear();
+  LCD.begin();
+  LCD.clear();
   RCServo0.write(0);
   pinMode(fromChewPin, INPUT);
   pinMode(irSignalPin, INPUT);
@@ -54,7 +54,7 @@ void setup() {
 
 void loop() {
 
-beforeStart:
+//beforeStart:
   while (!startbutton()) {
     Menu::eePromMenu();
   }
@@ -64,7 +64,9 @@ beforeStart:
   hanFlyo.setConstants();
 
 
-firstEwok:
+//firstEwok:
+  LCD.clear();
+  LCD.print("Move");
   digitalWrite(toChewPinRight, HIGH);
   digitalWrite(toChewPinLeft, LOW);
   // this tells the arduino to only look for ewoks on the right side
@@ -73,21 +75,26 @@ firstEwok:
     hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
 
     if (digitalRead(fromChewPin) == HIGH) {
+      
       hanMovo.stopMotors();
+      LCD.clear();
+      LCD.print("Stuffy");
       while (digitalRead(fromChewPin) == HIGH);
     }
   }
   hanMovo.stopMotors();
 
 
-firstBridge:
+//firstBridge:
   hanFlyo.dropBridge1(bridgeDropWaitTime, firstBridgeServoAngle, backupPercentage);
+  LCD.clear();
+  LCD.print("Bridge");
   hanMovo.driveMotors();
   while (!hanFlyo.cliff()); // "cliff" signals end of the bridge
   delay(400);
 
 
-toTheIR:
+//toTheIR:
   hanMovo.findTape(rightMiddleQRD, leftMiddleQRD, 1700);
   hanMovo.reset(-1);
 
@@ -100,14 +107,17 @@ toTheIR:
   // tells the arduino not to look for any stuffies
   digitalWrite(toChewPinRight, LOW);
   digitalWrite(toChewPinLeft, LOW);
-
+  LCD.clear();
+  LCD.print("IR");
   while (!hanFlyo.detect10KIR());
 
 
-stormtrooperRoom:
+//stormtrooperRoom:
   digitalWrite(toChewPinRight, LOW);
   digitalWrite(toChewPinLeft, LOW);
 
+  LCD.clear();
+  LCD.print("Storm");
   {
     unsigned long startTime = millis();
     while (millis() - startTime < 2500) {
@@ -128,54 +138,55 @@ stormtrooperRoom:
     }
   }
   hanMovo.stopMotors();
+  //goto beforeStart;
 
 
-secondBridge:
-  hanFlyo.backUp(2);
-  hanFlyo.backUp(1);
-
-  hanMovo.driveMotors();
-  while (!hanFlyo.cliff());
-
-  hanMovo.stopMotors();
-  hanFlyo.dropBridge2(bridgeDropWaitTime, secondBridgeServoAngle, 1);
-  hanMovo.driveMotors();
-  while (!hanFlyo.cliff()); // "cliff" signals end of the bridge
-  delay(400);
-
-
-firstTower:
-  //assuming we can sense this ewok on our side
-  while (digitalRead(fromChewPin) == LOW) {
-    hanMovo.followRightEdge(rightOutQRD, rightInQRD);
-  }
-
-  hanMovo.stopMotors();
-  while (digitalRead(fromChewPin) == HIGH);
-
-secondTower:
-  //assuming we can sense chewy on our side
-  while (digitalRead(fromChewPin) == LOW) {
-    hanMovo.followRightEdge(rightOutQRD, rightInQRD);
-  }
-
-  hanMovo.stopMotors();
-  while (digitalRead(fromChewPin) == HIGH);
-
-  raiseBasket();
-  while (digitalRead(basketSensorPin) == HIGH) {
-    hanMovo.followRightEdge(rightOutQRD, rightInQRD);
-  }
-  lowerBasket();
-
-stopSequence:
-  {
-    unsigned long startTime = millis();
-    while (millis() - startTime < 3000) {
-      hanMovo.followRightEdge(rightOutQRD, rightInQRD);
-    }
-  }
-  hanMovo.stopMotors();
+//secondBridge:
+//  hanFlyo.backUp(2);
+//  hanFlyo.backUp(1);
+//
+//  hanMovo.driveMotors();
+//  while (!hanFlyo.cliff());
+//
+//  hanMovo.stopMotors();
+//  hanFlyo.dropBridge2(bridgeDropWaitTime, secondBridgeServoAngle, 1);
+//  hanMovo.driveMotors();
+//  while (!hanFlyo.cliff()); // "cliff" signals end of the bridge
+//  delay(400);
+//
+//
+//firstTower:
+//  //assuming we can sense this ewok on our side
+//  while (digitalRead(fromChewPin) == LOW) {
+//    hanMovo.followRightEdge(rightOutQRD, rightInQRD);
+//  }
+//
+//  hanMovo.stopMotors();
+//  while (digitalRead(fromChewPin) == HIGH);
+//
+//secondTower:
+//  //assuming we can sense chewy on our side
+//  while (digitalRead(fromChewPin) == LOW) {
+//    hanMovo.followRightEdge(rightOutQRD, rightInQRD);
+//  }
+//
+//  hanMovo.stopMotors();
+//  while (digitalRead(fromChewPin) == HIGH);
+//
+//  raiseBasket();
+//  while (digitalRead(basketSensorPin) == HIGH) {
+//    hanMovo.followRightEdge(rightOutQRD, rightInQRD);
+//  }
+//  lowerBasket();
+//
+//stopSequence:
+//  {
+//    unsigned long startTime = millis();
+//    while (millis() - startTime < 3000) {
+//      hanMovo.followRightEdge(rightOutQRD, rightInQRD);
+//    }
+//  }
+//  hanMovo.stopMotors();
 
 }
 
