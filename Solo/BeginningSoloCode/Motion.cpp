@@ -38,7 +38,7 @@ void Motion::reset(uint8_t last) {
 }
 
 bool Motion::findTape(uint8_t rightQRD, uint8_t leftQRD, unsigned int searchTime) {
-  double mult = 0.5;
+  double mult = 0.8;
   unsigned long startTime = millis();
   if(!isOnWhite(rightQRD) || !isOnWhite(leftQRD)){
       return true;

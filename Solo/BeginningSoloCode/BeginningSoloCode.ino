@@ -115,6 +115,9 @@ void loop() {
     case 3 : {
         digitalWrite(toChewPinRight, LOW);
         digitalWrite(toChewPinLeft, LOW);
+
+        while(!hanMovo.findTape(rightMiddleQRD, leftMiddleQRD, 2500)){};
+        hanMovo.reset(-1);
         
         long st = millis();
         while (millis() - st < 2500) {

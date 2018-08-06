@@ -11,21 +11,29 @@ uint8_t servoAngle1 = 90;
 uint8_t servoAngle2 = 180;
 
 void loop() {
-  
-  uint8_t val = digitalRead(IRsig);
-  LCD.clear();
-  LCD.println("signal");
-  //LCD.print(val);
-  if (val == HIGH){
-    LCD.print("1K");
-  }else if(val == LOW){
-    LCD.println("10K");
-  }
 
-//    int val = knob(6)/1024.0 *360;
-//    RCServo0.write(val);
-//    LCD.clear();
-//    LCD.print(val);
+//*****************************
+//IR
+//  
+//  uint8_t val = digitalRead(IRsig);
+//  LCD.clear();
+//  LCD.println("signal");
+//  //LCD.print(val);
+//  if (val == HIGH){
+//    LCD.print("1K");
+//  }else if(val == LOW){
+//    LCD.println("10K");
+//  }
+//*****************************
+
+
+//*****************************
+//Servo
+    int val = knob(6)/1024.0 *360;
+    if(val > 170) val=170;
+    RCServo0.write(val);
+    LCD.clear();
+    LCD.print(val);
     
 //  for (int pos = servoAngle1 - 10; pos <= servoAngle1; pos++) {
 //    RCServo0.write(pos);
@@ -38,6 +46,10 @@ void loop() {
 //    RCServo0.write(pos);
 //    delay(10);
 //  }
+//*****************************
+
+//*****************************
+//Wheels
 //  LCD.clear();
 //  LCD.println("run");
 //  int sp1 = knob(7)/1024.0 *255*2-255;
@@ -52,5 +64,6 @@ void loop() {
 //  LCD.print(" sp3 ");
 //  LCD.print(sp3);
 //  
+//*****************************
   
 }
