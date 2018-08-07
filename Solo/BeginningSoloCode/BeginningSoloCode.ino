@@ -151,7 +151,11 @@ void loop() {
         while (!hanFlyo.cliff()) {
           hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
 
-          while (digitalRead(fromChewPin) == HIGH) {
+          if (digitalRead(fromChewPin) == HIGH) {
+            hanMovo.stopMotors();
+            delay(400);
+            hanMovo.driveMotors();
+            delay(300);
             hanMovo.stopMotors();
             LCD.clear();
             LCD.print("Pick up Stuffy");

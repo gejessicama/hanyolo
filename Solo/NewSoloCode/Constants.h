@@ -55,6 +55,6 @@
 const int bridgeDropWaitTime = 1500;
 const uint8_t firstBridgeServoAngle = 90;
 const uint8_t secondBridgeServoAngle = 170;
-const uint16_t findTapeWaitTime = 1700;
+const uint16_t findTapeWaitTime = 2000;
 
 #endif
