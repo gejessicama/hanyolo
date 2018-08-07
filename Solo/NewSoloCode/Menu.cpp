@@ -53,8 +53,8 @@ void Menu::eePromMenu() {
       if (stopbutton()) {
         delay(delayTime);
         while (!stopbutton()) {
-          temp = knob(6) / 1024.0 * 100;
-          displayMenu("Normal Po(E)", temp);
+          temp = knob(6) / 1024.0 * 200;
+          displayMenu("Normal Po(E)", temp / 100.0);
         }
         delay(delayTime);
         EEPROM[2] = temp;
@@ -66,7 +66,7 @@ void Menu::eePromMenu() {
       if (stopbutton()) {
         delay(delayTime);
         while (!stopbutton()) {
-          temp = knob(6) / 1024.0 * 100;
+          temp = knob(6) / 1024.0 * 200;
           displayMenu("Slow Po(E)", temp / 100.0);
         }
         delay(delayTime);
@@ -92,7 +92,7 @@ void Menu::eePromMenu() {
       if (stopbutton()) {
         delay(delayTime);
         while (!stopbutton()) {
-          temp = knob(6) / 1024.0 * 100;
+          temp = knob(6) / 1024.0 * 200;
           displayMenu("Right M(E)", temp / 100.0);
         }
         delay(delayTime);
