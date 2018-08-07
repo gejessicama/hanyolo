@@ -26,10 +26,7 @@ boolean Crossing::cliff() {
    code for droping a bridge
 */
 void Crossing::dropBridge1() {
-
-  backUp(rightWheelPercent);
-  motor.stop_all();
-
+  
   delay(bridgeDropWaitTime);
   RCServo0.write(firstBridgeServoAngle);
   delay(bridgeDropWaitTime);

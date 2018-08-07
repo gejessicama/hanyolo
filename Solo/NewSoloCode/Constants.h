@@ -1,8 +1,7 @@
 /*
- * CURRENT MENU VALUES AS OF 8/2/18
+ * CURRENT MENU VALUES AS OF 8/7/18
  * 
- * BASE SPEED: 151, 142
- * POWER MULT: 0.76
+ * POWER MULT: 0.77
  * power for approaching second gap: 0.48
  * P GAIN: 20
  * P Gain for the edge following: 25
@@ -11,15 +10,22 @@
  * OVER CLIFF: 460
  * cliff in the morning sun: 50 with a cardboard box helping
  * over cliff for edge following: 650, 620
- * BACKUP TIME: 1610
+ * BACKUP TIME: 151
  * backup time for after dropping the second bridge: 520
  * backup time to before dropping second bridge 420
- * BACKUP SPEED: 238
+ * BACKUP SPEED: 210 (4/3 of base speed)
  * 241 for second gap
- * BACKUP RIGHT: 0.65
+ * BACKUP RIGHT: 0.45
  * now it is set at 0.61
  * TURNING TIME: 90
  * backup cliff: 840
+ * 
+ * for second cliff/gap at low power: backupPow = 
+ * turntime = 960, backtime = 550, backup pow = 1.06
+ * at full power: turntime = 840, backuptime = 550, backupPow = .88
+ * 
+ * turning time for under 16 V: 880
+ * turning time for over 16V: 750
  */
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
@@ -45,7 +51,7 @@
 #define irSignalPin 4
 
 
-#define baseDrivingSpeed 200
+#define baseDrivingSpeed 153
 //#define baseBackupSpeed 235
 #define pGainTapeFollowing 20
 #define dGainTapeFollowing 12
