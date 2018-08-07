@@ -6,33 +6,29 @@
 
 class Motion {
   private:
-    uint8_t rightMotor, leftMotor;
-
-    byte baseSpeed, proportionalGain, derivativeGain, backUpSpeed;
-    double powerMult;
-    int onTape, overCliff, turningTime;
+    uint16_t onTape, overCliff, turningTime;
+    double regularPowerMult, slowPowerMult, backupPowerMult;
     
     int currentError, lastError, lastState, lastOn;
     uint16_t count;
     
     boolean isOnWhite(uint8_t);
     boolean isOverCliff(uint8_t);
-    void pidControl();
+    void pidControl(uint8_t, uint8_t);
 
   public:
-    Motion(uint8_t, uint8_t);
+    Motion(int);
     void setConstants();
     void reset(uint8_t);
     
-    void followTape(uint8_t, uint8_t);
-    void followTapeFour(uint8_t, uint8_t, uint8_t, uint8_t);
-    void followRightEdge(uint8_t, uint8_t);
-    void driveMotors(double);
+    void followTape();
+    void followRightEdge();
+    void driveMotors(double, double);
     void stopMotors();
     void turnRight();
 
-    bool findTape(uint8_t, uint8_t, unsigned int);
-    bool findRightEdge(uint8_t, uint8_t, unsigned int);
+    bool findTape(unsigned int);
+    bool findRightEdge(double, double, unsigned int);
 };
 
 #endif
