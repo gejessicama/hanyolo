@@ -32,10 +32,10 @@ bool Motion::findTapeLeft(uint16_t searchTime) {
   if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
     return true;
   }
-  //turns left first, is possible to go too far left
+  //turns left first, is possible to go too far left 
   unsigned long startTime = millis();
   driveMotors(slowPowerMult, -slowPowerMult);
-  while ((millis() < startTime + searchTime / 2)) {
+  while ((millis() < startTime + searchTime / 2.0)) {
     if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
       motor.stop_all();
       return true;

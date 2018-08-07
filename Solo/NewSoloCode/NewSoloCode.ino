@@ -74,6 +74,7 @@ firstEwok:
       delay(10);
       motor.stop_all();
       while (digitalRead(fromChewPin) == HIGH);
+
       hanMovo.findTapeLeft(findTapeWaitTime); // change this thing for different times
     }
   }
@@ -87,7 +88,7 @@ firstBridge:
   hanFlyo.dropBridge1();
   hanMovo.driveMotors(regularPowerMult, regularPowerMult);
   while (!hanFlyo.cliff()); // "cliff" signals end of the bridge
-  delay(450);
+  delay(1000);
 
 
 toTheIR:
@@ -105,7 +106,7 @@ toTheIR:
   digitalWrite(toChewPinLeft, LOW);
 
   while (!hanFlyo.detect10KIR());
-
+// might add something for realignment
 
 stormtrooperRoom:
   //  digitalWrite(toChewPinRight, LOW);
