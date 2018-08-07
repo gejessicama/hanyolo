@@ -27,7 +27,8 @@ class Motion {
     void stopMotors();
     void turnRight();
 
-    bool findTape(unsigned int);
+    bool findTapeLeft(uint16_t);
+    bool findTapeRight(uint16_t);
     bool findRightEdge(double, double, unsigned int);
 };
 

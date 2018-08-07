@@ -26,7 +26,7 @@ boolean Crossing::cliff() {
    code for droping a bridge
 */
 void Crossing::dropBridge1() {
-  
+
   delay(bridgeDropWaitTime);
   RCServo0.write(firstBridgeServoAngle);
   delay(bridgeDropWaitTime);
@@ -69,6 +69,10 @@ void Crossing::backUp(double rightMotorPercentage) {
 //}
 
 bool Crossing::detect10KIR() {
-  return(!digitalRead(irSignalPin));
+  if (digitalRead(irSignalPin) == HIGH) {
+    return false;
+  } else {
+    return true;
+  }
 }
 

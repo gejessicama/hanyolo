@@ -1,13 +1,14 @@
 /*
  * CURRENT MENU VALUES AS OF 8/7/18
  * 
- * POWER MULT: 0.77
- * power for approaching second gap: 0.48
- * P GAIN: 20
- * P Gain for the edge following: 25
- * D GAIN: 12
- * ON TAPE: 400
- * OVER CLIFF: 460
+ * ONTAPE: 400
+ * OVERCLIFF: 380
+ * NORMAL POWER: 0.76
+ * SLOW POWER: 0.44
+ * BACKUP POWER: 1.4
+ * RIGHT PERCENTAGE: 1.09
+ * FIRST BACKUP TIME: 420
+ 
  * cliff in the morning sun: 50 with a cardboard box helping
  * over cliff for edge following: 650, 620
  * BACKUP TIME: 151
@@ -61,6 +62,6 @@
 const int bridgeDropWaitTime = 1500;
 const uint8_t firstBridgeServoAngle = 90;
 const uint8_t secondBridgeServoAngle = 170;
-const uint16_t findTapeWaitTime = 2000;
+const uint16_t findTapeWaitTime = 1700;
 
 #endif

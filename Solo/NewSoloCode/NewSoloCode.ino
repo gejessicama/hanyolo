@@ -74,7 +74,7 @@ firstEwok:
       delay(10);
       motor.stop_all();
       while (digitalRead(fromChewPin) == HIGH);
-      hanMovo.findTape(findTapeWaitTime); // change this thing for different times
+      hanMovo.findTapeLeft(findTapeWaitTime); // change this thing for different times
     }
   }
   hanMovo.stopMotors();
@@ -91,7 +91,7 @@ firstBridge:
 
 
 toTheIR:
-  hanMovo.findTape(findTapeWaitTime);
+  hanMovo.findTapeRight(findTapeWaitTime);
   hanMovo.reset(-1);
 
   while (digitalRead(fromChewPin) == LOW) {
@@ -108,45 +108,63 @@ toTheIR:
 
 
 stormtrooperRoom:
-//  digitalWrite(toChewPinRight, LOW);
-//  digitalWrite(toChewPinLeft, LOW);
+  //  digitalWrite(toChewPinRight, LOW);
+  //  digitalWrite(toChewPinLeft, LOW);
   hanMovo.driveMotors(slowPowerMult, 0);
   delay(100);
-  hanMovo.findTape(findTapeWaitTime * 1.5);
+  hanMovo.findTapeLeft(findTapeWaitTime);
   hanMovo.reset(-1);
-  {
-    unsigned long startTime = millis();
-    while (millis() - startTime < 1500) {
-      hanMovo.followTape();
-    }
-  }
-
-  // now that we are past the stormtroopers we look for a stuffy on the left
-  digitalWrite(toChewPinRight, LOW);
-  digitalWrite(toChewPinLeft, HIGH);
 
   while (!hanFlyo.cliff()) {
     hanMovo.followTape();
-
-    if (digitalRead(fromChewPin) == HIGH) {
-      //hanMovo.stopMotors();
-      delay(10);
-      motor.stop_all();
-      while (digitalRead(fromChewPin) == HIGH);
-      hanMovo.findTape(findTapeWaitTime);
-    }
   }
+  hanMovo.stopMotors();
+
+  digitalWrite(toChewPinRight, LOW);
+  digitalWrite(toChewPinLeft, HIGH);
+  hanMovo.driveMotors(-backupPowerMult, -backupPowerMult);
+  delay(100);
+  hanMovo.driveMotors(-slowPowerMult, -slowPowerMult);
+
+  {
+    unsigned long startTime = millis();
+    while ((digitalRead(fromChewPin) == LOW) && (millis() - startTime < 1500));
+  }
+
+  motor.stop_all();
+  while (digitalRead(fromChewPin) == HIGH);
+  hanMovo.findTapeRight(findTapeWaitTime);
+
   hanMovo.stopMotors();
   goto beforeStart;
 
+
+  // now that we are past the stormtroopers we look for a stuffy on the left
+//  digitalWrite(toChewPinRight, LOW);
+//  digitalWrite(toChewPinLeft, HIGH);
+//
+//  while (!hanFlyo.cliff()) {
+//    hanMovo.followTape();
+//
+//    if (digitalRead(fromChewPin) == HIGH) {
+//      //hanMovo.stopMotors();
+//      delay(10);
+//      motor.stop_all();
+//      while (digitalRead(fromChewPin) == HIGH);
+//      hanMovo.findTapeRight(findTapeWaitTime);
+//    }
+//  }
+//  hanMovo.stopMotors();
+//  goto beforeStart;
+
 secondBridge:
-//  hanMovo.driveMotors(-backupPowerMult, -backupPowerMult);
-//  delay(firstBackupTime);
-//  hanMovo.driveMotors(-slowPowerMult, -slowPowerMult);
-//  delay(secondBackupTime);
-//  motor.stop_all();
-//  delay(10);
-  hanMovo.driveMotors(-slowPowerMult*1.55, -slowPowerMult*.6); // pretty sketchy rn tbh
+  //  hanMovo.driveMotors(-backupPowerMult, -backupPowerMult);
+  //  delay(firstBackupTime);
+  //  hanMovo.driveMotors(-slowPowerMult, -slowPowerMult);
+  //  delay(secondBackupTime);
+  //  motor.stop_all();
+  //  delay(10);
+  hanMovo.driveMotors(-slowPowerMult * 1.55, -slowPowerMult * .6); // pretty sketchy rn tbh
   delay(turningTime);
   motor.stop_all();
   delay(10);

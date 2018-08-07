@@ -28,7 +28,7 @@ void Motion::reset(uint8_t last) {
 
 }
 
-bool Motion::findTape(uint16_t searchTime) {
+bool Motion::findTapeLeft(uint16_t searchTime) {
   if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
     return true;
   }
@@ -44,6 +44,30 @@ bool Motion::findTape(uint16_t searchTime) {
   //turns right second, is possible to go too far right
   startTime = millis();
   driveMotors(-slowPowerMult, slowPowerMult);
+  while ((millis() < startTime + searchTime)) {
+    if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
+      motor.stop_all();
+      return true;
+    }
+  }
+  return false;
+}
+
+bool Motion::findTapeRight(uint16_t searchTime) {
+  if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
+    return true;
+  }
+  //turns right first
+  unsigned long startTime = millis();
+  driveMotors(-slowPowerMult, slowPowerMult);
+  while ((millis() < startTime + searchTime / 2)) {
+    if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
+      motor.stop_all();
+      return true;
+    }
+  }
+  startTime = millis();
+  driveMotors(slowPowerMult, -slowPowerMult);
   while ((millis() < startTime + searchTime)) {
     if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
       motor.stop_all();
