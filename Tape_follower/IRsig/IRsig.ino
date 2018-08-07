@@ -12,6 +12,7 @@ uint8_t servoAngle2 = 180;
 
 void loop() {
 
+<<<<<<< HEAD
 //*****************************
 //IR
 //  
@@ -35,6 +36,13 @@ void loop() {
     LCD.clear();
     LCD.print(val);
     
+=======
+//    int val = knob(6)/1024.0 *180;
+//    RCServo0.write(val);
+//    LCD.clear();
+//    LCD.print(val);
+//    
+>>>>>>> a7f3765758544327e8981cb9ce829a05e16c3c6b
 //  for (int pos = servoAngle1 - 10; pos <= servoAngle1; pos++) {
 //    RCServo0.write(pos);
 //    delay(10);
@@ -63,7 +71,11 @@ void loop() {
 //  LCD.print(sp1);
 //  LCD.print(" sp3 ");
 //  LCD.print(sp3);
+<<<<<<< HEAD
 //  
 //*****************************
+=======
+  
+>>>>>>> a7f3765758544327e8981cb9ce829a05e16c3c6b
   
 }

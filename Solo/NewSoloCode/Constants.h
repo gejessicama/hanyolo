@@ -32,8 +32,8 @@
 #define rightMiddleQRD 1
 #define leftMiddleQRD 2
 #define leftMostQRD 3
-#define rightOutQRD 5
-#define rightInQRD 4
+#define rightOutQRD 4
+#define rightInQRD 5
 
 #define basketSensorPin 7
 #define scissorUpLimitPin 4

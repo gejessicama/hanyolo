@@ -48,7 +48,6 @@ void setup() {
 void loop() {
 
 //beforeStart:
-// add in a bit before the menu that displays our qrd values so we can tune tape/cliff values to the current conditions
   while(!stopbutton()){
     displayQRDVals();
   }
@@ -61,8 +60,8 @@ void loop() {
   Motion hanMovo(0);
   Crossing hanFlyo(0);
 
-
-//firstEwok:
+  //firstEwok:
+  LCD.clear();
 
   digitalWrite(toChewPinRight, HIGH);
   digitalWrite(toChewPinLeft, LOW);
@@ -134,8 +133,6 @@ void loop() {
     hanMovo.followTape();
   }
   hanMovo.stopMotors();
-  //goto beforeStart;
-
 
 //secondBridge:
   hanMovo.driveMotors(-powerMult, -powerMult);
@@ -196,6 +193,7 @@ stopSequence:
     }
   }
   hanMovo.stopMotors();
+
 
 }
 
