@@ -1,4 +1,16 @@
-
+/*
+baseSpeed: 150-154 depending on power
+pMult: .76 but up to .83 
+gain: 20
+pgain: 20
+dgain: 12
+ontape: 400
+overcliff: 460 or 410 maybe ok
+backuptime: ranges from 1.190 to 1.5 depending on power
+backupspeed: 200 was okay
+backupright: depends on where we are, but .63 is okay but up to .7
+turningright: 90 but it's not in this code
+*/
 /*
    Code for the TINAH (Solo) that will only include up to the third stuffy, but can be added to as we gain more functionality
 */
