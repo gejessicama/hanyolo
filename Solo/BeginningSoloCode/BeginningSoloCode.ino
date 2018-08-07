@@ -106,8 +106,7 @@ void loop() {
         while (!hanFlyo.cliff());
         delay(450);
         // After the end of the bridge, we need to drive a little farther and then perform a sweep to find the tape
-
-        hanMovo.findTape(rightMiddleQRD, leftMiddleQRD, 1700);
+        while (!hanMovo.findTape(rightMiddleQRD, leftMiddleQRD, 1700));
         hanMovo.reset(-1);
         while (digitalRead(fromChewPin) == LOW) {
           hanMovo.followTape(rightMiddleQRD, leftMiddleQRD);
@@ -168,6 +167,7 @@ void loop() {
         digitalWrite(toChewPinLeft, LOW);
         hanFlyo.backUp(1.0);
         hanMovo.turnRight();
+
         state = 5;
         break;
       }
@@ -177,7 +177,28 @@ void loop() {
         if (hanFlyo.cliff()) {
           //hanMovo.stopMotors();
           hanFlyo.dropBridge2(bridgeDropWaitTime, secondBridgeServoAngle, 1.0);
-
+          digitalWrite(toChewPinRight, HIGH);
+          digitalWrite(toChewPinLeft, LOW);
+          state = 6;
+        }
+      }
+    case 6 : {
+        hanMovo.driveMotors();
+        while (!hanFlyo.cliff());
+        delay(450);
+        while (digitalRead(fromChewPin) == HIGH) {
+          hanMovo.stopMotors();
+          LCD.clear();
+          LCD.print("Pick up Stuffy");
+        }
+        state = 7;
+      }
+    case 7 : {
+        hanMovo.followRightEdge(rightOutQRD, rightInQRD);
+        while (digitalRead(fromChewPin) == HIGH) {
+          hanMovo.stopMotors();
+          LCD.clear();
+          LCD.print("Pick up Stuffy");
         }
       }
   }

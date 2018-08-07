@@ -18,12 +18,12 @@
 #define leftMotor 1
 #define scissorLiftMotor 2
 
-#define rightMostQRD 1
-#define rightMiddleQRD 2
-#define leftMiddleQRD 3
-#define leftMostQRD 4
-#define rightOutQRD 5
-#define rightInQRD 6
+#define rightMostQRD 0
+#define rightMiddleQRD 1
+#define leftMiddleQRD 2
+#define leftMostQRD 3
+#define rightOutQRD 4
+#define rightInQRD 5
 
 //#define basketSensorPin
 //#define scissorUpLimitPin
