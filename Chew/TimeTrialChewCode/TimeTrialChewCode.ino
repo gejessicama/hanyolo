@@ -4,64 +4,7 @@
 */
 
 #include <Servo.h>
-
-#define rightLEDPin 4
-#define rightQSDPin 1
-#define leftLEDPin 6
-#define leftQSDPin  2
-
-#define clawSusanPin 8
-#define clawBasePin 13
-#define clawElbowPin 12
-#define clawGripPin 11
-
-#define toSoloPin 1
-#define fromSoloRightPin 2
-#define fromSoloLeftPin 3
-
-#define moveDelay 500
-
-
-#define susanRight 43
-#define susanFront 0
-#define susanLeft 142
-#define susanBasket 100
-#define susanTravelRight 100
-#define susanTravelLeft 142
-
-#define baseRightDown 100
-#define elbowRightDown 180
-
-#define baseLeftDown 100
-#define elbowLeftDown 180
-
-#define baseDropoff 180
-#define elbowDropoff 0
-
-#define baseTravel 180
-#define elbowTravel 80
-
-#define baseSwivel 180
-#define elbowSwivel 0
-
-#define gripOpen 180
-#define gripClose 0
-
-const int objectLimit = 250;
-const int readWait = 800; //In microseconds
-
-int onValue, offValue;
-Servo susan, base, elbow, grip;
-boolean readInQSD(uint8_t, uint8_t);
-void pickUpRight();
-void pickUpLeft();
-void travelRight();
-void travelLeft();
-void dropoff();
-void swivel();
-void startClaw();
-void endClaw();
-void moveClaw(Servo, uint8_t);
+#include "ChewConstants.h"
 
 void setup() {
   pinMode(rightLEDPin, OUTPUT);
@@ -72,7 +15,6 @@ void setup() {
 void loop() {
   if (digitalRead(fromSoloRightPin) == HIGH && readInQSD(rightLEDPin, rightQSDPin)) {
     digitalWrite(toSoloPin, HIGH);
-    //delay(3000);
     pickUpRight();
     digitalWrite(toSoloPin, LOW);
   }
@@ -80,7 +22,6 @@ void loop() {
   if (digitalRead(fromSoloLeftPin) == HIGH && readInQSD(leftLEDPin, leftQSDPin)) {
     digitalWrite(toSoloPin, HIGH);
     pickUpLeft();
-    //delay(3000);
     digitalWrite(toSoloPin, LOW);
   }
 }
@@ -108,7 +49,7 @@ void pickUpRight() {
   moveClaw(elbow, elbowRightDown);
   moveClaw(grip, gripClose);
   swivel();
-  dropoff();
+  dropoff(susanBasketRight);
   travelRight();
   endClaw();
 }
@@ -123,14 +64,14 @@ void pickUpLeft() {
   moveClaw(elbow, elbowLeftDown);
   moveClaw(grip, gripClose);
   swivel();
-  dropoff();
+  dropoff(susanBasketLeft);
   travelLeft();
   endClaw();
 }
 
 // Drops stuff off in the basket
-void dropoff() {
-  moveClaw(susan, susanBasket);
+void dropoff(uint8_t side) {
+  moveClaw(susan, side);
   moveClaw(base, baseDropoff);
   moveClaw(elbow, elbowDropoff);
   moveClaw(grip, gripOpen);
@@ -147,14 +88,14 @@ void travelRight() {
 void travelLeft() {
   moveClaw(susan, susanTravelLeft);
   moveClaw(base, baseTravel);
-  moveClaw(elbow, elbowTravel);
+  moveClaw(elbow, elbowLeftDown);
   moveClaw(grip, gripClose);
 }
 
 // Position before susan moves so that we don't hit anything
 void swivel() {
   moveClaw(base, baseSwivel);
-  moveClaw(elbow, elbowSwivel);
+  elbow.write(elbowSwivel);
   moveClaw(grip, gripClose);
 }
 
