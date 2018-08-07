@@ -1,15 +1,19 @@
 /*
  * CURRENT MENU VALUES AS OF 8/2/18
  * 
- * BASE SPEED: 142
+ * BASE SPEED: 161
  * POWER MULT: 0.76
- * P GAIN: 50
- * D GAIN: 24
+ * P GAIN: 20
+ * P Gain for the edge following: 25
+ * D GAIN: 12
  * ON TAPE: 400
- * OVER CLIFF: 620
- * BACKUP TIME: 1250
- * BACKUP SPEED: 201
- * TIME TO IR: 2640
+ * OVER CLIFF: 460
+ * over cliff for edge following: 650
+ * BACKUP TIME: 1610
+ * backup time for after dropping the second bridge: 520
+ * BACKUP SPEED: 238
+ * BACKUP RIGHT: 0.47
+ * TURNING TIME: 80
  */
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
@@ -18,12 +22,12 @@
 #define leftMotor 1
 #define scissorLiftMotor 2
 
-#define rightMostQRD 1
-#define rightMiddleQRD 2
-#define leftMiddleQRD 3
-#define leftMostQRD 4
-#define rightOutQRD 5
-#define rightInQRD 6
+#define rightMostQRD 0
+#define rightMiddleQRD 1
+#define leftMiddleQRD 2
+#define leftMostQRD 3
+#define rightOutQRD 4
+#define rightInQRD 5
 
 #define basketSensorPin 7
 #define scissorUpLimitPin 2

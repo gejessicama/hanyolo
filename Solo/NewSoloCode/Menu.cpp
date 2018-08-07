@@ -1,18 +1,18 @@
 /*
- * knob(7) scrolls through the values to change
+   knob(7) scrolls through the values to change
     stopbutton() lets you begin and finish editing a single value
     startbutton() exits the menu and begins the robot code
 
 
     wish list:
     find tape speed
- */
+*/
 
 #include "Menu.h"
 
 static uint8_t menuScreen;
 static byte temp;
-static const uint8_t menuSize = 10;
+static const uint8_t menuSize = 11;
 static const uint8_t delayTime = 220;
 
 /*
@@ -53,7 +53,7 @@ void Menu::eePromMenu() {
         delay(delayTime);
         while (!stopbutton()) {
           temp = knob(6) / 1024.0 * 255;
-          displayMenu("ProportionalG(E)", temp);
+          displayMenu("PGain(E)", temp);
         }
         delay(delayTime);
         EEPROM[2] = temp;
@@ -66,7 +66,7 @@ void Menu::eePromMenu() {
         delay(delayTime);
         while (!stopbutton()) {
           temp = knob(6) / 1024.0 * 255;
-          displayMenu("DerivativeG(E)", temp);
+          displayMenu("DGain(E)", temp);
         }
         delay(delayTime);
         EEPROM[3] = temp;
@@ -125,28 +125,41 @@ void Menu::eePromMenu() {
       }
       break;
     case 8 ://3000
-      displayMenu("BackUpRight", EEPROM[8]/100.0);
+      displayMenu("BackUpRight", EEPROM[8] / 100.0);
       if (stopbutton()) {
         delay(delayTime);
         while (!stopbutton()) {
           temp = knob(6) / 1024.0 * 100;
-          displayMenu("BackUpRi(E)", temp/100.0);
+          displayMenu("BackUpRi(E)", temp / 100.0);
         }
         delay(delayTime);
         EEPROM[8] = temp;
       }
       break;
 
-      case 9 :
-      displayMenu("TurningTime", EEPROM[9]*10);
+    case 9 :
+      displayMenu("TurningTime", EEPROM[9] * 10);
       if (stopbutton()) {
         delay(delayTime);
         while (!stopbutton()) {
           temp = knob(6) / 1024.0 * 255;
-          displayMenu("TurningT(E)", temp*10);
+          displayMenu("TurningT(E)", temp * 10);
         }
         delay(delayTime);
         EEPROM[9] = temp;
+      }
+      break;
+
+    case 10 :
+      displayMenu("BackCliffTime", EEPROM[10] * 10);
+      if (stopbutton()) {
+        delay(delayTime);
+        while (!stopbutton()) {
+          temp = knob(6) / 1024.0 * 255;
+          displayMenu("BackCliffT(E)", temp * 10);
+        }
+        delay(delayTime);
+        EEPROM[10] = temp;
       }
       break;
   }
@@ -158,6 +171,7 @@ void Menu::eePromMenu() {
 void Menu::displayMenu(String varName, double varValue) {
   delay(1);
   LCD.clear();
-  LCD.println(varName + ": ");
+  LCD.print(varName + ": ");
+  LCD.setCursor(0, 1);
   LCD.print(varValue);
 }
