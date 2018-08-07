@@ -37,7 +37,7 @@ void displayQRDVals();
 void setup() {
   LCD.begin();
   LCD.clear();
-  RCServo0.write(90);
+  RCServo0.write(0);
   pinMode(fromChewPin, INPUT);
   pinMode(irSignalPin, INPUT);
   pinMode(toChewPinLeft, OUTPUT);
@@ -47,8 +47,8 @@ void setup() {
 
 void loop() {
 
-//beforeStart:
-  while(!stopbutton()){
+beforeStart:
+  while (!stopbutton()) {
     displayQRDVals();
   }
   delay(500);
@@ -56,13 +56,13 @@ void loop() {
     Menu::eePromMenu();
   }
   delay(1000);
+  LCD.clear();
   saveMenuValues();
   Motion hanMovo(0);
   Crossing hanFlyo(0);
 
-  //firstEwok:
-  LCD.clear();
 
+firstEwok:
   digitalWrite(toChewPinRight, HIGH);
   digitalWrite(toChewPinLeft, LOW);
   // this tells the arduino to only look for ewoks on the right side
@@ -71,7 +71,6 @@ void loop() {
     hanMovo.followTape();
 
     if (digitalRead(fromChewPin) == HIGH) {
-      
       hanMovo.stopMotors();
       while (digitalRead(fromChewPin) == HIGH);
     }
@@ -79,15 +78,15 @@ void loop() {
   hanMovo.stopMotors();
 
 
-//firstBridge:
+firstBridge:
   hanFlyo.dropBridge1();
 
   hanMovo.driveMotors(powerMult, powerMult);
   while (!hanFlyo.cliff()); // "cliff" signals end of the bridge
-  delay(400);
+  delay(450);
 
 
-//toTheIR:
+toTheIR:
   hanMovo.findTape(findTapeWaitTime);
   hanMovo.reset(-1);
 
@@ -104,9 +103,9 @@ void loop() {
   while (!hanFlyo.detect10KIR());
 
 
-//stormtrooperRoom:
-  digitalWrite(toChewPinRight, LOW);
-  digitalWrite(toChewPinLeft, LOW);
+stormtrooperRoom:
+  //  digitalWrite(toChewPinRight, LOW);
+  //  digitalWrite(toChewPinLeft, LOW);
 
   hanMovo.findTape(findTapeWaitTime);
   hanMovo.reset(-1);
@@ -121,20 +120,28 @@ void loop() {
   digitalWrite(toChewPinRight, LOW);
   digitalWrite(toChewPinLeft, HIGH);
 
-  while (digitalRead(fromChewPin) == LOW && !hanFlyo.cliff()){
+//  while (digitalRead(fromChewPin) == LOW && !hanFlyo.cliff()) {
+//    hanMovo.followTape();
+//  }
+//  if (digitalRead(fromChewPin) == HIGH) {
+//    hanMovo.stopMotors();
+//    while (digitalRead(fromChewPin) == HIGH);
+//    digitalWrite(toChewPinLeft, LOW);
+//  }
+//  while (!hanFlyo.cliff()) {
+//    hanMovo.followTape();
+//  }
+  while (!hanFlyo.cliff()) {
     hanMovo.followTape();
-  }
-  if (digitalRead(fromChewPin) == HIGH) {
-      hanMovo.stopMotors();
-      while (digitalRead(fromChewPin) == HIGH);
-      digitalWrite(toChewPinLeft, LOW);
-  }
-  while(!hanFlyo.cliff()){
-    hanMovo.followTape();
-  }
-  hanMovo.stopMotors();
 
-//secondBridge:
+    while (digitalRead(fromChewPin) == HIGH) {
+      hanMovo.stopMotors();
+    }
+  }
+//  hanMovo.stopMotors();
+goto beforeStart;
+
+secondBridge:
   hanMovo.driveMotors(-powerMult, -powerMult);
   delay(backupCliffTime);
   //hanMovo.turnRight();
@@ -149,7 +156,7 @@ void loop() {
   motor.stop(leftMotor);
   hanFlyo.dropBridge2(400);
   RCServo0.detach();
-//// need to drop it and then back up
+  //// need to drop it and then back up
   hanMovo.driveMotors(1, 1);
   while (!hanFlyo.cliff()); // "cliff" signals end of the bridge
   delay(1000);
@@ -166,7 +173,7 @@ firstTower:
   while (digitalRead(fromChewPin) == LOW) {
     hanMovo.followRightEdge();
   }
-//
+  //
   hanMovo.stopMotors();
   while (digitalRead(fromChewPin) == HIGH);
 
@@ -180,6 +187,7 @@ secondTower:
   while (digitalRead(fromChewPin) == HIGH);
 
   raiseBasket();
+  hanMovo.findRightEdge(0.45, 0.9, 2000);
   while (digitalRead(basketSensorPin) == HIGH) {
     hanMovo.followRightEdge();
   }
@@ -207,19 +215,19 @@ void saveMenuValues() {
 
 void raiseBasket() {
   motor.speed(scissorLiftMotor, -255);
-  while(digitalRead(scissorUpLimitPin));
+  while (digitalRead(scissorUpLimitPin));
   motor.speed(scissorLiftMotor, 255);
   motor.stop(scissorLiftMotor);
 }
 
 void lowerBasket() {
   motor.speed(scissorLiftMotor, 255);
-  while(digitalRead(scissorDownLimitPin) == HIGH);
+  while (digitalRead(scissorDownLimitPin) == HIGH);
   motor.speed(scissorLiftMotor, -255);
   motor.stop(scissorLiftMotor);
 }
 
-void displayQRDVals(){
+void displayQRDVals() {
   LCD.clear();
   LCD.print(analogRead(leftMostQRD));
   LCD.print(" ");

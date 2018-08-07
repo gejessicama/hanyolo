@@ -45,8 +45,8 @@
 #define irSignalPin 4
 
 
-#define baseDrivingSpeed 152
-#define baseBackupSpeed 235
+#define baseDrivingSpeed 200
+//#define baseBackupSpeed 235
 #define pGainTapeFollowing 20
 #define dGainTapeFollowing 12
 #define pGainEdgeFollowing 25

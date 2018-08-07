@@ -72,13 +72,15 @@ void setup() {
 void loop() {
   if (digitalRead(fromSoloRightPin) == HIGH && readInQSD(rightLEDPin, rightQSDPin)) {
     digitalWrite(toSoloPin, HIGH);
-    delay(3000);
+    //delay(3000);
+    pickUpRight();
     digitalWrite(toSoloPin, LOW);
   }
 
   if (digitalRead(fromSoloLeftPin) == HIGH && readInQSD(leftLEDPin, leftQSDPin)) {
     digitalWrite(toSoloPin, HIGH);
-    delay(3000);
+    pickUpLeft();
+    //delay(3000);
     digitalWrite(toSoloPin, LOW);
   }
 }
