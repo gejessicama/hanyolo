@@ -3,65 +3,48 @@
 */
 
 #include "Crossing.h"
+#include "Constants.h"
 
 /*
    Initializer for a Crossing Object
 */
-Crossing::Crossing(uint8_t rMotor, uint8_t lMotor, uint8_t rQRD, uint8_t lQRD, uint8_t sigIR) {
-  rightMotor = rMotor;
-  leftMotor = lMotor;
-  rightQRD = rQRD;
-  leftQRD = lQRD;
-  IRsig = sigIR;
-}
-
-/*
-   Sets necessary constants for Crossing functions. Must be called before anythig else can run
-*/
-void Crossing::setConstants() {
-  overCliff = EEPROM[5] * 10;
+Crossing::Crossing(int val) {
+  overCliff = EEPROM[1] * 10;
+  backupPowerMult = EEPROM[4] / 100.0;
+  rightWheelPercent = EEPROM[5] / 100.0;
   backupTime = EEPROM[6] * 10;
-  backupSpeed = EEPROM[7];
 }
 
 /*
    Tells us if we are over a cliff
 */
 boolean Crossing::cliff() {
-  if (analogRead(rightQRD) > overCliff && analogRead(leftQRD) > overCliff) {
-    return true;
-  } else {
-    return false;
-  }
+  return (analogRead(rightMostQRD) > overCliff && analogRead(leftMostQRD) > overCliff);
 }
 
 /*
    code for droping a bridge
 */
-void Crossing::dropBridge1(int waitTime, uint8_t servoAngle, double rightWheelPercentage) {
+void Crossing::dropBridge1() {
 
-  backUp(rightWheelPercentage);
+  backUp(rightWheelPercent);
   motor.stop_all();
 
-  delay(waitTime);
-  RCServo0.write(servoAngle);
-  delay(waitTime);
+  delay(bridgeDropWaitTime);
+  RCServo0.write(firstBridgeServoAngle);
+  delay(bridgeDropWaitTime);
 }
 
-void Crossing::dropBridge2(int waitTime, uint8_t servoAngle, double rightWheelPercentage) {
-//  backUp(rightWheelPercentage);
-//  //  //motor.stop_all();
+void Crossing::dropBridge2(uint16_t backupTime) {
+  delay(bridgeDropWaitTime);
 
-  delay(waitTime);
-
-  RCServo0.write(servoAngle);
-  delay(waitTime);
+  RCServo0.write(secondBridgeServoAngle);
+  delay(bridgeDropWaitTime);
   motor.speed(rightMotor, -80);
   motor.speed(leftMotor, 100);
-  delay(400);
-  motor.speed(rightMotor, 0);
-  motor.speed(leftMotor, 0);
-  delay(waitTime);
+  delay(backupTime);
+  motor.stop_all();
+  delay(bridgeDropWaitTime);
 
 
 }
@@ -71,30 +54,24 @@ void Crossing::dropBridge2(int waitTime, uint8_t servoAngle, double rightWheelPe
 */
 void Crossing::backUp(double rightMotorPercentage) {
   motor.speed(rightMotor, 0);
-  motor.speed(leftMotor, backupSpeed);
+  motor.speed(leftMotor, baseDrivingSpeed * backupPowerMult);
   delay(backupTime / 2);
 
-  motor.speed(rightMotor, -(backupSpeed) * rightMotorPercentage);
+  motor.speed(rightMotor, -baseDrivingSpeed * backupPowerMult * rightMotorPercentage);
   motor.speed(leftMotor, 0);
   delay(backupTime / 2);
 
   motor.stop_all();
 }
 
-void Crossing::alignStep() {
-  motor.speed(leftMotor, backupSpeed);
-  motor.speed(rightMotor, backupSpeed);
-  delay(backupTime * 1.5);
-  motor.stop_all();
-}
+//void Crossing::alignStep() {
+//  motor.speed(leftMotor, backupSpeed);
+//  motor.speed(rightMotor, backupSpeed);
+//  delay(backupTime * 1.5);
+//  motor.stop_all();
+//}
 
 bool Crossing::detect10KIR() {
-  uint8_t val = digitalRead(IRsig);
-  if (digitalRead(IRsig) == HIGH) {
-    return false;
-  } else {
-    return true;
-  }
-
+  return(!digitalRead(irSignalPin));
 }
 
