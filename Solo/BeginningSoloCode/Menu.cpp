@@ -43,7 +43,7 @@ void Menu::eePromMenu() {
       }
       break;
 
-    case 2 :// 50
+    case 2 :// 12
       displayMenu("PGain", EEPROM[2]);
       if (stopbutton()) {
         delay(delayTime);
@@ -82,7 +82,7 @@ void Menu::eePromMenu() {
       }
       break;
 
-    case 5 ://620
+    case 5 ://450
       displayMenu("OverCliff", EEPROM[5] * 10);
       if (stopbutton()) {
         delay(delayTime);
