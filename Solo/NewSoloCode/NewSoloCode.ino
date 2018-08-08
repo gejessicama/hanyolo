@@ -54,6 +54,7 @@ beforeStart:
   digitalWrite(toChewPinRight, HIGH);
   digitalWrite(toChewPinLeft, LOW);
   delay(500);
+  RCServo0.write(0);
   while (!startbutton()) {
     Menu::eePromMenu();
   }
@@ -62,7 +63,7 @@ beforeStart:
   saveMenuValues();
   Motion hanMovo(0);
   Crossing hanFlyo(0);
-  RCServo0.write(0);
+
   goto firstEwok;
 
 firstEwok:
@@ -78,6 +79,7 @@ firstEwok:
       while (digitalRead(fromChewPin) == HIGH);
 
       hanMovo.findTapeLeft(findTapeWaitTime); // change this thing for different times
+      hanMovo.findTapeRight(findTapeWaitTime * 2); // change this thing for different times
 
       baseSpeed = 0.7 * baseSpeed;
 
@@ -124,29 +126,42 @@ stormtrooperRoom:
   delay(100);
   hanMovo.findTapeLeft(findTapeWaitTime);
   hanMovo.reset(-1);
+  int st = millis();
+  while (millis() - st < 3000) {
+    hanMovo.followTape();
+  }
+  digitalWrite(toChewPinRight, LOW);
+  digitalWrite(toChewPinLeft, HIGH);
 
   while (!hanFlyo.cliff()) {
     hanMovo.followTape();
+    if (digitalRead(fromChewPin) == HIGH) {
+      delay(10);
+      motor.stop_all();
+      while (digitalRead(fromChewPin) == HIGH);
+      hanMovo.reset(-1);
+    }
+    
   }
   hanMovo.stopMotors();
 
   digitalWrite(toChewPinRight, LOW);
-  digitalWrite(toChewPinLeft, HIGH);
+  digitalWrite(toChewPinLeft, LOW);
   hanMovo.driveMotors(-backupPowerMult, -backupPowerMult);
   delay(100);
 
   hanMovo.driveMotors(-slowPowerMult, -slowPowerMult);
 
-  {
-    unsigned long startTime = millis();
-    while ((digitalRead(fromChewPin) == LOW) && (millis() - startTime < 1500));
-  }
-
-  motor.stop_all();
-  while (digitalRead(fromChewPin) == HIGH);
-  hanMovo.findTapeRight(findTapeWaitTime);
-
-  hanMovo.stopMotors();
+//  {
+//    unsigned long startTime = millis();
+//    while ((digitalRead(fromChewPin) == LOW) && (millis() - startTime < 1500));
+//  }
+//
+//  motor.stop_all();
+//  while (digitalRead(fromChewPin) == HIGH);
+//  hanMovo.findTapeRight(findTapeWaitTime);
+//
+//  hanMovo.stopMotors();
 
 
   goto beforeStart;
