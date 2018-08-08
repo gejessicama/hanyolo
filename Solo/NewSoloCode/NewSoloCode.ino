@@ -51,17 +51,17 @@ beforeStart:
   digitalWrite(toChewPinRight, LOW);
   digitalWrite(toChewPinLeft, LOW);
   RCServo0.write(0);
-  
+
   while (!stopbutton()) {
     displayQRDVals();
   }
   delay(500);
-  
+
   while (!startbutton()) {
     Menu::eePromMenu();
   }
   delay(1000);
-  
+
   LCD.clear();
   saveMenuValues();
   Motion hanMovo(0);
@@ -80,15 +80,15 @@ firstEwok:
       delay(stuffyDelay);
       motor.stop_all();
       while (digitalRead(fromChewPin) == HIGH);
-
       hanMovo.driveMotors(slowPowerMult, slowPowerMult);
       delay(100);
       hanMovo.findTapeLeft(ewokFindTapeTime);
       break;
     }
   }
+
   while (!hanFlyo.cliff()) {
-    hanMovo.followTape(regularPowerMult);
+    hanMovo.followTape(slowPowerMult);
 
     if (digitalRead(fromChewPin) == HIGH) {
       delay(stuffyDelay);
@@ -135,8 +135,8 @@ toTheIR:
   digitalWrite(toChewPinRight, LOW);
   digitalWrite(toChewPinLeft, LOW);
 
-  if (hanFlyo.detect10KIR()){
-    while(hanFlyo.detect10KIR());
+  if (hanFlyo.detect10KIR()) {
+    while (hanFlyo.detect10KIR());
   }
   while (!hanFlyo.detect10KIR());
   // might add something for realignment
@@ -149,7 +149,7 @@ stormtrooperRoom:
   delay(100);
   hanMovo.findTapeLeft(findTapeWaitTime);
   hanMovo.reset(-1);
-
+  
   {
     unsigned long startTime = millis();
     while (millis() - startTime < 2500) {
@@ -157,25 +157,33 @@ stormtrooperRoom:
     }
   }
 
-  //now that we are past the stormtroopers we look for a stuffy on the left
+secondCliff:
   digitalWrite(toChewPinRight, LOW);
   digitalWrite(toChewPinLeft, HIGH);
 
   while (!hanFlyo.cliff()) {
     hanMovo.followTape(regularPowerMult);
-
     if (digitalRead(fromChewPin) == HIGH) {
-      delay(10);
+      delay(stuffyDelay);
       motor.stop_all();
       while (digitalRead(fromChewPin) == HIGH);
-      hanMovo.findTapeRight(findTapeWaitTime);
+      hanMovo.findTapeRight(ewokFindTapeTime);
     }
+
   }
   hanMovo.stopMotors();
   goto beforeStart;
 
-//returnSequence:
-// turn around and raise the basket
+  
+//  digitalWrite(toChewPinRight, LOW);
+//  digitalWrite(toChewPinLeft, LOW);
+//  hanMovo.driveMotors(-backupPowerMult, -backupPowerMult);
+//  delay(100);
+//
+//  hanMovo.driveMotors(-slowPowerMult, -slowPowerMult);
+
+  //returnSequence:
+  // turn around and raise the basket
 
 
 }

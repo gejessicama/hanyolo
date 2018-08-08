@@ -13,7 +13,8 @@ void setup() {
 }
 
 void loop() {
-  if (digitalRead(fromSoloRightPin) == HIGH && readInQSD(rightLEDPin, rightQSDPin)) {
+  if(digitalRead(fromSoloRightPin) == HIGH && readInQSD(rightLEDPin, rightQSDPin)) {
+  //if (readInQSD(rightLEDPin, rightQSDPin)) {  // for testing, if we want to ignore the TINAH
     digitalWrite(toSoloPin, HIGH);
     delay(3000);
     //pickUpRight();
@@ -21,6 +22,7 @@ void loop() {
   }
 
   if (digitalRead(fromSoloLeftPin) == HIGH && readInQSD(leftLEDPin, leftQSDPin)) {
+  //if (readInQSD(leftLEDPin, leftQSDPin)) { // for testing, if we want to ignore the TINAH
     digitalWrite(toSoloPin, HIGH);
     delay(3000);
     //pickUpLeft();
@@ -59,7 +61,7 @@ void pickUpRight() {
 // Pickup something from the left
 void pickUpLeft() {
   startClaw();
-  swivel();
+  moveClaw(elbow, 30);
   moveClaw(susan, susanLeft);
   moveClaw(grip, gripOpen);
   moveClaw(base, baseLeftDown);

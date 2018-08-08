@@ -3,15 +3,15 @@
 
 #define moveDelay 450
 
-#define susanRight 33
+#define susanRight 25 
 #define susanFront 0
-#define susanLeft 147
-#define susanBasketRight 80
-#define susanBasketLeft 115 
-#define susanTravelRight 100
+#define susanLeft 140
+#define susanBasketRight 62
+#define susanBasketLeft 102 
+#define susanTravelRight 102
 #define susanTravelLeft 150
 
-#define baseRightDown 80
+#define baseRightDown 90
 #define elbowRightDown 180
 
 #define baseLeftDown 80
@@ -21,7 +21,7 @@
 #define elbowDropoff 10
 
 #define baseTravel 180
-#define elbowTravel 80
+#define elbowTravel 50
 
 #define baseSwivel 180
 #define elbowSwivel 0
@@ -30,7 +30,7 @@
 #define gripClose 0
 
 const int objectLimit = 250;
-const int readWait = 800; //In microseconds
+const int readWait = 500; //In microseconds
 int onValue, offValue;
 Servo susan, base, elbow, grip;
 
@@ -57,6 +57,6 @@ void moveClaw(Servo, uint8_t);
 
 #define toSoloPin 1
 #define fromSoloRightPin 2
-#define fromSoloLeftPin 3
+#define fromSoloLeftPin 3 
 
 #endif
