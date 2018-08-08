@@ -196,6 +196,11 @@ turnAround:
   hanMovo.driveMotors(slowPowerMult, -slowPowerMult);
   delay(500);
   hanMovo.findTapeLeft(5000);
+  
+//  ALTERNATIVE RETURN STRATEGY
+//  hanMovo.driveMotors(-slowPowerMult, slowPowerMult);
+//  delay(500);
+//  hanMovo.findTapeRight(5000);
 
 
 returnSequence:
@@ -215,6 +220,24 @@ returnSequence:
       hanMovo.followTape(slowPowerMult);
     }
   }
+
+//  ALTERNATIVE RETURN STRATEGY
+//  {
+//    unsigned long startTime = millis();
+//    while (millis() - startTime < 1000){
+//      hanMovo.driveMotors(slowPowerMult*1.25, slowPowerMult);
+//    }
+//  }
+//  motor.stop_all();
+//  raiseBasket();
+//  
+//  {
+//    unsigned long startTime = millis();
+//    while (millis() - startTime < tempTime){
+//      hanMovo.driveMotors(slowPowerMult*1.25, slowPowerMult);
+//    }
+//  }
+
   motor.stop_all();
   lowerBasket();
   goto beforeStart;
