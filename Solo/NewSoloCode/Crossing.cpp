@@ -30,6 +30,11 @@ void Crossing::dropBridge1() {
   delay(bridgeDropWaitTime);
   RCServo0.write(firstBridgeServoAngle);
   delay(bridgeDropWaitTime);
+  motor.speed(rightMotor, -80);
+  motor.speed(leftMotor, 100);
+  delay(100);
+  motor.stop_all();
+  delay(100);
 }
 
 void Crossing::dropBridge2(uint16_t backupTime) {

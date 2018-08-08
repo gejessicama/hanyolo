@@ -99,7 +99,7 @@ bool Motion::findRightEdge(double rightMultiplier, double leftMultiplier, unsign
 /*
    Calculates the error values and such for following tape
 */
-void Motion::followTape() {
+void Motion::followTape(double powerMult) {
 
   bool rVal = isOnWhite(rightMiddleQRD);
   bool lVal = isOnWhite(leftMiddleQRD);
@@ -117,13 +117,13 @@ void Motion::followTape() {
     currentError = lastOn * 5;
   }
 
-  pidControl(pGainTapeFollowing, dGainTapeFollowing);
+  pidControl(pGainTapeFollowing, dGainTapeFollowing, powerMult);
 }
 
 /*
    Calculates errors and such for following the right edge of a cliff
 */
-void Motion::followRightEdge() {
+void Motion::followRightEdge(double powerMult) {
 
   bool rVal = isOverCliff(rightOutQRD);
   bool lVal = isOverCliff(rightInQRD);
@@ -139,19 +139,19 @@ void Motion::followRightEdge() {
     lastOn = 1;
   }
 
-  pidControl(pGainEdgeFollowing, dGainEdgeFollowing);
+  pidControl(pGainEdgeFollowing, dGainEdgeFollowing, powerMult);
 }
 
 /*
    Controls the motion of the robot based on the last calculated error values and such
 */
-void Motion::pidControl(uint8_t proportionalGain, uint8_t derivativeGain) {
+void Motion::pidControl(uint8_t proportionalGain, uint8_t derivativeGain, double powerMult) {
   int proportionalTerm = proportionalGain * currentError;
   int derivativeTerm = derivativeGain * (currentError - lastState) * 1.0 / count;
   int gain = proportionalTerm + derivativeTerm;
 
-  motor.speed(rightMotor, regularPowerMult * (baseDrivingSpeed + gain));
-  motor.speed(leftMotor, regularPowerMult * (-baseDrivingSpeed + gain));
+  motor.speed(rightMotor, powerMult * (baseDrivingSpeed + gain));
+  motor.speed(leftMotor, powerMult * (-baseDrivingSpeed + gain));
 
   if (currentError != lastError) {
     lastState = lastError;
@@ -175,15 +175,6 @@ void Motion::driveMotors(double rightMultiplier, double leftMultiplier) {
 void Motion::stopMotors() {
   motor.speed(rightMotor, -255);
   motor.speed(leftMotor, 255);
-  motor.stop_all();
-}
-
-/*
-   Tells the robot to exectute a right turn by stopping the left wheel and backing up the right wheel
-*/
-void Motion::turnRight() {
-  driveMotors(-backupPowerMult, backupPowerMult);
-  delay(turningTime);
   motor.stop_all();
 }
 

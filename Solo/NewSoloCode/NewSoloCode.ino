@@ -65,17 +65,18 @@ beforeStart:
 firstEwok:
   digitalWrite(toChewPinRight, HIGH);
   digitalWrite(toChewPinLeft, LOW);
-  // this tells the arduino to only look for ewoks on the right side
 
   while (!hanFlyo.cliff()) {
-    hanMovo.followTape();
+    hanMovo.followTape(rampPowerMult);
 
     if (digitalRead(fromChewPin) == HIGH) {
       delay(10);
       motor.stop_all();
       while (digitalRead(fromChewPin) == HIGH);
-
-      hanMovo.findTapeLeft(findTapeWaitTime); // change this thing for different times
+      hanMovo.driveMotors(slowPowerMult, slowPowerMult);
+      delay(100);
+      hanMovo.findTapeLeft(ewokFindTapeTime);
+      hanMovo.reset(1);
     }
   }
   hanMovo.stopMotors();
@@ -96,7 +97,7 @@ toTheIR:
   hanMovo.reset(-1);
 
   while (digitalRead(fromChewPin) == LOW) {
-    hanMovo.followTape();
+    hanMovo.followTape(regularPowerMult);
   }
   hanMovo.stopMotors();
   while (digitalRead(fromChewPin) == HIGH);
@@ -117,7 +118,7 @@ stormtrooperRoom:
   hanMovo.reset(-1);
 
   while (!hanFlyo.cliff()) {
-    hanMovo.followTape();
+    hanMovo.followTape(regularPowerMult);
   }
   hanMovo.stopMotors();
 
@@ -198,7 +199,7 @@ firstTower:
   //assuming we can sense this ewok on our side
   hanMovo.findRightEdge(0.45, 0.9, 1000);
   while (digitalRead(fromChewPin) == LOW) {
-    hanMovo.followRightEdge();
+    hanMovo.followRightEdge(regularPowerMult);
   }
   //
   hanMovo.stopMotors();
@@ -207,7 +208,7 @@ firstTower:
 secondTower:
   //assuming we can sense chewy on our side
   while (digitalRead(fromChewPin) == LOW) {
-    hanMovo.followRightEdge();
+    hanMovo.followRightEdge(regularPowerMult);
   }
 
   hanMovo.stopMotors();
@@ -216,7 +217,7 @@ secondTower:
   raiseBasket();
   hanMovo.findRightEdge(0.45, 0.9, 2000);
   while (digitalRead(basketSensorPin) == HIGH) {
-    hanMovo.followRightEdge();
+    hanMovo.followRightEdge(regularPowerMult);
   }
   lowerBasket();
 
@@ -224,7 +225,7 @@ stopSequence:
   {
     unsigned long startTime = millis();
     while (millis() - startTime < 3000) {
-      hanMovo.followRightEdge();
+      hanMovo.followRightEdge(regularPowerMult);
     }
   }
   hanMovo.stopMotors();
