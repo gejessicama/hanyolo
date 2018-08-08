@@ -48,11 +48,11 @@
 
 #define fromChewPin 6
 #define toChewPinLeft 8
-#define toChewPinRight 9
+#define toChewPinRight 9 
 #define irSignalPin 4
 
 
-#define baseDrivingSpeed 153
+#define baseDrivingSpeed 200
 //#define baseBackupSpeed 235
 #define pGainTapeFollowing 20
 #define dGainTapeFollowing 12

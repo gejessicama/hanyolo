@@ -51,6 +51,8 @@ beforeStart:
   while (!stopbutton()) {
     displayQRDVals();
   }
+  digitalWrite(toChewPinRight, HIGH);
+  digitalWrite(toChewPinLeft, LOW);
   delay(500);
   while (!startbutton()) {
     Menu::eePromMenu();
@@ -60,24 +62,28 @@ beforeStart:
   saveMenuValues();
   Motion hanMovo(0);
   Crossing hanFlyo(0);
+  RCServo0.write(0);
   goto firstEwok;
 
 firstEwok:
   digitalWrite(toChewPinRight, HIGH);
   digitalWrite(toChewPinLeft, LOW);
   // this tells the arduino to only look for ewoks on the right side
-
+  byte tempV = baseSpeed; // potential method for adjusting speeds
   while (!hanFlyo.cliff()) {
     hanMovo.followTape();
-
     if (digitalRead(fromChewPin) == HIGH) {
       delay(10);
       motor.stop_all();
       while (digitalRead(fromChewPin) == HIGH);
 
       hanMovo.findTapeLeft(findTapeWaitTime); // change this thing for different times
+
+      baseSpeed = 0.7 * baseSpeed;
+
     }
   }
+  baseSpeed = tempV;
   hanMovo.stopMotors();
 
 
@@ -88,11 +94,14 @@ firstBridge:
   hanFlyo.dropBridge1();
   hanMovo.driveMotors(regularPowerMult, regularPowerMult);
   while (!hanFlyo.cliff()); // "cliff" signals end of the bridge
-  delay(1000);
+  delay(800);
 
 
 toTheIR:
-  hanMovo.findTapeRight(findTapeWaitTime);
+  digitalWrite(toChewPinRight, HIGH);
+  digitalWrite(toChewPinLeft, LOW);
+  hanMovo.findTapeLeft(findTapeWaitTime);
+  hanMovo.findTapeRight(findTapeWaitTime * 2);
   hanMovo.reset(-1);
 
   while (digitalRead(fromChewPin) == LOW) {
@@ -106,11 +115,11 @@ toTheIR:
   digitalWrite(toChewPinLeft, LOW);
 
   while (!hanFlyo.detect10KIR());
-// might add something for realignment
+  // might add something for realignment
 
 stormtrooperRoom:
-  //  digitalWrite(toChewPinRight, LOW);
-  //  digitalWrite(toChewPinLeft, LOW);
+  digitalWrite(toChewPinRight, LOW);
+  digitalWrite(toChewPinLeft, LOW);
   hanMovo.driveMotors(slowPowerMult, 0);
   delay(100);
   hanMovo.findTapeLeft(findTapeWaitTime);
@@ -125,6 +134,7 @@ stormtrooperRoom:
   digitalWrite(toChewPinLeft, HIGH);
   hanMovo.driveMotors(-backupPowerMult, -backupPowerMult);
   delay(100);
+
   hanMovo.driveMotors(-slowPowerMult, -slowPowerMult);
 
   {
@@ -137,26 +147,28 @@ stormtrooperRoom:
   hanMovo.findTapeRight(findTapeWaitTime);
 
   hanMovo.stopMotors();
+
+
   goto beforeStart;
 
 
   // now that we are past the stormtroopers we look for a stuffy on the left
-//  digitalWrite(toChewPinRight, LOW);
-//  digitalWrite(toChewPinLeft, HIGH);
-//
-//  while (!hanFlyo.cliff()) {
-//    hanMovo.followTape();
-//
-//    if (digitalRead(fromChewPin) == HIGH) {
-//      //hanMovo.stopMotors();
-//      delay(10);
-//      motor.stop_all();
-//      while (digitalRead(fromChewPin) == HIGH);
-//      hanMovo.findTapeRight(findTapeWaitTime);
-//    }
-//  }
-//  hanMovo.stopMotors();
-//  goto beforeStart;
+  //  digitalWrite(toChewPinRight, LOW);
+  //  digitalWrite(toChewPinLeft, HIGH);
+  //
+  //  while (!hanFlyo.cliff()) {
+  //    hanMovo.followTape();
+  //
+  //    if (digitalRead(fromChewPin) == HIGH) {
+  //      //hanMovo.stopMotors();
+  //      delay(10);
+  //      motor.stop_all();
+  //      while (digitalRead(fromChewPin) == HIGH);
+  //      hanMovo.findTapeRight(findTapeWaitTime);
+  //    }
+  //  }
+  //  hanMovo.stopMotors();
+  //  goto beforeStart;
 
 secondBridge:
   //  hanMovo.driveMotors(-backupPowerMult, -backupPowerMult);

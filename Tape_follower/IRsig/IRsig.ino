@@ -12,7 +12,17 @@ uint8_t servoAngle2 = 180;
 
 void loop() {
 
-<<<<<<< HEAD
+//digitalWrite(8, HIGH);
+//digitalWrite(9, LOW);
+//digitalWrite(10, HIGH);
+//digitalWrite(11, LOW);
+//digitalWrite(12, HIGH);
+//digitalWrite(13, LOW);
+//digitalWrite(14, HIGH);
+//digitalWrite(15, LOW);
+//
+//LCD.print("8 H, 15 L");
+//LCD.clear();
 //*****************************
 //IR
 //  
@@ -30,19 +40,19 @@ void loop() {
 
 //*****************************
 //Servo
-    int val = knob(6)/1024.0 *360;
-    if(val > 170) val=170;
+//    int val = knob(6)/1024.0 *360;
+//    if(val > 170) val=170;
+//    RCServo0.write(val);
+//    LCD.clear();
+//    LCD.print(val);
+    
+
+    int val = knob(6)/1024.0 *180;
     RCServo0.write(val);
     LCD.clear();
     LCD.print(val);
     
-=======
-//    int val = knob(6)/1024.0 *180;
-//    RCServo0.write(val);
-//    LCD.clear();
-//    LCD.print(val);
-//    
->>>>>>> a7f3765758544327e8981cb9ce829a05e16c3c6b
+
 //  for (int pos = servoAngle1 - 10; pos <= servoAngle1; pos++) {
 //    RCServo0.write(pos);
 //    delay(10);
@@ -71,11 +81,8 @@ void loop() {
 //  LCD.print(sp1);
 //  LCD.print(" sp3 ");
 //  LCD.print(sp3);
-<<<<<<< HEAD
+
 //  
 //*****************************
-=======
-  
->>>>>>> a7f3765758544327e8981cb9ce829a05e16c3c6b
-  
+
 }
