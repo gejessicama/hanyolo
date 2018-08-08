@@ -174,18 +174,24 @@ secondCliff:
   hanMovo.stopMotors();
   goto beforeStart;
 
-  
-//  digitalWrite(toChewPinRight, LOW);
-//  digitalWrite(toChewPinLeft, LOW);
-//  hanMovo.driveMotors(-backupPowerMult, -backupPowerMult);
-//  delay(100);
-//
-//  hanMovo.driveMotors(-slowPowerMult, -slowPowerMult);
 
-  //returnSequence:
-  // turn around and raise the basket
+turnAround:
+  digitalWrite(toChewPinRight, LOW);
+  digitalWrite(toChewPinLeft, LOW);
+  hanMovo.driveMotors(-backupPowerMult, -backupPowerMult);
+  delay(firstBackupTime);
+
+  hanMovo.findTapeRight(5000);
 
 
+returnSequence:
+  raiseBasket();
+  hanMovo.driveMotors(slowPowerMult, slowPowerMult);
+  while(digitalRead(basketSensorPin) == HIGH);
+  delay(100);
+  motor.stop_all();
+  lowerBasket();
+  goto beforeStart;
 }
 
 void saveMenuValues() {

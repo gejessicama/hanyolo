@@ -33,7 +33,7 @@ bool Motion::findTapeLeft(uint16_t searchTime) {
     return true;
   }
 
-  uint16_t startTime1 = millis();
+  uint32_t startTime1 = millis();
   driveMotors(slowPowerMult, -slowPowerMult);
   while (millis() < (startTime1 + (searchTime / 1.5))) {
     if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
@@ -42,7 +42,7 @@ bool Motion::findTapeLeft(uint16_t searchTime) {
     }
   }
 
-  uint16_t startTime2 = millis();
+  uint32_t startTime2 = millis();
   driveMotors(-slowPowerMult, slowPowerMult);
   while (millis() < (startTime2 + searchTime)) {
     if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
@@ -58,7 +58,7 @@ bool Motion::findTapeRight(uint16_t searchTime) {
     return true;
   }
 
-  uint16_t startTime1 = millis();
+  uint32_t startTime1 = millis();
   driveMotors(-slowPowerMult, slowPowerMult);
   while (millis() < (startTime1 + (searchTime / 1.5))) {
     if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
@@ -67,7 +67,7 @@ bool Motion::findTapeRight(uint16_t searchTime) {
     }
   }
 
-  uint16_t startTime2 = millis();
+  uint32_t startTime2 = millis();
   driveMotors(slowPowerMult, -slowPowerMult);
   while (millis() < (startTime2 + searchTime)) {
     if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
