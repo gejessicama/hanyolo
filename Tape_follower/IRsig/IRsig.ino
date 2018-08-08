@@ -26,15 +26,15 @@ void loop() {
 //*****************************
 //IR
 //  
-//  uint8_t val = digitalRead(IRsig);
-//  LCD.clear();
-//  LCD.println("signal");
-//  //LCD.print(val);
-//  if (val == HIGH){
-//    LCD.print("1K");
-//  }else if(val == LOW){
-//    LCD.println("10K");
-//  }
+  uint8_t val = digitalRead(IRsig);
+  LCD.clear();
+  LCD.println("signal");
+  //LCD.print(val);
+  if (val == HIGH){
+    LCD.print("1K");
+  }else if(val == LOW){
+    LCD.println("10K");
+  }
 //*****************************
 
 
@@ -46,11 +46,11 @@ void loop() {
 //    LCD.clear();
 //    LCD.print(val);
     
-
-    int val = knob(6)/1024.0 *180;
-    RCServo0.write(val);
-    LCD.clear();
-    LCD.print(val);
+//
+//    int val = knob(6)/1024.0 *180;
+//    RCServo0.write(val);
+//    LCD.clear();
+//    LCD.print(val);
     
 
 //  for (int pos = servoAngle1 - 10; pos <= servoAngle1; pos++) {
