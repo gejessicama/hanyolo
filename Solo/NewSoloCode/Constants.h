@@ -3,8 +3,8 @@
  * 
  * ONTAPE: 400
  * OVERCLIFF: 380
- * NORMAL POWER: 0.76
- * SLOW POWER: 0.44
+ * NORMAL POWER: 0.76, 0.83
+ * SLOW POWER: 0.44, 0.5
  * BACKUP POWER: 1.4
  * RIGHT PERCENTAGE: 1.09
  * FIRST BACKUP TIME: 420
@@ -59,7 +59,7 @@
 #define pGainEdgeFollowing 25
 #define dGainEdgeFollowing 12
 
-const double rampPowerMult = 0.9;
+//const double rampPowerMult = 0.9;
 const uint8_t firstBridgeServoAngle = 90;
 const uint8_t secondBridgeServoAngle = 170;
 const uint16_t bridgeDropWaitTime = 1500;

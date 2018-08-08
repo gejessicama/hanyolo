@@ -13,7 +13,7 @@ Motion::Motion(int val) {
   regularPowerMult = EEPROM[2]/100.0;
   slowPowerMult = EEPROM[3]/100.0;
   backupPowerMult = EEPROM[4]/100.0;
-  turningTime = EEPROM[8] * 10;
+  //turningTime = EEPROM[8] * 10;
 }
 
 /*
@@ -32,19 +32,19 @@ bool Motion::findTapeLeft(uint16_t searchTime) {
   if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
     return true;
   }
-  //turns left first, is possible to go too far left 
-  unsigned long startTime = millis();
+
+  uint16_t startTime1 = millis();
   driveMotors(slowPowerMult, -slowPowerMult);
-  while ((millis() < startTime + searchTime / 2.0)) {
+  while (millis() < (startTime1 + (searchTime / 1.5))) {
     if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
       motor.stop_all();
       return true;
     }
   }
-  //turns right second, is possible to go too far right
-  startTime = millis();
+
+  uint16_t startTime2 = millis();
   driveMotors(-slowPowerMult, slowPowerMult);
-  while ((millis() < startTime + searchTime)) {
+  while (millis() < (startTime2 + searchTime)) {
     if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
       motor.stop_all();
       return true;
@@ -57,18 +57,19 @@ bool Motion::findTapeRight(uint16_t searchTime) {
   if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
     return true;
   }
-  //turns right first
-  unsigned long startTime = millis();
+
+  uint16_t startTime1 = millis();
   driveMotors(-slowPowerMult, slowPowerMult);
-  while ((millis() < startTime + searchTime / 2)) {
+  while (millis() < (startTime1 + (searchTime / 1.5))) {
     if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
       motor.stop_all();
       return true;
     }
   }
-  startTime = millis();
+
+  uint16_t startTime2 = millis();
   driveMotors(slowPowerMult, -slowPowerMult);
-  while ((millis() < startTime + searchTime)) {
+  while (millis() < (startTime2 + searchTime)) {
     if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
       motor.stop_all();
       return true;
