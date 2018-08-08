@@ -43,7 +43,7 @@
 #define rightInQRD 5
 
 #define basketSensorPin 7
-#define scissorUpLimitPin 4
+#define scissorUpLimitPin 2
 #define scissorDownLimitPin 3
 
 #define fromChewPin 6

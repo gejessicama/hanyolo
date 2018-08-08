@@ -22,7 +22,7 @@
 
 // OTHER VARIABLES
 uint8_t stuffyDelay;
-uint16_t firstBackupTime, turningTime;
+uint16_t firstBackupTime, tempTime;
 double regularPowerMult, slowPowerMult, backupPowerMult, rightWheelPercent, rampPowerMult;
 
 byte baseSpeed; //proportionalGain, derivativeGain;
@@ -38,8 +38,12 @@ void displayQRDVals();
 void setup() {
   LCD.begin();
   LCD.clear();
+  Serial.begin(9600);
   pinMode(fromChewPin, INPUT);
   pinMode(irSignalPin, INPUT);
+  pinMode(basketSensorPin, INPUT);
+  pinMode(scissorUpLimitPin, INPUT);
+  pinMode(scissorDownLimitPin, INPUT);
   pinMode(toChewPinLeft, OUTPUT);
   pinMode(toChewPinRight, OUTPUT);
 }
@@ -66,7 +70,8 @@ beforeStart:
   saveMenuValues();
   Motion hanMovo(0);
   Crossing hanFlyo(0);
-  goto firstEwok;
+
+  //goto beforeStart;
 
 
 firstEwok:
@@ -121,8 +126,6 @@ toTheIR:
   digitalWrite(toChewPinRight, HIGH);
   digitalWrite(toChewPinLeft, LOW);
   hanMovo.findTapeRight(findTapeWaitTime);
-  //hanMovo.findTapeRight(findTapeWaitTime * 2);
-  //hanMovo.reset(-1);
 
   while (digitalRead(fromChewPin) == LOW) {
     hanMovo.followTape(regularPowerMult);
@@ -130,6 +133,7 @@ toTheIR:
   delay(stuffyDelay);
   hanMovo.stopMotors();
   while (digitalRead(fromChewPin) == HIGH);
+  // could adjust here and keep checking for the stuffy
 
   // tells the arduino not to look for any stuffies
   digitalWrite(toChewPinRight, LOW);
@@ -149,7 +153,7 @@ stormtrooperRoom:
   delay(100);
   hanMovo.findTapeLeft(findTapeWaitTime);
   hanMovo.reset(-1);
-  
+
   {
     unsigned long startTime = millis();
     while (millis() - startTime < 2500) {
@@ -163,16 +167,15 @@ secondCliff:
 
   while (!hanFlyo.cliff()) {
     hanMovo.followTape(regularPowerMult);
+
     if (digitalRead(fromChewPin) == HIGH) {
       delay(stuffyDelay);
       motor.stop_all();
       while (digitalRead(fromChewPin) == HIGH);
       hanMovo.findTapeRight(ewokFindTapeTime);
     }
-
   }
   hanMovo.stopMotors();
-  goto beforeStart;
 
 
 turnAround:
@@ -181,14 +184,20 @@ turnAround:
   hanMovo.driveMotors(-backupPowerMult, -backupPowerMult);
   delay(firstBackupTime);
 
-  hanMovo.findTapeRight(5000);
+  hanMovo.driveMotors(slowPowerMult, -slowPowerMult);
+  delay(500);
+  hanMovo.findTapeLeft(5000);
 
 
 returnSequence:
   raiseBasket();
-  hanMovo.driveMotors(slowPowerMult, slowPowerMult);
-  while(digitalRead(basketSensorPin) == HIGH);
-  delay(100);
+  
+  {
+    unsigned long startTime = millis();
+    while (millis() - startTime < tempTime){
+      hanMovo.followTape(slowPowerMult);
+    }
+  }
   motor.stop_all();
   lowerBasket();
   goto beforeStart;
@@ -202,20 +211,28 @@ void saveMenuValues() {
   firstBackupTime = EEPROM[6] * 10;
   stuffyDelay = EEPROM[7];
   rampPowerMult = EEPROM[8] / 100.0;
+  tempTime = EEPROM[9] * 20;
 }
 
 void raiseBasket() {
-  motor.speed(scissorLiftMotor, -255);
-  while (digitalRead(scissorUpLimitPin));
-  motor.speed(scissorLiftMotor, 255);
+  motor.speed(scissorLiftMotor, -200);
+  while (digitalRead(scissorUpLimitPin) == HIGH);
+  motor.speed(scissorLiftMotor, 200);
+  delay(10);
   motor.stop(scissorLiftMotor);
 }
 
 void lowerBasket() {
-  motor.speed(scissorLiftMotor, 255);
-  while (digitalRead(scissorDownLimitPin) == HIGH);
-  motor.speed(scissorLiftMotor, -255);
-  motor.stop(scissorLiftMotor);
+  while(!startbutton());
+  delay(800);
+  motor.speed(scissorLiftMotor, 160);
+  while(!startbutton());
+  delay(800);
+//  motor.speed(scissorLiftMotor, 200);
+//  while (digitalRead(scissorDownLimitPin) == HIGH);
+//  motor.speed(scissorLiftMotor, -200);
+//  delay(10);
+//  motor.stop(scissorLiftMotor);
 }
 
 void displayQRDVals() {
