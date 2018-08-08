@@ -42,14 +42,14 @@
 #define rightOutQRD 4
 #define rightInQRD 5
 
-#define basketSensorPin 7
-#define scissorUpLimitPin 2
-#define scissorDownLimitPin 3
+#define basketSensorPin 5
+#define scissorUpLimitPin 3
+#define scissorDownLimitPin 4
 
 #define fromChewPin 6
 #define toChewPinLeft 8
 #define toChewPinRight 9
-#define irSignalPin 4
+#define irSignalPin 1
 
 
 #define baseDrivingSpeed 153

@@ -38,12 +38,21 @@ void displayQRDVals();
 void setup() {
   LCD.begin();
   LCD.clear();
-  Serial.begin(9600);
-  pinMode(fromChewPin, INPUT);
-  pinMode(irSignalPin, INPUT);
-  pinMode(basketSensorPin, INPUT);
-  pinMode(scissorUpLimitPin, INPUT);
-  pinMode(scissorDownLimitPin, INPUT);
+  pinMode(0, INPUT);
+  pinMode(1, INPUT);
+  pinMode(2, INPUT);
+  pinMode(3, INPUT);
+  pinMode(4, INPUT);
+  pinMode(5, INPUT);
+  pinMode(6, INPUT);
+  pinMode(7, INPUT);
+  
+//  pinMode(fromChewPin, INPUT);
+//  pinMode(irSignalPin, INPUT);
+//  pinMode(basketSensorPin, INPUT);
+//  pinMode(scissorUpLimitPin, INPUT);
+//  pinMode(scissorDownLimitPin, INPUT);
+  
   pinMode(toChewPinLeft, OUTPUT);
   pinMode(toChewPinRight, OUTPUT);
 }
@@ -71,7 +80,7 @@ beforeStart:
   Motion hanMovo(0);
   Crossing hanFlyo(0);
 
-  //goto beforeStart;
+  goto secondCliff;
 
 
 firstEwok:
@@ -190,6 +199,14 @@ turnAround:
 
 
 returnSequence:
+
+  {
+    unsigned long startTime = millis();
+    while (millis() - startTime < 1000){
+      hanMovo.followTape(slowPowerMult);
+    }
+  }
+  motor.stop_all();
   raiseBasket();
   
   {
@@ -225,8 +242,10 @@ void raiseBasket() {
 void lowerBasket() {
   while(!startbutton());
   delay(800);
-  motor.speed(scissorLiftMotor, 160);
+  motor.speed(scissorLiftMotor, 100);
   while(!startbutton());
+  motor.speed(scissorLiftMotor, -255);
+  motor.stop(scissorLiftMotor);
   delay(800);
 //  motor.speed(scissorLiftMotor, 200);
 //  while (digitalRead(scissorDownLimitPin) == HIGH);
