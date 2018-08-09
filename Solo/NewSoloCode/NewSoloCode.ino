@@ -106,13 +106,13 @@ firstEwok:
 
       hanMovo.driveMotors(slowPowerMult, slowPowerMult);
       delay(100);
-      hanMovo.findTapeLeft(ewokFindTapeTime);
+      hanMovo.findTapeRight(ewokFindTapeTime);
     }
   }
   hanMovo.stopMotors();
   //  LCD.clear();
   //  LCD.print("Arduino ");
-  LCD.println(digitalRead(fromChewPin));
+  //LCD.println(digitalRead(fromChewPin));
 
 
 firstBridge:
@@ -124,38 +124,31 @@ firstBridge:
   motor.stop_all();
 
   hanFlyo.dropBridge1();
+  hanMovo.driveMotors(-slowPowerMult, -slowPowerMult);
+  delay(300);
+  motor.stop_all();
+  delay(10);
   hanMovo.driveMotors(regularPowerMult, regularPowerMult);
   while (!hanFlyo.cliff()); // "cliff" signals end of the bridge
-  //  LCD.clear();
-  //  LCD.print("Arduino ");
-  //  LCD.println(digitalRead(fromChewPin));
-  //  LCD.print("Bridge end");
-  delay(800);
-  //  LCD.clear();
+  delay(600);
 
 
-toTheIR:
+secondStuffy:
   digitalWrite(toChewPinRight, HIGH);
   digitalWrite(toChewPinLeft, LOW);
   hanMovo.findTapeLeft(findTapeWaitTime);
-  //  LCD.print("Arduino ");
-  //  LCD.println(digitalRead(fromChewPin));
+  
   while (digitalRead(fromChewPin) == LOW) {
     hanMovo.followTape(regularPowerMult);
   }
   hanMovo.driveMotors(regularPowerMult, -regularPowerMult);
   delay(stuffyDelay);
   hanMovo.stopMotors();
-  //  LCD.clear();
-  //  LCD.print("Arduino ");
-  //  LCD.println(digitalRead(fromChewPin));
-  //  LCD.print("Pick up 2");
-  //delay(1000);
+
   while (digitalRead(fromChewPin) == HIGH);
-  hanMovo.stopMotors();
 
-  // could adjust here and keep checking for the stuffy
 
+toTheIR:
   // tells the arduino not to look for any stuffies
   digitalWrite(toChewPinRight, LOW);
   digitalWrite(toChewPinLeft, LOW);
@@ -170,8 +163,6 @@ toTheIR:
   while (!hanFlyo.detect10KIR());
   LCD.clear();
   LCD.print("10K");
-  //hanMovo.
-  // might add something for realignment
 
 stormtrooperRoom:
   digitalWrite(toChewPinRight, LOW);
@@ -184,18 +175,19 @@ stormtrooperRoom:
 
   {
     unsigned long startTime = millis();
-    while (millis() - startTime < 1000) { //should be enough time to put us on the platform
+    while (millis() - startTime < 2500) { //should be enough time to put us on the platform
       hanMovo.followTape(regularPowerMult);
     }
   }
   
-  {
-    unsigned long startTime = millis();
-    while (millis() - startTime < 1500) {
-      hanMovo.followTape(regularPowerMult);
-      hanMovo.lostAndFindTape(); // if we lose the tape, we will search for it
-    }
-  }
+//  {
+//    unsigned long startTime = millis();
+//    while (millis() - startTime < 1500) {
+//      hanMovo.followTape(regularPowerMult);
+//      hanMovo.lostAndFindTape(); // if we lose the tape, we will search for it
+//    }
+//  }
+
 
 secondCliff:
   digitalWrite(toChewPinRight, LOW);
@@ -212,7 +204,7 @@ secondCliff:
     }
   }
   hanMovo.stopMotors();
-  delay(4000);
+  delay(waitForClaw);
 
 
 turnAround:
