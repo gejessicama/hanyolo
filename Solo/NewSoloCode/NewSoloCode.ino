@@ -127,9 +127,9 @@ firstBridge:
   while (!hanFlyo.cliff());
   delay(200);
   
-  hanMovo.findTapeLeft(findTapeWaitTime);
+  //hanMovo.findTapeLeft(findTapeWaitTime); // removed because yolo had difficulty finding line and staying on it 
   while (!hanFlyo.cliff()) {
-    hanMovo.followTape(slowPowerMult);
+    //hanMovo.followTape(slowPowerMult);
   }
   delay(300);
 
@@ -140,7 +140,7 @@ secondStuffy:
   hanMovo.findTapeRight(findTapeWaitTime);
 
   while (digitalRead(fromChewPin) == LOW) {
-    hanMovo.followTape(regularPowerMult);
+    hanMovo.followTape(slowPowerMult);
   }
   hanMovo.driveMotors(regularPowerMult, -regularPowerMult);
   delay(stuffyDelay);
@@ -159,19 +159,15 @@ toTheIR:
     LCD.print("IR 10k p1");
     while (hanFlyo.detect10KIR());
   }
-  LCD.clear();
-  LCD.print("IR not 10k");
   while (!hanFlyo.detect10KIR());
-  LCD.clear();
-  LCD.print("10K");
 
 
 stormtrooperRoom:
   digitalWrite(toChewPinRight, LOW);
   digitalWrite(toChewPinLeft, LOW);
 
-  hanMovo.driveMotors(slowPowerMult, 0);
-  delay(100);
+  //hanMovo.driveMotors(slowPowerMult, 0);
+  //delay(100);
   hanMovo.findTapeLeft(findTapeWaitTime);
   //hanMovo.reset(-1);
 
