@@ -6,7 +6,7 @@
 
 class Motion {
   private:
-    uint16_t onTape, overCliff, turningTime;
+    uint16_t onTape, overCliff;
     double regularPowerMult, slowPowerMult, backupPowerMult;
     
     int currentError, lastError, lastState, lastOn;

@@ -13,7 +13,6 @@ Motion::Motion(int val) {
   regularPowerMult = EEPROM[2] / 100.0;
   slowPowerMult = EEPROM[3] / 100.0;
   backupPowerMult = EEPROM[4] / 100.0;
-  //turningTime = EEPROM[8] * 10;
 }
 
 /*
@@ -32,25 +31,25 @@ bool Motion::findTapeLeft(uint16_t searchTime) {
   if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
     return true;
   }
-
-  uint32_t startTime1 = millis();
+  
   driveMotors(slowPowerMult, -slowPowerMult);
+  uint32_t startTime1 = millis();
   while (millis() < (startTime1 + (searchTime / 1.5))) {
     if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
       motor.stop_all();
       return true;
     }
   }
-
-  uint32_t startTime2 = millis();
+    
   driveMotors(-slowPowerMult, slowPowerMult);
+  uint32_t startTime2 = millis();
   while (millis() < (startTime2 + searchTime)) {
     if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
       motor.stop_all();
       return true;
     }
+    return false;
   }
-  return false;
 }
 
 bool Motion::findTapeRight(uint16_t searchTime) {
@@ -58,18 +57,18 @@ bool Motion::findTapeRight(uint16_t searchTime) {
     return true;
   }
 
-  uint32_t startTime1 = millis();
   driveMotors(-slowPowerMult, slowPowerMult);
-  while (millis() < (startTime1 + (searchTime / 1.5))) {
+  uint32_t startTime1 = millis();
+  while (millis() < (startTime1 + searchTime)) {
     if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
       motor.stop_all();
       return true;
     }
   }
-
-  uint32_t startTime2 = millis();
+  
   driveMotors(slowPowerMult, -slowPowerMult);
-  while (millis() < (startTime2 + searchTime)) {
+  uint32_t startTime2 = millis();
+  while (millis() < (startTime2 + searchTime * 2)) {
     if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
       motor.stop_all();
       return true;
@@ -83,6 +82,8 @@ bool Motion::findTapeRight(uint16_t searchTime) {
 */
 void Motion::lostAndFindTape() {
   if (isOnWhite(rightMostQRD) && isOnWhite(rightMiddleQRD) && isOnWhite(leftMiddleQRD) && isOnWhite(leftMostQRD)) {
+    driveMotors(slowPowerMult, slowPowerMult);
+    delay(300);
     findTapeRight(lostAndFoundTime);
   }
 }
