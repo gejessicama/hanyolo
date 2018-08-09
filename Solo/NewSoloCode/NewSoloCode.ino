@@ -59,7 +59,6 @@ beforeStart:
   digitalWrite(toChewPinLeft, LOW);
   RCServo0.write(0);
 
-
   while (!stopbutton()) {
     displayQRDVals();
   }
@@ -163,6 +162,7 @@ toTheIR:
   while (!hanFlyo.detect10KIR());
   LCD.clear();
   LCD.print("10K");
+  
 
 stormtrooperRoom:
   digitalWrite(toChewPinRight, LOW);
@@ -171,7 +171,7 @@ stormtrooperRoom:
   hanMovo.driveMotors(slowPowerMult, 0);
   delay(100);
   hanMovo.findTapeLeft(findTapeWaitTime);
-  hanMovo.reset(-1);
+  //hanMovo.reset(-1);
 
   {
     unsigned long startTime = millis();

@@ -31,26 +31,27 @@ void Motion::reset(uint8_t last) {
 bool Motion::findTapeLeft(uint16_t searchTime) {
   if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
     return true;
-  }
+  } else {
 
-  uint32_t startTime1 = millis();
-  driveMotors(slowPowerMult, -slowPowerMult);
-  while (millis() < (startTime1 + (searchTime / 1.5))) {
-    if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
-      motor.stop_all();
-      return true;
+    uint32_t startTime1 = millis();
+    driveMotors(slowPowerMult, -slowPowerMult);
+    while (millis() < (startTime1 + searchTime)) {
+      if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
+        motor.stop_all();
+        return true;
+      }
     }
-  }
 
-  uint32_t startTime2 = millis();
-  driveMotors(-slowPowerMult, slowPowerMult);
-  while (millis() < (startTime2 + searchTime)) {
-    if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
-      motor.stop_all();
-      return true;
+    uint32_t startTime2 = millis();
+    driveMotors(-slowPowerMult, slowPowerMult);
+    while (millis() < (startTime2 + searchTime * 2)) {
+      if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
+        motor.stop_all();
+        return true;
+      }
     }
+    return false;
   }
-  return false;
 }
 
 bool Motion::findTapeRight(uint16_t searchTime) {
@@ -60,7 +61,7 @@ bool Motion::findTapeRight(uint16_t searchTime) {
 
   uint32_t startTime1 = millis();
   driveMotors(-slowPowerMult, slowPowerMult);
-  while (millis() < (startTime1 + (searchTime / 1.5))) {
+  while (millis() < (startTime1 + searchTime)) {
     if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
       motor.stop_all();
       return true;
@@ -69,7 +70,7 @@ bool Motion::findTapeRight(uint16_t searchTime) {
 
   uint32_t startTime2 = millis();
   driveMotors(slowPowerMult, -slowPowerMult);
-  while (millis() < (startTime2 + searchTime)) {
+  while (millis() < (startTime2 + searchTime * 2)) {
     if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
       motor.stop_all();
       return true;
