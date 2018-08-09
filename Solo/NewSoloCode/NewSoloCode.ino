@@ -22,7 +22,7 @@
 
 // OTHER VARIABLES
 uint8_t stuffyDelay;
-uint16_t firstBackupTime, returnTime;
+uint16_t firstBackupTime, findTapeTime;
 double regularPowerMult, slowPowerMult, backupPowerMult, rightWheelPercent, rampPowerMult;
 
 byte baseSpeed; //proportionalGain, derivativeGain;
@@ -73,8 +73,6 @@ beforeStart:
   saveMenuValues();
   Motion hanMovo(0);
   Crossing hanFlyo(0);
-  //lowerBasket();
-  //goto secondCliff;
 
 
 firstEwok:
@@ -121,17 +119,17 @@ firstBridge:
 
   hanFlyo.dropBridge1();
   hanMovo.driveMotors(-slowPowerMult, -slowPowerMult);
-  delay(300);
+  delay(250);
   motor.stop_all();
-  delay(10);
+  delay(20);
   
-  hanMovo.driveMotors(regularPowerMult, regularPowerMult);
+  hanMovo.driveMotors(slowPowerMult, slowPowerMult);
   while (!hanFlyo.cliff());
   delay(200);
   
   hanMovo.findTapeLeft(findTapeWaitTime);
   while (!hanFlyo.cliff()) {
-    hanMovo.followTape(regularPowerMult);
+    hanMovo.followTape(slowPowerMult);
   }
   delay(300);
 
@@ -179,8 +177,8 @@ stormtrooperRoom:
 
   {
     unsigned long startTime = millis();
-    while (millis() - startTime < 2500) { //should be enough time to put us on the platform
-      hanMovo.followTape(regularPowerMult);
+    while (millis() - startTime < 3000) { //should be enough time to put us on the platform
+      hanMovo.followTape(slowPowerMult);
     }
   }
 
@@ -220,29 +218,7 @@ turnAround:
   hanMovo.driveMotors(slowPowerMult, -slowPowerMult);
   delay(500);
   hanMovo.findTapeLeft(5000);
-
-
-//returnSequence:
-//
-//  {
-//    unsigned long startTime = millis();
-//    while (millis() - startTime < 1000) {
-//      hanMovo.followTape(slowPowerMult);
-//    }
-//  }
-//  motor.stop_all();
-//  raiseBasket();
-//
-//  {
-//    unsigned long startTime = millis();
-//    while (millis() - startTime < returnTime) {
-//      hanMovo.followTape(slowPowerMult);
-//    }
-//  }
-//
-//  motor.stop_all();
-//  lowerBasket();
-//  goto beforeStart;
+  
 
 driveBack:
   digitalWrite(toChewPinRight, LOW);
@@ -253,13 +229,13 @@ driveBack:
     hanMovo.lostAndFindTape();
   }
   delay(200);
-  hanMovo.findTapeRight(findTapeWaitTime);
+  hanMovo.findTapeRight(findTapeTime);
 
   while (!hanFlyo.cliff()) {
     hanMovo.followTape(slowPowerMult);
   }
   delay(200);
-  hanMovo.findTapeLeft(findTapeWaitTime);
+  hanMovo.findTapeLeft(findTapeTime);
   while(!startbutton()){
     hanMovo.followTape(slowPowerMult);
   }
@@ -277,7 +253,7 @@ void saveMenuValues() {
   firstBackupTime = EEPROM[6] * 10;
   stuffyDelay = EEPROM[7];
   rampPowerMult = EEPROM[8] / 100.0;
-  returnTime = EEPROM[9] * 20;
+  findTapeTime = EEPROM[9] * 20;
 }
 
 void raiseBasket() {

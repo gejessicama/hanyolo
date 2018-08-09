@@ -83,6 +83,8 @@ bool Motion::findTapeRight(uint16_t searchTime) {
 */
 void Motion::lostAndFindTape() {
   if (isOnWhite(rightMostQRD) && isOnWhite(rightMiddleQRD) && isOnWhite(leftMiddleQRD) && isOnWhite(leftMostQRD)) {
+    driveMotors(slowPowerMult, slowPowerMult);
+    delay(100);
     findTapeRight(lostAndFoundTime);
   }
 }
