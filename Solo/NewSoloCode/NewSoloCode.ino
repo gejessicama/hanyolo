@@ -76,6 +76,13 @@ beforeStart:
   Crossing hanFlyo(0);
   //lowerBasket();
   //goto secondCliff;
+//findTape:
+//  hanMovo.findTapeRight(ewokFindTapeTime);
+//  while(1)
+//  hanMovo.followTape(slowPowerMult);
+//  //delay (2000);
+// goto beforeStart;
+
 
 
 firstEwok:
@@ -137,7 +144,7 @@ secondStuffy:
   digitalWrite(toChewPinRight, HIGH);
   digitalWrite(toChewPinLeft, LOW);
   hanMovo.findTapeLeft(findTapeWaitTime);
-  
+
   while (digitalRead(fromChewPin) == LOW) {
     hanMovo.followTape(regularPowerMult);
   }
@@ -168,10 +175,10 @@ stormtrooperRoom:
   digitalWrite(toChewPinRight, LOW);
   digitalWrite(toChewPinLeft, LOW);
 
-  hanMovo.driveMotors(slowPowerMult, 0);
-  delay(100);
+//  hanMovo.driveMotors(slowPowerMult, -slowPowerMult);
+//  delay(250);
   hanMovo.findTapeLeft(findTapeWaitTime);
-  hanMovo.reset(-1);
+  //hanMovo.reset(-1);
 
   {
     unsigned long startTime = millis();
@@ -179,14 +186,14 @@ stormtrooperRoom:
       hanMovo.followTape(regularPowerMult);
     }
   }
-  
-//  {
-//    unsigned long startTime = millis();
-//    while (millis() - startTime < 1500) {
-//      hanMovo.followTape(regularPowerMult);
-//      hanMovo.lostAndFindTape(); // if we lose the tape, we will search for it
-//    }
-//  }
+
+  //  {
+  //    unsigned long startTime = millis();
+  //    while (millis() - startTime < 1500) {
+  //      hanMovo.followTape(regularPowerMult);
+  //      hanMovo.lostAndFindTape(); // if we lose the tape, we will search for it
+  //    }
+  //  }
 
 
 secondCliff:
