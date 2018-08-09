@@ -18,17 +18,16 @@ class Motion {
 
   public:
     Motion(int);
-    void setConstants();
     void reset(uint8_t);
     
     void followTape(double);
-    void followRightEdge(double);
     void driveMotors(double, double);
     void stopMotors();
-
+    void lostAndFindTape();
+    
     bool findTapeLeft(uint16_t);
     bool findTapeRight(uint16_t);
-    bool findRightEdge(double, double, unsigned int);
+    
 };
 
 #endif

@@ -22,7 +22,7 @@
 
 // OTHER VARIABLES
 uint8_t stuffyDelay;
-uint16_t firstBackupTime, tempTime;
+uint16_t firstBackupTime, returnTime;
 double regularPowerMult, slowPowerMult, backupPowerMult, rightWheelPercent, rampPowerMult;
 
 byte baseSpeed; //proportionalGain, derivativeGain;
@@ -47,12 +47,6 @@ void setup() {
   pinMode(6, INPUT);
   pinMode(7, INPUT);
 
-  //  pinMode(fromChewPin, INPUT);
-  //  pinMode(irSignalPin, INPUT);
-  //  pinMode(basketSensorPin, INPUT);
-  //  pinMode(scissorUpLimitPin, INPUT);
-  //  pinMode(scissorDownLimitPin, INPUT);
-
   pinMode(toChewPinLeft, OUTPUT);
   pinMode(toChewPinRight, OUTPUT);
 }
@@ -64,7 +58,7 @@ beforeStart:
   digitalWrite(toChewPinRight, LOW);
   digitalWrite(toChewPinLeft, LOW);
   RCServo0.write(0);
-  
+
 
   while (!stopbutton()) {
     displayQRDVals();
@@ -116,8 +110,8 @@ firstEwok:
     }
   }
   hanMovo.stopMotors();
-//  LCD.clear();
-//  LCD.print("Arduino ");
+  //  LCD.clear();
+  //  LCD.print("Arduino ");
   LCD.println(digitalRead(fromChewPin));
 
 
@@ -132,29 +126,30 @@ firstBridge:
   hanFlyo.dropBridge1();
   hanMovo.driveMotors(regularPowerMult, regularPowerMult);
   while (!hanFlyo.cliff()); // "cliff" signals end of the bridge
-//  LCD.clear();
-//  LCD.print("Arduino ");
-//  LCD.println(digitalRead(fromChewPin));
-//  LCD.print("Bridge end");
+  //  LCD.clear();
+  //  LCD.print("Arduino ");
+  //  LCD.println(digitalRead(fromChewPin));
+  //  LCD.print("Bridge end");
   delay(800);
-//  LCD.clear();
+  //  LCD.clear();
 
 
 toTheIR:
   digitalWrite(toChewPinRight, HIGH);
   digitalWrite(toChewPinLeft, LOW);
-  hanMovo.findTapeRight(findTapeWaitTime);
-//  LCD.print("Arduino ");
-//  LCD.println(digitalRead(fromChewPin));
+  hanMovo.findTapeLeft(findTapeWaitTime);
+  //  LCD.print("Arduino ");
+  //  LCD.println(digitalRead(fromChewPin));
   while (digitalRead(fromChewPin) == LOW) {
     hanMovo.followTape(regularPowerMult);
   }
+  hanMovo.driveMotors(regularPowerMult, -regularPowerMult);
   delay(stuffyDelay);
   hanMovo.stopMotors();
-//  LCD.clear();
-//  LCD.print("Arduino ");
-//  LCD.println(digitalRead(fromChewPin));
-//  LCD.print("Pick up 2");
+  //  LCD.clear();
+  //  LCD.print("Arduino ");
+  //  LCD.println(digitalRead(fromChewPin));
+  //  LCD.print("Pick up 2");
   //delay(1000);
   while (digitalRead(fromChewPin) == HIGH);
   hanMovo.stopMotors();
@@ -189,8 +184,16 @@ stormtrooperRoom:
 
   {
     unsigned long startTime = millis();
-    while (millis() - startTime < 2500) {
+    while (millis() - startTime < 1000) { //should be enough time to put us on the platform
       hanMovo.followTape(regularPowerMult);
+    }
+  }
+  
+  {
+    unsigned long startTime = millis();
+    while (millis() - startTime < 1500) {
+      hanMovo.followTape(regularPowerMult);
+      hanMovo.lostAndFindTape(); // if we lose the tape, we will search for it
     }
   }
 
@@ -199,7 +202,7 @@ secondCliff:
   digitalWrite(toChewPinLeft, HIGH);
 
   while (!hanFlyo.cliff()) {
-    hanMovo.followTape(regularPowerMult);
+    hanMovo.followTape(slowPowerMult);
 
     if (digitalRead(fromChewPin) == HIGH) {
       delay(stuffyDelay);
@@ -209,7 +212,7 @@ secondCliff:
     }
   }
   hanMovo.stopMotors();
-  delay(1000);
+  delay(4000);
 
 
 turnAround:
@@ -241,7 +244,7 @@ returnSequence:
 
   {
     unsigned long startTime = millis();
-    while (millis() - startTime < tempTime) {
+    while (millis() - startTime < returnTime) {
       hanMovo.followTape(slowPowerMult);
     }
   }
@@ -276,7 +279,7 @@ void saveMenuValues() {
   firstBackupTime = EEPROM[6] * 10;
   stuffyDelay = EEPROM[7];
   rampPowerMult = EEPROM[8] / 100.0;
-  tempTime = EEPROM[9] * 20;
+  returnTime = EEPROM[9] * 20;
 }
 
 void raiseBasket() {
@@ -288,20 +291,20 @@ void raiseBasket() {
 }
 
 void lowerBasket() {
-  LCD.clear();
-  LCD.print("Lower Basket <Start>");
-  while (!startbutton());
-  delay(800);
-  motor.speed(scissorLiftMotor, 200);
-  while (!startbutton());
-  motor.speed(scissorLiftMotor, -255);
-  motor.stop(scissorLiftMotor);
-  delay(800);
+  //  LCD.clear();
+  //  LCD.print("Lower Basket <Start>");
+  //  while (!startbutton());
+  //  delay(800);
   //  motor.speed(scissorLiftMotor, 200);
-  //  while (digitalRead(scissorDownLimitPin) == HIGH);
-  //  motor.speed(scissorLiftMotor, -200);
-  //  delay(10);
+  //  while (!startbutton());
+  //  motor.speed(scissorLiftMotor, -255);
   //  motor.stop(scissorLiftMotor);
+  //  delay(800);
+  motor.speed(scissorLiftMotor, 200);
+  while (digitalRead(scissorDownLimitPin) == HIGH);
+  motor.speed(scissorLiftMotor, -200);
+  delay(10);
+  motor.stop(scissorLiftMotor);
 }
 
 void displayQRDVals() {

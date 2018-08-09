@@ -10,9 +10,9 @@
 Motion::Motion(int val) {
   onTape = EEPROM[0] * 10;
   overCliff = EEPROM[1] * 10;
-  regularPowerMult = EEPROM[2]/100.0;
-  slowPowerMult = EEPROM[3]/100.0;
-  backupPowerMult = EEPROM[4]/100.0;
+  regularPowerMult = EEPROM[2] / 100.0;
+  slowPowerMult = EEPROM[3] / 100.0;
+  backupPowerMult = EEPROM[4] / 100.0;
   //turningTime = EEPROM[8] * 10;
 }
 
@@ -78,23 +78,13 @@ bool Motion::findTapeRight(uint16_t searchTime) {
   return false;
 }
 
-bool Motion::findRightEdge(double rightMultiplier, double leftMultiplier, unsigned int searchTime) {
-  if (isOverCliff(rightOutQRD) && !isOverCliff(rightInQRD)) {
-    return true;
+/*
+   if all four qrds are reading white, then I want to find tape depending looking to the right
+*/
+void Motion::lostAndFindTape() {
+  if (isOnWhite(rightMostQRD) && isOnWhite(rightMiddleQRD) && isOnWhite(leftMiddleQRD) && isOnWhite(leftMostQRD)) {
+    findTapeRight(lostAndFoundTime);
   }
-  else if (!isOverCliff(rightOutQRD)) {
-    unsigned long startTime = millis();
-    driveMotors(rightMultiplier, leftMultiplier);
-    while (millis() < startTime + searchTime) {
-      if (isOverCliff(rightOutQRD)) {
-        motor.speed(leftMotor, 255);
-        motor.speed(rightMotor, -255);
-        motor.stop_all();
-        return true;
-      }
-    }
-  }
-  return false;
 }
 
 /*
@@ -121,27 +111,6 @@ void Motion::followTape(double powerMult) {
   pidControl(pGainTapeFollowing, dGainTapeFollowing, powerMult);
 }
 
-/*
-   Calculates errors and such for following the right edge of a cliff
-*/
-void Motion::followRightEdge(double powerMult) {
-
-  bool rVal = isOverCliff(rightOutQRD);
-  bool lVal = isOverCliff(rightInQRD);
-
-  if (rVal && !lVal) { //all is good
-    currentError = 0;
-    lastState = 0;
-  } else if (!rVal) { // too far left
-    currentError = -1;
-    lastOn = -1;
-  } else if (lVal) { // too far right
-    currentError = 1;
-    lastOn = 1;
-  }
-
-  pidControl(pGainEdgeFollowing, dGainEdgeFollowing, powerMult);
-}
 
 /*
    Controls the motion of the robot based on the last calculated error values and such

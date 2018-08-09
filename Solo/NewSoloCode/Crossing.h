@@ -11,14 +11,10 @@ class Crossing{
 
   public:
     Crossing(int);
-    void setConstants();
     boolean cliff();
-    void backUp(double);
-    void turnRight();
     void dropBridge1();
-    void dropBridge2(uint16_t);
     bool detect10KIR();
-    void alignStep();
+
 };
 
 #endif

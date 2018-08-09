@@ -140,12 +140,12 @@ void Menu::eePromMenu() {
       break;
       
       case 9 :
-      displayMenu("Temp var time", EEPROM[9] * 20);
+      displayMenu("Return Time", EEPROM[9] * 20);
       if (stopbutton()) {
         delay(delayTime);
         while (!stopbutton()) {
           temp = knob(6) / 1024.0 * 255;
-          displayMenu("temp var t(E)", temp * 20);
+          displayMenu("Return T(E)", temp * 20);
         }
         delay(delayTime);
         EEPROM[9] = temp;

@@ -2,31 +2,15 @@
  * CURRENT MENU VALUES AS OF 8/7/18
  * 
  * ONTAPE: 400
- * OVERCLIFF: 460
- * NORMAL POWER: 0.76, 0.83
- * SLOW POWER: 0.44, 0.5
- * BACKUP POWER: 1.4
- * RIGHT PERCENTAGE: 1.09
- * FIRST BACKUP TIME: 420
- 
- * cliff in the morning sun: 50 with a cardboard box helping
- * over cliff for edge following: 650, 620
- * BACKUP TIME: 151
- * backup time for after dropping the second bridge: 520
- * backup time to before dropping second bridge 420
- * BACKUP SPEED: 210 (4/3 of base speed)
- * 241 for second gap
- * BACKUP RIGHT: 0.45
- * now it is set at 0.61
- * TURNING TIME: 90
- * backup cliff: 840
- * 
- * for second cliff/gap at low power: backupPow = 
- * turntime = 960, backtime = 550, backup pow = 1.06
- * at full power: turntime = 840, backuptime = 550, backupPow = .88
- * 
- * turning time for under 16 V: 880
- * turning time for over 16V: 750
+ * OVERCLIFF: 470
+ * NORMAL POWER: 0.76, 0.83, 0.79
+ * SLOW POWER: 0.44, 0.51
+ * BACKUP POWER: 1.4, 1.07
+ * RIGHT PERCENTAGE: 1.09, 0.74
+ * FIRST BACKUP TIME: 420, 450
+ * STUFFY DELAY: 21
+ * RAMP POWER: 0.99
+ * RETURN TIME: 3400
  */
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
@@ -65,5 +49,6 @@ const uint8_t secondBridgeServoAngle = 170;
 const uint16_t bridgeDropWaitTime = 1500;
 const uint16_t ewokFindTapeTime = 2000;
 const uint16_t findTapeWaitTime = 1700;
+const uint16_t lostAndFoundTime = 3000;
 
 #endif
