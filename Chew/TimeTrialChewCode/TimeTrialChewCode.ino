@@ -10,23 +10,21 @@ void setup() {
   pinMode(rightLEDPin, OUTPUT);
   pinMode(leftLEDPin, OUTPUT);
   pinMode(toSoloPin, OUTPUT);
+  susan.attach(clawSusanPin);
 }
 
 void loop() {
   if(digitalRead(fromSoloRightPin) == HIGH && readInQSD(rightLEDPin, rightQSDPin)) {
   //if (readInQSD(rightLEDPin, rightQSDPin)) {  // for testing, if we want to ignore the TINAH
     digitalWrite(toSoloPin, HIGH);
-    delay(3000);
-    //pickUpRight();
+    pickUpRight();
     digitalWrite(toSoloPin, LOW);
   }
 
   if (digitalRead(fromSoloLeftPin) == HIGH && readInQSD(leftLEDPin, leftQSDPin)) {
   //if (readInQSD(leftLEDPin, leftQSDPin)) { // for testing, if we want to ignore the TINAH
     digitalWrite(toSoloPin, HIGH);
-    delay(3000);
-    //pickUpLeft();
-    digitalWrite(toSoloPin, LOW);
+    pickUpLeft();
   }
 }
 
@@ -50,7 +48,7 @@ void pickUpRight() {
   moveClaw(susan, susanRight);
   moveClaw(grip, gripOpen);
   moveClaw(base, baseRightDown);
-  moveClaw(elbow, elbowRightDown);
+  moveClaw(elbow, elbowLeftDown);
   moveClaw(grip, gripClose);
   swivel();
   dropoff(susanBasketRight);
@@ -58,16 +56,21 @@ void pickUpRight() {
   endClaw();
 }
 
-// Pickup something from the left
+// Pickup something from the left: hold it for a few seconds (to move from under the zipline), then deposit in basket. 
 void pickUpLeft() {
   startClaw();
-  moveClaw(elbow, 30);
+  swivel();
   moveClaw(susan, susanLeft);
   moveClaw(grip, gripOpen);
   moveClaw(base, baseLeftDown);
   moveClaw(elbow, elbowLeftDown);
   moveClaw(grip, gripClose);
-  swivel();
+  
+  moveClaw(base, baseLeftDown+50); // hold it a bit above the ground so it doesn't drag and pull out
+  digitalWrite(toSoloPin, LOW); // DELAY and allow chassis movement
+  delay(2000);
+  
+  swivelLeft();
   dropoff(susanBasketLeft);
   travelLeft();
   endClaw();
@@ -81,17 +84,24 @@ void dropoff(uint8_t side) {
   moveClaw(grip, gripOpen);
 }
 
+void dropoffLeft(uint8_t side) {
+  moveClaw(susan, side);
+  moveClaw(base, baseDropoff);
+  moveClaw(elbow, elbowLeftSwivel);
+  moveClaw(grip, gripOpen);
+}
+
 // The position for the claw to be in while we're just running the course
 void travelRight() {
   moveClaw(susan, susanTravelRight);
-  moveClaw(base, baseTravel);
-  moveClaw(elbow, elbowTravel);
+  moveClaw(base, baseTravelRight);
+  moveClaw(elbow, elbowTravelRight);
   moveClaw(grip, gripClose);
 }
 
 void travelLeft() {
   moveClaw(susan, susanTravelLeft);
-  moveClaw(base, baseTravel);
+  moveClaw(base, baseTravelLeft);
   moveClaw(elbow, elbowLeftDown);
   moveClaw(grip, gripClose);
 }
@@ -99,7 +109,13 @@ void travelLeft() {
 // Position before susan moves so that we don't hit anything
 void swivel() {
   moveClaw(base, baseSwivel);
-  elbow.write(elbowSwivel);
+  elbow.write(elbowHighSwivel);
+  moveClaw(grip, gripClose);
+}
+
+void swivelLow() {
+  moveClaw(base, baseSwivel);
+  elbow.write(elbowLowSwivel);
   moveClaw(grip, gripClose);
 }
 
@@ -114,7 +130,6 @@ void startClaw() {
   base.attach(clawBasePin);
   elbow.attach(clawElbowPin);
   grip.attach(clawGripPin);
-  susan.attach(clawSusanPin);
 }
 
 // Detaches all servos, after movement, for power saving
@@ -122,5 +137,4 @@ void endClaw() {
   base.detach();
   elbow.detach();
   grip.detach();
-  susan.detach();
 }

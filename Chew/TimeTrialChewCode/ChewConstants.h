@@ -1,36 +1,47 @@
 #ifndef CHEWCONSTANTS_H
 #define CHEWCONSTANTS_H
 
+/*
+ * SUSAN: 0 TO 180 IS FROM LEFT TO RIGHT, CCW
+ * BASE: 180 IS STRAIGHT UP, 0 IS PARALLEL TO FLOOR
+ * ELBOW: 180 IS THE MOST BENT
+ * GRIP: 0 IS CLOSED
+ */
+
 #define moveDelay 450
 
-#define susanRight 25 
 #define susanFront 0
-#define susanLeft 140
-#define susanBasketRight 62
-#define susanBasketLeft 102 
-#define susanTravelRight 102
-#define susanTravelLeft 150
+#define susanLeft 11
+#define susanRight 142 
 
-#define baseRightDown 90
+#define baseRightDown 80
 #define elbowRightDown 180
 
 #define baseLeftDown 80
 #define elbowLeftDown 180
 
+#define susanBasketRight 80 // drops slightly to right of basket
+#define susanBasketLeft 70 // drops slighty to left of basket
 #define baseDropoff 180
 #define elbowDropoff 10
 
-#define baseTravel 180
-#define elbowTravel 50
+#define susanTravelLeft 30
+#define baseTravelLeft 180
+#define elbowTravelLeft 50
+
+#define susanTravelRight 125
+#define baseTravelRight 95
+#define elbowTravelRight 180
 
 #define baseSwivel 180
-#define elbowSwivel 0
+#define elbowHighSwivel 10
+#define elbowLowSwivel 0
 
 #define gripOpen 180
 #define gripClose 0
 
-const int objectLimit = 250;
-const int readWait = 500; //In microseconds
+const int objectLimit = 200;
+const int readWait = 1000; //In microseconds
 int onValue, offValue;
 Servo susan, base, elbow, grip;
 

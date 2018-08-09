@@ -88,9 +88,9 @@ firstEwok:
       delay(stuffyDelay);
       motor.stop_all();
       while (digitalRead(fromChewPin) == HIGH);
-      hanMovo.driveMotors(slowPowerMult, slowPowerMult);
-      delay(100);
-      hanMovo.findTapeLeft(ewokFindTapeTime);
+//      hanMovo.driveMotors(slowPowerMult, slowPowerMult);
+//      delay(100);
+//      hanMovo.findTapeLeft(ewokFindTapeTime);
       break;
     }
   }
@@ -103,15 +103,12 @@ firstEwok:
       motor.stop_all();
       while (digitalRead(fromChewPin) == HIGH);
 
-      hanMovo.driveMotors(slowPowerMult, slowPowerMult);
-      delay(100);
-      hanMovo.findTapeRight(ewokFindTapeTime);
+//      hanMovo.driveMotors(slowPowerMult, slowPowerMult);
+//      delay(100);
+//      hanMovo.findTapeRight(ewokFindTapeTime);
     }
   }
   hanMovo.stopMotors();
-  //  LCD.clear();
-  //  LCD.print("Arduino ");
-  //LCD.println(digitalRead(fromChewPin));
 
 
 firstBridge:
@@ -127,16 +124,23 @@ firstBridge:
   delay(300);
   motor.stop_all();
   delay(10);
+  
   hanMovo.driveMotors(regularPowerMult, regularPowerMult);
-  while (!hanFlyo.cliff()); // "cliff" signals end of the bridge
-  delay(600);
+  while (!hanFlyo.cliff());
+  delay(200);
+  
+  hanMovo.findTapeLeft(findTapeWaitTime);
+  while (!hanFlyo.cliff()) {
+    hanMovo.followTape(regularPowerMult);
+  }
+  delay(300);
 
 
 secondStuffy:
   digitalWrite(toChewPinRight, HIGH);
   digitalWrite(toChewPinLeft, LOW);
-  hanMovo.findTapeLeft(findTapeWaitTime);
-  
+  hanMovo.findTapeRight(findTapeWaitTime);
+
   while (digitalRead(fromChewPin) == LOW) {
     hanMovo.followTape(regularPowerMult);
   }
@@ -162,7 +166,7 @@ toTheIR:
   while (!hanFlyo.detect10KIR());
   LCD.clear();
   LCD.print("10K");
-  
+
 
 stormtrooperRoom:
   digitalWrite(toChewPinRight, LOW);
@@ -179,14 +183,14 @@ stormtrooperRoom:
       hanMovo.followTape(regularPowerMult);
     }
   }
-  
-//  {
-//    unsigned long startTime = millis();
-//    while (millis() - startTime < 1500) {
-//      hanMovo.followTape(regularPowerMult);
-//      hanMovo.lostAndFindTape(); // if we lose the tape, we will search for it
-//    }
-//  }
+
+  //  {
+  //    unsigned long startTime = millis();
+  //    while (millis() - startTime < 1500) {
+  //      hanMovo.followTape(regularPowerMult);
+  //      hanMovo.lostAndFindTape(); // if we lose the tape, we will search for it
+  //    }
+  //  }
 
 
 secondCliff:
@@ -217,50 +221,52 @@ turnAround:
   delay(500);
   hanMovo.findTapeLeft(5000);
 
-  //  ALTERNATIVE RETURN STRATEGY
-  //  hanMovo.driveMotors(-slowPowerMult, slowPowerMult);
-  //  delay(500);
-  //  hanMovo.findTapeRight(5000);
 
+//returnSequence:
+//
+//  {
+//    unsigned long startTime = millis();
+//    while (millis() - startTime < 1000) {
+//      hanMovo.followTape(slowPowerMult);
+//    }
+//  }
+//  motor.stop_all();
+//  raiseBasket();
+//
+//  {
+//    unsigned long startTime = millis();
+//    while (millis() - startTime < returnTime) {
+//      hanMovo.followTape(slowPowerMult);
+//    }
+//  }
+//
+//  motor.stop_all();
+//  lowerBasket();
+//  goto beforeStart;
 
-returnSequence:
+driveBack:
+  digitalWrite(toChewPinRight, LOW);
+  digitalWrite(toChewPinLeft, LOW);
+  
+  while (!hanFlyo.cliff()) {
+    hanMovo.followTape(slowPowerMult);
+    hanMovo.lostAndFindTape();
+  }
+  delay(200);
+  hanMovo.findTapeRight(findTapeWaitTime);
 
-  {
-    unsigned long startTime = millis();
-    while (millis() - startTime < 1000) {
-      hanMovo.followTape(slowPowerMult);
-    }
+  while (!hanFlyo.cliff()) {
+    hanMovo.followTape(slowPowerMult);
+  }
+  delay(200);
+  hanMovo.findTapeLeft(findTapeWaitTime);
+  while(!startbutton()){
+    hanMovo.followTape(slowPowerMult);
   }
   motor.stop_all();
-  raiseBasket();
-
-  {
-    unsigned long startTime = millis();
-    while (millis() - startTime < returnTime) {
-      hanMovo.followTape(slowPowerMult);
-    }
-  }
-
-  //  ALTERNATIVE RETURN STRATEGY
-  //  {
-  //    unsigned long startTime = millis();
-  //    while (millis() - startTime < 1000){
-  //      hanMovo.driveMotors(slowPowerMult*1.25, slowPowerMult);
-  //    }
-  //  }
-  //  motor.stop_all();
-  //  raiseBasket();
-  //
-  //  {
-  //    unsigned long startTime = millis();
-  //    while (millis() - startTime < tempTime){
-  //      hanMovo.driveMotors(slowPowerMult*1.25, slowPowerMult);
-  //    }
-  //  }
-
-  motor.stop_all();
-  lowerBasket();
   goto beforeStart;
+  
+
 }
 
 void saveMenuValues() {

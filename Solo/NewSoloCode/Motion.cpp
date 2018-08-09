@@ -31,24 +31,23 @@ void Motion::reset(uint8_t last) {
 bool Motion::findTapeLeft(uint16_t searchTime) {
   if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
     return true;
-  } else {
-
-    uint32_t startTime1 = millis();
-    driveMotors(slowPowerMult, -slowPowerMult);
-    while (millis() < (startTime1 + searchTime)) {
-      if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
-        motor.stop_all();
-        return true;
-      }
+  }
+  
+  driveMotors(slowPowerMult, -slowPowerMult);
+  uint32_t startTime1 = millis();
+  while (millis() < (startTime1 + (searchTime / 1.5))) {
+    if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
+      motor.stop_all();
+      return true;
     }
-
-    uint32_t startTime2 = millis();
-    driveMotors(-slowPowerMult, slowPowerMult);
-    while (millis() < (startTime2 + searchTime * 2)) {
-      if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
-        motor.stop_all();
-        return true;
-      }
+  }
+    
+  driveMotors(-slowPowerMult, slowPowerMult);
+  uint32_t startTime2 = millis();
+  while (millis() < (startTime2 + searchTime)) {
+    if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
+      motor.stop_all();
+      return true;
     }
     return false;
   }
@@ -59,17 +58,17 @@ bool Motion::findTapeRight(uint16_t searchTime) {
     return true;
   }
 
-  uint32_t startTime1 = millis();
   driveMotors(-slowPowerMult, slowPowerMult);
+  uint32_t startTime1 = millis();
   while (millis() < (startTime1 + searchTime)) {
     if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
       motor.stop_all();
       return true;
     }
   }
-
-  uint32_t startTime2 = millis();
+  
   driveMotors(slowPowerMult, -slowPowerMult);
+  uint32_t startTime2 = millis();
   while (millis() < (startTime2 + searchTime * 2)) {
     if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
       motor.stop_all();
