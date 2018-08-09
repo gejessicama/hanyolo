@@ -12,7 +12,7 @@
 
 static uint8_t menuScreen;
 static byte temp;
-static const uint8_t menuSize = 10;
+static const uint8_t menuSize = 11;
 static const uint8_t delayTime = 250;
 
 /*
@@ -149,6 +149,19 @@ void Menu::eePromMenu() {
         }
         delay(delayTime);
         EEPROM[9] = temp;
+      }
+      break;
+
+      case 10 :
+      displayMenu("After Cliff", EEPROM[10] * 10);
+      if (stopbutton()) {
+        delay(delayTime);
+        while (!stopbutton()) {
+          temp = knob(6) / 1024.0 * 255;
+          displayMenu("After Cl(E)", temp * 10);
+        }
+        delay(delayTime);
+        EEPROM[10] = temp;
       }
       break;
   }

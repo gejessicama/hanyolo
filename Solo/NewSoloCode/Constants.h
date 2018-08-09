@@ -48,7 +48,7 @@ const uint8_t firstBridgeServoAngle = 90;
 const uint8_t secondBridgeServoAngle = 170;
 const uint16_t bridgeDropWaitTime = 1500;
 const uint16_t ewokFindTapeTime = 2100;
-const uint16_t findTapeWaitTime = 1700;
+const uint16_t findTapeWaitTime = 1000;
 const uint16_t lostAndFoundTime = 1700;
 const uint16_t waitForClaw = 5000;
 

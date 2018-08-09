@@ -13,7 +13,6 @@ Motion::Motion(int val) {
   regularPowerMult = EEPROM[2] / 100.0;
   slowPowerMult = EEPROM[3] / 100.0;
   backupPowerMult = EEPROM[4] / 100.0;
-  //turningTime = EEPROM[8] * 10;
 }
 
 /*

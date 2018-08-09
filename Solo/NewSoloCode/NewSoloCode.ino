@@ -22,7 +22,7 @@
 
 // OTHER VARIABLES
 uint8_t stuffyDelay;
-uint16_t firstBackupTime, findTapeTime;
+uint16_t firstBackupTime, findTapeTime, afterCliffTime;
 double regularPowerMult, slowPowerMult, backupPowerMult, rightWheelPercent, rampPowerMult;
 
 byte baseSpeed; //proportionalGain, derivativeGain;
@@ -131,7 +131,7 @@ firstBridge:
   while (!hanFlyo.cliff()) {
     //hanMovo.followTape(slowPowerMult);
   }
-  delay(300);
+  delay(afterCliffTime);
 
 
 secondStuffy:
@@ -168,8 +168,8 @@ stormtrooperRoom:
 
   //hanMovo.driveMotors(slowPowerMult, 0);
   //delay(100);
-  hanMovo.findTapeLeft(findTapeWaitTime);
-  //hanMovo.reset(-1);
+  hanMovo.findTapeRight(findTapeTime);
+
 
   {
     unsigned long startTime = millis();
@@ -230,7 +230,7 @@ driveBack:
   while (!hanFlyo.cliff()) {
     hanMovo.followTape(slowPowerMult);
   }
-  delay(200);
+  delay(500);
   hanMovo.findTapeLeft(findTapeTime);
   while(!startbutton()){
     hanMovo.followTape(slowPowerMult);
@@ -250,6 +250,7 @@ void saveMenuValues() {
   stuffyDelay = EEPROM[7];
   rampPowerMult = EEPROM[8] / 100.0;
   findTapeTime = EEPROM[9] * 20;
+  afterCliffTime = EEPROM[10] * 10;
 }
 
 void raiseBasket() {
