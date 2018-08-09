@@ -10,10 +10,10 @@
 Motion::Motion(int val) {
   onTape = EEPROM[0] * 10;
   overCliff = EEPROM[1] * 10;
-  regularPowerMult = EEPROM[2]/100.0;
-  slowPowerMult = EEPROM[3]/100.0;
-  backupPowerMult = EEPROM[4]/100.0;
-  turningTime = EEPROM[8] * 10;
+  regularPowerMult = EEPROM[2] / 100.0;
+  slowPowerMult = EEPROM[3] / 100.0;
+  backupPowerMult = EEPROM[4] / 100.0;
+  //turningTime = EEPROM[8] * 10;
 }
 
 /*
@@ -32,19 +32,19 @@ bool Motion::findTapeLeft(uint16_t searchTime) {
   if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
     return true;
   }
-  //turns left first, is possible to go too far left 
-  unsigned long startTime = millis();
+
+  uint32_t startTime1 = millis();
   driveMotors(slowPowerMult, -slowPowerMult);
-  while ((millis() < startTime + searchTime / 2.0)) {
+  while (millis() < (startTime1 + (searchTime / 1.5))) {
     if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
       motor.stop_all();
       return true;
     }
   }
-  //turns right second, is possible to go too far right
-  startTime = millis();
+
+  uint32_t startTime2 = millis();
   driveMotors(-slowPowerMult, slowPowerMult);
-  while ((millis() < startTime + searchTime)) {
+  while (millis() < (startTime2 + searchTime)) {
     if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
       motor.stop_all();
       return true;
@@ -57,49 +57,40 @@ bool Motion::findTapeRight(uint16_t searchTime) {
   if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
     return true;
   }
-  //turns right first
-  unsigned long startTime = millis();
-  driveMotors(-slowPowerMult, slowPowerMult);
-  while ((millis() < startTime + searchTime / 2)) {
-    if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
-      motor.stop_all();
-      return true;
-    }
-  }
-  startTime = millis();
-  driveMotors(slowPowerMult, -slowPowerMult);
-  while ((millis() < startTime + searchTime)) {
-    if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
-      motor.stop_all();
-      return true;
-    }
-  }
-  return false;
-}
 
-bool Motion::findRightEdge(double rightMultiplier, double leftMultiplier, unsigned int searchTime) {
-  if (isOverCliff(rightOutQRD) && !isOverCliff(rightInQRD)) {
-    return true;
+  uint32_t startTime1 = millis();
+  driveMotors(-slowPowerMult, slowPowerMult);
+  while (millis() < (startTime1 + (searchTime / 1.5))) {
+    if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
+      motor.stop_all();
+      return true;
+    }
   }
-  else if (!isOverCliff(rightOutQRD)) {
-    unsigned long startTime = millis();
-    driveMotors(rightMultiplier, leftMultiplier);
-    while (millis() < startTime + searchTime) {
-      if (isOverCliff(rightOutQRD)) {
-        motor.speed(leftMotor, 255);
-        motor.speed(rightMotor, -255);
-        motor.stop_all();
-        return true;
-      }
+
+  uint32_t startTime2 = millis();
+  driveMotors(slowPowerMult, -slowPowerMult);
+  while (millis() < (startTime2 + searchTime)) {
+    if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
+      motor.stop_all();
+      return true;
     }
   }
   return false;
 }
 
 /*
+   if all four qrds are reading white, then I want to find tape depending looking to the right
+*/
+void Motion::lostAndFindTape() {
+  if (isOnWhite(rightMostQRD) && isOnWhite(rightMiddleQRD) && isOnWhite(leftMiddleQRD) && isOnWhite(leftMostQRD)) {
+    findTapeRight(lostAndFoundTime);
+  }
+}
+
+/*
    Calculates the error values and such for following tape
 */
-void Motion::followTape() {
+void Motion::followTape(double powerMult) {
 
   bool rVal = isOnWhite(rightMiddleQRD);
   bool lVal = isOnWhite(leftMiddleQRD);
@@ -117,41 +108,20 @@ void Motion::followTape() {
     currentError = lastOn * 5;
   }
 
-  pidControl(pGainTapeFollowing, dGainTapeFollowing);
+  pidControl(pGainTapeFollowing, dGainTapeFollowing, powerMult);
 }
 
-/*
-   Calculates errors and such for following the right edge of a cliff
-*/
-void Motion::followRightEdge() {
-
-  bool rVal = isOverCliff(rightOutQRD);
-  bool lVal = isOverCliff(rightInQRD);
-
-  if (rVal && !lVal) { //all is good
-    currentError = 0;
-    lastState = 0;
-  } else if (!rVal) { // too far left
-    currentError = -1;
-    lastOn = -1;
-  } else if (lVal) { // too far right
-    currentError = 1;
-    lastOn = 1;
-  }
-
-  pidControl(pGainEdgeFollowing, dGainEdgeFollowing);
-}
 
 /*
    Controls the motion of the robot based on the last calculated error values and such
 */
-void Motion::pidControl(uint8_t proportionalGain, uint8_t derivativeGain) {
+void Motion::pidControl(uint8_t proportionalGain, uint8_t derivativeGain, double powerMult) {
   int proportionalTerm = proportionalGain * currentError;
   int derivativeTerm = derivativeGain * (currentError - lastState) * 1.0 / count;
   int gain = proportionalTerm + derivativeTerm;
 
-  motor.speed(rightMotor, regularPowerMult * (baseDrivingSpeed + gain));
-  motor.speed(leftMotor, regularPowerMult * (-baseDrivingSpeed + gain));
+  motor.speed(rightMotor, powerMult * (baseDrivingSpeed + gain));
+  motor.speed(leftMotor, powerMult * (-baseDrivingSpeed + gain));
 
   if (currentError != lastError) {
     lastState = lastError;
@@ -175,15 +145,6 @@ void Motion::driveMotors(double rightMultiplier, double leftMultiplier) {
 void Motion::stopMotors() {
   motor.speed(rightMotor, -255);
   motor.speed(leftMotor, 255);
-  motor.stop_all();
-}
-
-/*
-   Tells the robot to exectute a right turn by stopping the left wheel and backing up the right wheel
-*/
-void Motion::turnRight() {
-  driveMotors(-backupPowerMult, backupPowerMult);
-  delay(turningTime);
   motor.stop_all();
 }
 

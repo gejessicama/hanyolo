@@ -14,22 +14,20 @@ class Motion {
     
     boolean isOnWhite(uint8_t);
     boolean isOverCliff(uint8_t);
-    void pidControl(uint8_t, uint8_t);
+    void pidControl(uint8_t, uint8_t, double);
 
   public:
     Motion(int);
-    void setConstants();
     void reset(uint8_t);
     
-    void followTape();
-    void followRightEdge();
+    void followTape(double);
     void driveMotors(double, double);
     void stopMotors();
-    void turnRight();
-
+    void lostAndFindTape();
+    
     bool findTapeLeft(uint16_t);
     bool findTapeRight(uint16_t);
-    bool findRightEdge(double, double, unsigned int);
+    
 };
 
 #endif

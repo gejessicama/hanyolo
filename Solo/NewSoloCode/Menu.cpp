@@ -12,7 +12,7 @@
 
 static uint8_t menuScreen;
 static byte temp;
-static const uint8_t menuSize = 9;
+static const uint8_t menuSize = 10;
 static const uint8_t delayTime = 250;
 
 /*
@@ -114,12 +114,12 @@ void Menu::eePromMenu() {
       break;
 
     case 7 :
-      displayMenu("2nd Back Time", EEPROM[7] * 10);
+      displayMenu("Stuffy Delay", EEPROM[7]);
       if (stopbutton()) {
         delay(delayTime);
         while (!stopbutton()) {
           temp = knob(6) / 1024.0 * 255;
-          displayMenu("2nd Back T(E)", temp * 10);
+          displayMenu("Stuffy De(E)", temp);
         }
         delay(delayTime);
         EEPROM[7] = temp;
@@ -127,15 +127,28 @@ void Menu::eePromMenu() {
       break;
 
     case 8 :
-      displayMenu("Turn Time", EEPROM[8] * 10);
+      displayMenu("Ramp Power", EEPROM[8] / 100.0);
       if (stopbutton()) {
         delay(delayTime);
         while (!stopbutton()) {
           temp = knob(6) / 1024.0 * 255;
-          displayMenu("Turn T(E)", temp * 10);
+          displayMenu("Ramp Po(E)", temp / 100.0);
         }
         delay(delayTime);
         EEPROM[8] = temp;
+      }
+      break;
+      
+      case 9 :
+      displayMenu("Return Time", EEPROM[9] * 20);
+      if (stopbutton()) {
+        delay(delayTime);
+        while (!stopbutton()) {
+          temp = knob(6) / 1024.0 * 255;
+          displayMenu("Return T(E)", temp * 20);
+        }
+        delay(delayTime);
+        EEPROM[9] = temp;
       }
       break;
   }
