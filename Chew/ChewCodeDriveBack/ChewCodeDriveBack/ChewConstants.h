@@ -11,36 +11,35 @@
 #define moveDelay 450
 
 #define susanFront 0
-#define susanLeft 11
+#define susanLeft 5
 #define susanRight 137 
 
 #define baseRightDown 80
-#define elbowRightDown 180
+#define elbowRightDown 145
 
 #define baseLeftDown 80
-#define elbowLeftDown 180
+#define elbowLeftDown 155
 
-#define susanBasketRight 75 // drops slightly to right of basket
-#define susanBasketLeft 70 // drops slighty to left of basket
+#define susanBasketRight 73 // drops slightly to right of basket
+#define susanBasketLeft 73 // drops slighty to left of basket
 #define baseDropoff 180
 #define elbowDropoff 0
 
-#define susanTravelLeft 30
-#define baseTravelLeft 180
+#define susanTravelLeft 73
+#define baseTravelLeft 170
 #define elbowTravelLeft 50
 
-#define susanTravelRight 125
-#define baseTravelRight 95
-#define elbowTravelRight 180
+#define susanTravelRight 73
+#define baseTravelRight 170
+#define elbowTravelRight 50
 
 #define baseSwivel 180
 #define elbowHighSwivel 0
-#define elbowLowSwivel 0
+#define elbowLowSwivel 20
 
 #define gripOpen 180
 #define gripClose 0
 
-const int objectLimit = 200;
 const int readWait = 1000; //In microseconds
 int onValue, offValue;
 Servo susan, base, elbow, grip;

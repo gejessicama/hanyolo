@@ -10,33 +10,27 @@ void setup() {
   pinMode(rightLEDPin, OUTPUT);
   pinMode(leftLEDPin, OUTPUT);
   pinMode(toSoloPin, OUTPUT);
-  //susan.attach(clawSusanPin);
-  //grip.attach(clawGripPin);
-  //moveClaw(grip, gripOpen);
-  //grip.detach();
 }
 
 void loop() {
-  if(digitalRead(fromSoloRightPin) == HIGH && readInQSD(rightLEDPin, rightQSDPin)) {
-  //if (readInQSD(rightLEDPin, rightQSDPin)) {  // for testing, if we want to ignore the TINAH
+  if (digitalRead(fromSoloRightPin) == HIGH && readInQSD(rightLEDPin, rightQSDPin, 200)) {
+  //if (readInQSD(rightLEDPin, rightQSDPin, 200)) {  // for testing, if we want to ignore the TINAH
     digitalWrite(toSoloPin, HIGH);
-    //pickUpRight();
-    delay(3000);
+    pickUpRight();
+    //delay(3000);
     digitalWrite(toSoloPin, LOW);
   }
 
-  if (digitalRead(fromSoloLeftPin) == HIGH && readInQSD(leftLEDPin, leftQSDPin)) {
-  //if (readInQSD(leftLEDPin, leftQSDPin)) { // for testing, if we want to ignore the TINAH
+  if (digitalRead(fromSoloLeftPin) == HIGH && readInQSD(leftLEDPin, leftQSDPin, 150)) {
+  //if (readInQSD(leftLEDPin, leftQSDPin, 200)) { // for testing, if we want to ignore the TINAH
     digitalWrite(toSoloPin, HIGH);
-    //pickUpLeft();
-    delay(3000);
+    pickUpLeft();
+    //delay(3000);
     digitalWrite(toSoloPin, LOW);
-
-    
   }
 }
 
-boolean readInQSD(uint8_t ledPin, uint8_t qsdPin) {
+boolean readInQSD(uint8_t ledPin, uint8_t qsdPin, uint8_t objectLimit) {
   digitalWrite(ledPin, HIGH);
   delayMicroseconds(readWait);
   onValue = analogRead(qsdPin);
@@ -55,7 +49,7 @@ void pickUpRight() {
   swivel();
   moveClaw(susan, susanRight);
   moveClaw(grip, gripOpen);
-  moveClaw(elbow, elbowLeftDown);
+  moveClaw(elbow, elbowRightDown);
   moveClaw(base, baseRightDown);
   moveClaw(grip, gripClose);
   swivel();
@@ -67,7 +61,7 @@ void pickUpRight() {
 // Pickup something from the left: hold it for a few seconds (to move from under the zipline), then deposit in basket. 
 void pickUpLeft() {
   startClaw();
-  swivel();
+  swivelLow();
   moveClaw(susan, susanLeft);
   moveClaw(grip, gripOpen);
   moveClaw(elbow, elbowLeftDown);
@@ -80,7 +74,7 @@ void pickUpLeft() {
   
   swivelLow();
   dropoff(susanBasketLeft);
-  travelLeft();
+  travelRight();
   endClaw();
 }
 
@@ -95,7 +89,7 @@ void dropoff(uint8_t side) {
 void dropoffLeft(uint8_t side) {
   moveClaw(susan, side);
   moveClaw(base, baseDropoff);
-  moveClaw(elbow, elbowLowSwivel);
+  moveClaw(elbow, elbowDropoff);
   moveClaw(grip, gripOpen);
 }
 
@@ -132,16 +126,18 @@ void moveClaw(Servo servo, uint8_t pos) {
   servo.write(pos);
   delay(moveDelay);
 }
-
+ 
 // Attaches all servos, right before movement for power saving
 void startClaw() {
   base.attach(clawBasePin);
   elbow.attach(clawElbowPin);
   grip.attach(clawGripPin);
+  susan.attach(clawSusanPin);
 }
 
 // Detaches all servos, after movement, for power saving
 void endClaw() {
+  susan.detach();
   base.detach();
   elbow.detach();
   grip.detach();
