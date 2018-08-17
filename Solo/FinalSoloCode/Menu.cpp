@@ -1,11 +1,20 @@
 /*
-   knob(7) scrolls through the values to change
+   INSTRUCTIONS
+    knob(7) scrolls through the values to change
     stopbutton() lets you begin and finish editing a single value
     startbutton() exits the menu and begins the robot code
 
-
-    wish list:
-    find tape speed
+   CURRENT VALUES
+    ONTAPE: 400
+    OVERCLIFF: 470
+    NORMAL POWER: 0.79
+    SLOW POWER: 0.51
+    BACKUP POWER: 1.07
+    RIGHT PERCENTAGE: 0.74
+    FIRST BACKUP TIME: 450
+    STUFFY DELAY: 21
+    RAMP POWER: 0.99
+    RETURN TIME: 3400
 */
 
 #include "Menu.h"
@@ -138,8 +147,8 @@ void Menu::eePromMenu() {
         EEPROM[8] = temp;
       }
       break;
-      
-      case 9 :
+
+    case 9 :
       displayMenu("Find Tape Time", EEPROM[9] * 20);
       if (stopbutton()) {
         delay(delayTime);
@@ -152,7 +161,7 @@ void Menu::eePromMenu() {
       }
       break;
 
-      case 10 :
+    case 10 :
       displayMenu("After Cliff", EEPROM[10] * 10);
       if (stopbutton()) {
         delay(delayTime);

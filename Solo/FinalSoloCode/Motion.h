@@ -1,3 +1,9 @@
+/*
+   Motion is a class with objects intended to contain all (most) of the functions necessary
+   for our robot to move
+*/
+
+
 #include<Arduino.h>
 #include<phys253.h>
 #include <EEPROM.h>
@@ -8,10 +14,10 @@ class Motion {
   private:
     uint16_t onTape, overCliff;
     double regularPowerMult, slowPowerMult, backupPowerMult;
-    
+
     int currentError, lastError, lastState, lastOn;
     uint16_t count;
-    
+
     boolean isOnWhite(uint8_t);
     boolean isOverCliff(uint8_t);
     void pidControl(uint8_t, uint8_t, double);
@@ -19,15 +25,15 @@ class Motion {
   public:
     Motion(int);
     void reset(uint8_t);
-    
+
     void followTape(double);
     void driveMotors(double, double);
     void stopMotors();
     void lostAndFindTape();
-    
+
     bool findTapeLeft(uint16_t);
     bool findTapeRight(uint16_t);
-    
+
 };
 
 #endif

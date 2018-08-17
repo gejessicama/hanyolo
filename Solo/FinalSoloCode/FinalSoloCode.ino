@@ -1,16 +1,7 @@
-
 /*
-   Code for the TINAH that is reformatted to hopefully be more efficient
-
-   Potential problems: I added hanMovo.stopMotors() when we sense a cliff that was not there before
-    and might cause us to have to readdjust our back up times and such
-
-    look over stuff for the second bridge crossing: it's a bit sketchy
-
-    all the tower stuff is purely theoretical and may not actually work
-
-  TODO: find all raw numbers and try to figure out a better way
-    run code and optimize values
+   Main code for the TINAH microprocessor (aka Solo)
+   Contains a sequence of actions to be performed by the robot, and a couple of
+   helper functions that didn't fit with any of our helper classes
 */
 
 #include <phys253.h>
@@ -20,40 +11,34 @@
 #include "Constants.h"
 #include "Menu.h"
 
-// OTHER VARIABLES
 uint8_t stuffyDelay;
 uint16_t firstBackupTime, findTapeTime, afterCliffTime;
 double regularPowerMult, slowPowerMult, backupPowerMult, rightWheelPercent, rampPowerMult;
 
-byte baseSpeed; //proportionalGain, derivativeGain;
+byte baseSpeed;
 double powerMult;
-//int onTape, overCliff, backupTime;
 
-//  HELPER FUNCTIONS
-void saveMenuValues();
-void raiseBasket();
-void lowerBasket();
-void displayQRDVals();
-
+/*
+   Sets up our Liquid Crystal Display, declares our inputs and our outputs
+*/
 void setup() {
   LCD.begin();
   LCD.clear();
-  pinMode(0, INPUT);
-  pinMode(1, INPUT);
-  pinMode(2, INPUT);
-  pinMode(3, INPUT);
-  pinMode(4, INPUT);
-  pinMode(5, INPUT);
-  pinMode(6, INPUT);
-  pinMode(7, INPUT);
 
+  pinMode(fromChewPin, INPUT);
+  pinMode(irSignalPin, INPUT);
   pinMode(toChewPinLeft, OUTPUT);
   pinMode(toChewPinRight, OUTPUT);
 }
 
-
+/*
+   Our main function:
+   Though the function automatically loops back on itself,
+   we opted to use our own loops for better control over the robot's actions
+*/
 void loop() {
 
+  /* Before we start, we want a chance to set things up, and edit values stored in memory */
 beforeStart:
   digitalWrite(toChewPinRight, LOW);
   digitalWrite(toChewPinLeft, LOW);
@@ -75,7 +60,9 @@ beforeStart:
   Crossing hanFlyo(0);
 
 
+  /* Actions that take us from the start to the first gap */
 firstEwok:
+  // tells the Arduino (Chewy) to only look on the right for Ewoks
   digitalWrite(toChewPinRight, HIGH);
   digitalWrite(toChewPinLeft, LOW);
 
@@ -86,13 +73,14 @@ firstEwok:
       delay(stuffyDelay);
       motor.stop_all();
       while (digitalRead(fromChewPin) == HIGH);
-//      hanMovo.driveMotors(slowPowerMult, slowPowerMult);
-//      delay(100);
-//      hanMovo.findTapeLeft(ewokFindTapeTime);
+      //      hanMovo.driveMotors(slowPowerMult, slowPowerMult);
+      //      delay(100);
+      //      hanMovo.findTapeLeft(ewokFindTapeTime);
       break;
     }
   }
 
+  // If we see the first Ewok, then we will drive more slowly as we approach the cliff
   while (!hanFlyo.cliff()) {
     hanMovo.followTape(slowPowerMult);
 
@@ -101,15 +89,17 @@ firstEwok:
       motor.stop_all();
       while (digitalRead(fromChewPin) == HIGH);
 
-//      hanMovo.driveMotors(slowPowerMult, slowPowerMult);
-//      delay(100);
-//      hanMovo.findTapeRight(ewokFindTapeTime);
+      //      hanMovo.driveMotors(slowPowerMult, slowPowerMult);
+      //      delay(100);
+      //      hanMovo.findTapeRight(ewokFindTapeTime);
     }
   }
   hanMovo.stopMotors();
 
 
+  /* Steps for dropping and crossing our bridge */
 firstBridge:
+  // tells the Arduino (Chewy) not to look for Ewoks
   digitalWrite(toChewPinRight, LOW);
   digitalWrite(toChewPinLeft, LOW);
 
@@ -117,24 +107,25 @@ firstBridge:
   delay(firstBackupTime);
   motor.stop_all();
 
-  hanFlyo.dropBridge1();
+  hanFlyo.dropBridge();
   hanMovo.driveMotors(-slowPowerMult, -slowPowerMult);
   delay(250);
   motor.stop_all();
   delay(20);
-  
+
   hanMovo.driveMotors(slowPowerMult, slowPowerMult);
   while (!hanFlyo.cliff());
   delay(200);
-  
-  //hanMovo.findTapeLeft(findTapeWaitTime); // removed because yolo had difficulty finding line and staying on it 
-  while (!hanFlyo.cliff()) {
-    //hanMovo.followTape(slowPowerMult);
-  }
+
+  // Our bridge has two "cliffs" on it to mark the beginning and end of the bridge
+  // This is more helpful for crossing it on our way back
+  while (!hanFlyo.cliff());
   delay(afterCliffTime);
 
 
+  /* Actions for picking up the second stuffy */
 secondStuffy:
+  // tells Chewy to only look on the right for Ewoks
   digitalWrite(toChewPinRight, HIGH);
   digitalWrite(toChewPinLeft, LOW);
   hanMovo.findTapeRight(findTapeWaitTime);
@@ -149,8 +140,9 @@ secondStuffy:
   while (digitalRead(fromChewPin) == HIGH);
 
 
+  /* Deals with detecting a change in frequency with the IR signal */
 toTheIR:
-  // tells the arduino not to look for any stuffies
+  // tells Chewy not to look for stuffies
   digitalWrite(toChewPinRight, LOW);
   digitalWrite(toChewPinLeft, LOW);
 
@@ -163,14 +155,16 @@ toTheIR:
 
 
 stormtrooperRoom:
+  // additional command for ease of jumping to this label when we were testing our code
   digitalWrite(toChewPinRight, LOW);
   digitalWrite(toChewPinLeft, LOW);
 
+  // Originally had additional commands for better aligning ourselves to cross under the archway
   //hanMovo.driveMotors(slowPowerMult, 0);
   //delay(100);
   hanMovo.findTapeRight(findTapeTime);
 
-
+  // We have to wait to pass by the stormtroopers so we don't mistake them for Ewoks
   {
     unsigned long startTime = millis();
     while (millis() - startTime < 3000) { //should be enough time to put us on the platform
@@ -178,20 +172,15 @@ stormtrooperRoom:
     }
   }
 
-  //  {
-  //    unsigned long startTime = millis();
-  //    while (millis() - startTime < 1500) {
-  //      hanMovo.followTape(regularPowerMult);
-  //      hanMovo.lostAndFindTape(); // if we lose the tape, we will search for it
-  //    }
-  //  }
 
-
+/* Actions related to picking up the third Ewok and not falling off a cliff */
 secondCliff:
+  // Tells Chewy to look for Ewoks on the Left only
   digitalWrite(toChewPinRight, LOW);
   digitalWrite(toChewPinLeft, HIGH);
 
   while (!hanFlyo.cliff()) {
+    // Going slowly helps us not accidentally rotate a spinning platform
     hanMovo.followTape(slowPowerMult);
 
     if (digitalRead(fromChewPin) == HIGH) {
@@ -205,6 +194,7 @@ secondCliff:
   delay(waitForClaw);
 
 
+/* How we back up, and turn around to find the tape again */
 turnAround:
   digitalWrite(toChewPinRight, LOW);
   digitalWrite(toChewPinLeft, LOW);
@@ -214,33 +204,41 @@ turnAround:
   hanMovo.driveMotors(slowPowerMult, -slowPowerMult);
   delay(500);
   hanMovo.findTapeLeft(5000);
-  
 
+
+/* Commands for driving all the way back to the start */
 driveBack:
   digitalWrite(toChewPinRight, LOW);
   digitalWrite(toChewPinLeft, LOW);
-  
+
   while (!hanFlyo.cliff()) {
     hanMovo.followTape(slowPowerMult);
+    // In case we rotated the platform, we need to be able to get back on tape
     hanMovo.lostAndFindTape();
   }
   delay(200);
   hanMovo.findTapeRight(findTapeTime);
 
+  // Our bridge has two "cliffs" to signal its begininng and end
+  // We follow tape to stay in the middle of the bridge
   while (!hanFlyo.cliff()) {
     hanMovo.followTape(slowPowerMult);
   }
   delay(500);
   hanMovo.findTapeLeft(findTapeTime);
-  while(!startbutton()){
+
+  // We stop after getting back into the start area (which ends in the edge of the table)
+  while (!hanFlyo.cliff()) {
     hanMovo.followTape(slowPowerMult);
   }
   motor.stop_all();
   goto beforeStart;
-  
 
 }
 
+/*
+ * Stores all the values we need from the TINAH memory
+ */
 void saveMenuValues() {
   regularPowerMult = EEPROM[2] / 100.0;
   slowPowerMult = EEPROM[3] / 100.0;
@@ -253,31 +251,9 @@ void saveMenuValues() {
   afterCliffTime = EEPROM[10] * 10;
 }
 
-void raiseBasket() {
-  motor.speed(scissorLiftMotor, -200);
-  while (digitalRead(scissorUpLimitPin) == HIGH);
-  motor.speed(scissorLiftMotor, 200);
-  delay(10);
-  motor.stop(scissorLiftMotor);
-}
-
-void lowerBasket() {
-  //  LCD.clear();
-  //  LCD.print("Lower Basket <Start>");
-  //  while (!startbutton());
-  //  delay(800);
-  //  motor.speed(scissorLiftMotor, 200);
-  //  while (!startbutton());
-  //  motor.speed(scissorLiftMotor, -255);
-  //  motor.stop(scissorLiftMotor);
-  //  delay(800);
-  motor.speed(scissorLiftMotor, 200);
-  while (digitalRead(scissorDownLimitPin) == HIGH);
-  motor.speed(scissorLiftMotor, -200);
-  delay(10);
-  motor.stop(scissorLiftMotor);
-}
-
+/*
+ * Displays all our QRD values so we can easily see how ambient light will affect our performance
+ */
 void displayQRDVals() {
   LCD.clear();
   LCD.print(analogRead(leftMostQRD));

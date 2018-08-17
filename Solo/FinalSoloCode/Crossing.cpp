@@ -1,9 +1,6 @@
-/*
-   All the functions related to crossign the first gap and detecting the IR signal
-*/
-
 #include "Crossing.h"
 #include "Constants.h"
+
 
 /*
    Initializer for a Crossing Object
@@ -23,13 +20,14 @@ boolean Crossing::cliff() {
 }
 
 /*
-   code for droping a bridge
+   Drops our bridge
 */
-void Crossing::dropBridge1() {
-
+void Crossing::dropBridge() {
   delay(bridgeDropWaitTime);
+  
   RCServo0.write(firstBridgeServoAngle);
   delay(bridgeDropWaitTime);
+  
   motor.speed(rightMotor, -80);
   motor.speed(leftMotor, 100);
   delay(100);

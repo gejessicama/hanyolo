@@ -1,11 +1,9 @@
-/*
-   Contains functions related to motion: tapeFollowing, edgeFollowing, driving forwards, stopping the motors
-*/
 #include "Motion.h"
 #include "Constants.h"
 
+
 /*
-   Initializes the motion object and saves all the needed menu values
+   Initializes the motion object and saves relevant values that were stored in EEPROM
 */
 Motion::Motion(int val) {
   onTape = EEPROM[0] * 10;
@@ -15,23 +13,28 @@ Motion::Motion(int val) {
   backupPowerMult = EEPROM[4] / 100.0;
 }
 
+
 /*
-   Resets PID values so that new tape following doesnt deal with old stuff
+   Resets values related to PID Control so that we aren't influenced by previous errors
 */
 void Motion::reset(uint8_t last) {
   lastError = 0;
   lastState = 0;
   lastOn = last;
-  // WATCH OUT FOR THIS
   count = 0;
 
 }
 
+
+/*
+   Finds the tape by sweeping to the left and then sweeping to the right
+   Stops when at least one QRD is over the tape
+*/
 bool Motion::findTapeLeft(uint16_t searchTime) {
   if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
     return true;
   }
-  
+
   driveMotors(slowPowerMult, -slowPowerMult);
   uint32_t startTime1 = millis();
   while (millis() < (startTime1 + (searchTime / 1.5))) {
@@ -40,7 +43,7 @@ bool Motion::findTapeLeft(uint16_t searchTime) {
       return true;
     }
   }
-    
+
   driveMotors(-slowPowerMult, slowPowerMult);
   uint32_t startTime2 = millis();
   while (millis() < (startTime2 + searchTime)) {
@@ -52,6 +55,11 @@ bool Motion::findTapeLeft(uint16_t searchTime) {
   }
 }
 
+
+/*
+   Finds the tape by sweeping to the right and then sweeping to the left
+   Stops when at least one QRD is over the tape
+*/
 bool Motion::findTapeRight(uint16_t searchTime) {
   if (!isOnWhite(rightMiddleQRD) || !isOnWhite(leftMiddleQRD)) {
     return true;
@@ -65,7 +73,7 @@ bool Motion::findTapeRight(uint16_t searchTime) {
       return true;
     }
   }
-  
+
   driveMotors(slowPowerMult, -slowPowerMult);
   uint32_t startTime2 = millis();
   while (millis() < (startTime2 + searchTime * 2)) {
@@ -76,6 +84,7 @@ bool Motion::findTapeRight(uint16_t searchTime) {
   }
   return false;
 }
+
 
 /*
    if all four qrds are reading white, then I want to find tape depending looking to the right
@@ -132,6 +141,7 @@ void Motion::pidControl(uint8_t proportionalGain, uint8_t derivativeGain, double
   count ++;
 }
 
+
 /*
    Drives both motors forward at a constant rate
 */
@@ -140,14 +150,17 @@ void Motion::driveMotors(double rightMultiplier, double leftMultiplier) {
   motor.speed(leftMotor, -baseDrivingSpeed * leftMultiplier);
 }
 
+
 /*
-   Hard stop to motors
+   Hard stop to both motors
+   Only useful if we were going forwards
 */
 void Motion::stopMotors() {
   motor.speed(rightMotor, -255);
   motor.speed(leftMotor, 255);
   motor.stop_all();
 }
+
 
 /*
    Returns true if the given QRD is over a white surface, false otherwise
@@ -160,6 +173,7 @@ boolean Motion::isOnWhite (uint8_t qrdPin) {
   }
 }
 
+
 /*
    Returns true if the given QRD is over a cliff, false otherwise
 */
@@ -170,4 +184,3 @@ boolean Motion::isOverCliff (uint8_t qrdPin) {
     return false;
   }
 }
-
