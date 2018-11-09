@@ -15,6 +15,8 @@ void setup() {
 
 void loop() {
 
+delay(1000);
+
 circleSpinLeft:
   driveMotors(1, driveRatio);
   delay(circleTime);
@@ -22,16 +24,24 @@ circleSpinLeft:
 
 clawDanceLeft:
   digitalWrite(toChewPinLeft, HIGH);
+  delay(500);
+  digitalWrite(toChewPinLeft, LOW);
   while(digitalRead(fromChewPin) == LOW){}
 
-circleSpinRight:
-  driveMotors(driveRatio, 1);
+delay (10000);
+
+circleSpinLeftAgain:
+  driveMotors(1, driveRatio);
   delay(circleTime);
   stopMotors();
 
 clawDanceRight:
   digitalWrite(toChewPinRight, HIGH);
+  delay(500);
+  digitalWrite(toChewPinRight, LOW);
   while(digitalRead(fromChewPin) == LOW){}
+
+delay (10000);
 
 }
 

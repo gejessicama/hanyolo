@@ -11,9 +11,9 @@
 #define toChewPinLeft 8
 #define toChewPinRight 9
 
-#define baseDrivingSpeed 153
+#define baseDrivingSpeed 140
 
-const double driveRatio = 0.5;
-const uint16_t circleTime = 6000;
+const double driveRatio = 0.3;
+const uint16_t circleTime = 5000;
 
 #endif
